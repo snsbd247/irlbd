@@ -39,7 +39,7 @@ This creates `release/` and `release/irlbd-release.zip`:
 
 | Folder | What it is | Goes to |
 |---|---|---|
-| `frontend/` | Static React build (`index.html`, `assets/`, `.htaccess`, `robots.txt`) | `public_html/` |
+| `frontend/` | Static React build (`index.html`, `assets/`, `.htaccess`, `robots.txt`, `share.php` + `share-config.php` for link previews) | `public_html/` |
 | `api-public/` | Laravel's public folder; its `index.php` boots the app from `../irlbd-api` | API subdomain document root |
 | `irlbd-api/` | Laravel app with production `vendor/` already installed | `/home/USER/irlbd-api` (outside `public_html`) |
 
@@ -257,7 +257,11 @@ Seeding happens only when the database has no pages, so it never overwrites edit
 - **Change the admin password** (Admin → My profile) if `ADMIN_PASSWORD` was ever shared.
 - Replace the placeholder images and verify the seeded facts (see README → *Before going live*).
 - **Sitemap:** Admin → General settings → SEO → *Regenerate sitemap.xml* (needs `SITEMAP_OUTPUT_PATH`). Then edit `public_html/robots.txt` so `Sitemap:` uses your domain. Regenerate after publishing major content. A live sitemap is always available at `https://api.example.com/api/v1/sitemap.xml`.
-- **Email notifications (optional):** create a mailbox in cPanel → *Email Accounts*, fill the `MAIL_*` values in `.env`, then set *Admin → Settings → Contact → Send enquiry notifications to*. Enquiries are always stored even if email fails.
+- **Email (strongly recommended):** create a mailbox in cPanel → *Email Accounts* and fill the `MAIL_*` values in `.env`. Email is needed for the *Forgot password* link, enquiry/quote/job-application notifications (set the addresses in *Admin → Settings → Contact*) and newsletters. Submissions are always stored even if email fails. Send yourself a test from *Admin → Newsletter → Send test* to confirm.
+- **Newsletters:** sending runs in batches of `NEWSLETTER_BATCH_SIZE` (default 20) while the admin keeps the *Send* page open, so no cron is needed. Many shared hosts cap outgoing email (often 100–500 per hour). Ask your host and keep the list size in mind. If a send is interrupted, open the campaign again and press *Resume sending*.
+- **Two-factor authentication:** each admin can turn it on in *My profile*. Store the recovery codes safely. If someone loses their phone, a super admin can reset their 2FA from *Users*.
+- **Link previews:** paste a page URL into the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) to check the title/image. Set a JPG/PNG *Social share image* first, because SVG images aren't shown by Facebook/WhatsApp.
+- **Bengali:** the website has an EN | বাংলা switch. Add Bengali versions of the content in each form's *বাংলা* card and in *Settings → বাংলা*. Empty fields show English.
 - **Cron is not required.** Queues run synchronously and expired sessions are cleaned up automatically during normal traffic.
 
 ---
@@ -268,10 +272,11 @@ Seeding happens only when the database has no pages, so it never overwrites edit
 |---|---|---|
 | Database | cPanel → **Backup** → *Download a MySQL Database Backup*, or phpMyAdmin → Export (SQL) | Daily/weekly, and before every update |
 | Uploaded media | Download `api.example.com/uploads/` (File Manager → Compress) | Weekly |
+| Applicant CVs | Download `irlbd-api/storage/app/private/cvs/` (personal data: store it securely and delete old CVs per your retention policy) | Weekly |
 | Configuration | Download `irlbd-api/.env` and keep it somewhere private (it contains secrets) | After every change |
 | Full account | cPanel → **Backup** → *Full Backup*, or JetBackup if the host provides it | Monthly |
 
-To restore: import the SQL in phpMyAdmin, re-upload `uploads/`, restore `.env`.
+To restore: import the SQL in phpMyAdmin, re-upload `uploads/` and `storage/app/private/cvs/`, restore `.env`.
 
 ---
 
@@ -281,10 +286,10 @@ To restore: import the SQL in phpMyAdmin, re-upload `uploads/`, restore `.env`.
 
 1. Back up the database, `uploads/` and `.env` (section 11).
 2. Build a new release on your PC.
-3. Upload the new `irlbd-api/` as `/home/USER/irlbd-api-new`, copy your `.env` into it, and copy `storage/app/private/installed.lock` if it exists.
+3. Upload the new `irlbd-api/` as `/home/USER/irlbd-api-new`, copy your `.env` into it, and copy the whole `storage/app/private/` folder (`installed.lock` and applicants' `cvs/`).
 4. Rename `irlbd-api` → `irlbd-api-previous`, then `irlbd-api-new` → `irlbd-api`.
 5. Replace `api.example.com/index.php` and `.htaccess` if they changed. **Keep `uploads/`.**
-6. Replace the files in `public_html/` with the new `frontend/` (keep `sitemap.xml`).
+6. Replace the files in `public_html/` with the new `frontend/` (keep `sitemap.xml`). The new build includes its own `share-config.php`.
 7. Apply migrations: SSH `php artisan migrate --force && php artisan optimize:clear && php artisan config:cache && php artisan route:cache`, **or** temporarily set `INSTALL_TOKEN` and call `/api/install` (migrate-only after the first install), then remove the token.
 
 **Roll back:** rename `irlbd-api-previous` back to `irlbd-api`, restore the previous frontend files and, if the update ran migrations, import the database backup taken in step 1.
@@ -307,9 +312,18 @@ To restore: import the SQL in phpMyAdmin, re-upload `uploads/`, restore `.env`.
 | Mixed-content warnings | `APP_URL`, `UPLOADS_URL` and `VITE_API_URL` must all be `https://`. |
 | Too many attempts (429) | Rate limit hit (login 5/min, forms 5/min). Wait a minute. |
 | Installer returns 404 | `INSTALL_TOKEN` is empty or shorter than 32 characters (this is the safe default). |
+| Whole site shows **500** right after uploading `public_html` | An Apache module used in `.htaccess` is missing. The file needs `mod_rewrite` and permission to set `Options -Indexes`; everything else is optional. Check `public_html/error_log` and ask the host to enable them. |
+| Link previews show no image/title | `share-config.php` is missing or has the wrong `api_url` (rebuild with the correct `API_URL`), or the share image is an SVG. |
+| "Forgot password" email never arrives | `MAIL_*` settings are wrong or the host blocks SMTP; check `storage/logs/laravel-*.log`. A super admin can still set a new password for the user. |
+| CV upload fails with "too large" | Raise `upload_max_filesize` / `post_max_size` in *Select PHP Version → Options* to at least `UPLOAD_CV_MAX_KB` (default 5 MB) and PDF limits (15 MB). |
+| Newsletter stops after some emails | The host's hourly email limit was reached. Wait, then press *Resume sending*. Already-sent addresses are skipped. |
 
 ---
 
 ## SEO notes
 
-The site is a client-rendered single-page app. Google renders JavaScript and picks up the per-page titles, descriptions and Open Graph tags that the app sets. Crawlers and social previews that don't execute JavaScript only see the defaults in `index.html`. For full social-preview support on every page, you could later add a prerendering step to the build or a small PHP endpoint that injects meta tags. Neither is required to deploy.
+The site is a client-rendered single-page app. Google renders JavaScript and picks up the per-page titles, descriptions and Open Graph tags that the app sets.
+
+**Social link previews:** WhatsApp, Facebook, LinkedIn, X, Telegram, Slack and similar crawlers don't run JavaScript. `public_html/.htaccess` recognises them by user agent and sends only them to `share.php`, which fetches `/api/v1/meta?path=…` and returns a tiny page with the right title, description and image. Visitors and Google always get the normal app. `share.php` reads the API address from `share-config.php`, which the release script writes from `API_URL`.
+
+Other crawlers that don't execute JavaScript only see the defaults in `index.html`. A prerendering step could be added later if needed.
