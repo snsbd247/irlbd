@@ -159,6 +159,10 @@ return [
         'whatsapp_number' => ['integrations', 'text', 'WhatsApp number (international format, e.g. 8801711000000)', ['nullable', 'regex:/^\+?[0-9]{8,15}$/'], true],
         'whatsapp_message' => ['integrations', 'text', 'Pre-filled WhatsApp message', 'nullable|string|max:200', true],
 
+        // Facebook Messenger chat button (m.me link; no Facebook script is loaded)
+        'messenger_enabled' => ['integrations', 'boolean', 'Show Facebook Messenger chat button', 'boolean', true],
+        'messenger_page' => ['integrations', 'text', 'Facebook Page username or ID (from facebook.com/USERNAME)', ['nullable', 'regex:/^[A-Za-z0-9.]{3,80}$/'], true],
+
         // Analytics (IDs only; the site loads the official scripts itself)
         'ga4_measurement_id' => ['integrations', 'text', 'Google Analytics 4 measurement ID (G-XXXXXXX)', ['nullable', 'regex:/^G-[A-Z0-9]{4,20}$/'], true],
         'facebook_pixel_id' => ['integrations', 'text', 'Facebook (Meta) Pixel ID', ['nullable', 'regex:/^[0-9]{6,20}$/'], true],

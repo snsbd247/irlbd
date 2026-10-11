@@ -59,16 +59,19 @@ class IntegrationsTest extends TestCase
 
         $this->actingAs($admin)->spa()->putJson('/api/v1/admin/settings', [
             'site_name' => 'IR', 'whatsapp_number' => '<script>', 'ga4_measurement_id' => 'UA-123', 'facebook_pixel_id' => 'abc',
-        ])->assertStatus(422)->assertJsonValidationErrors(['whatsapp_number', 'ga4_measurement_id', 'facebook_pixel_id']);
+            'messenger_page' => 'https://evil.example/x',
+        ])->assertStatus(422)->assertJsonValidationErrors(['whatsapp_number', 'ga4_measurement_id', 'facebook_pixel_id', 'messenger_page']);
 
         $this->actingAs($admin)->spa()->putJson('/api/v1/admin/settings', [
             'site_name' => 'IR', 'whatsapp_enabled' => true, 'whatsapp_number' => '+8801711000000',
             'whatsapp_message' => 'Hello', 'ga4_measurement_id' => 'G-ABC123XYZ', 'facebook_pixel_id' => '1234567890',
+            'messenger_enabled' => true, 'messenger_page' => 'irlimited.bd',
         ])->assertOk();
 
         $this->getJson('/api/v1/settings')
             ->assertJsonPath('whatsapp_enabled', true)
             ->assertJsonPath('whatsapp_number', '+8801711000000')
+            ->assertJsonPath('messenger_page', 'irlimited.bd')
             ->assertJsonPath('ga4_measurement_id', 'G-ABC123XYZ');
     }
 

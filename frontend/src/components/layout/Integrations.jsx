@@ -91,22 +91,29 @@ export function OrganizationJsonLd() {
   )
 }
 
-/** Floating WhatsApp chat button (bottom-left; back-to-top lives bottom-right). */
-export function WhatsAppButton() {
+/** Floating chat buttons (bottom-left; back-to-top lives bottom-right): WhatsApp and Messenger. */
+export function ChatButtons() {
   const t = useT()
   const { data: s = {} } = useSettings()
   const number = (s.whatsapp_number || '').replace(/[^\d]/g, '')
-  if (!s.whatsapp_enabled || number.length < 8) return null
+  const whatsapp = s.whatsapp_enabled && number.length >= 8
+  const page = /^[A-Za-z0-9.]{3,80}$/.test(s.messenger_page || '') ? s.messenger_page : null
+  const messenger = s.messenger_enabled && page
+  if (!whatsapp && !messenger) return null
   const text = s.whatsapp_message ? `?text=${encodeURIComponent(s.whatsapp_message)}` : ''
+  const base = 'flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition-transform hover:scale-105 focus-visible:outline-offset-4'
   return (
-    <a
-      href={`https://wa.me/${number}${text}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={t('Chat with us on WhatsApp')}
-      className="fixed bottom-5 left-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-105 focus-visible:outline-offset-4"
-    >
-      <BrandIcon name="whatsapp" className="h-7 w-7" />
-    </a>
+    <div className="fixed bottom-5 left-5 z-30 flex flex-col gap-3">
+      {messenger && (
+        <a href={`https://m.me/${page}`} target="_blank" rel="noopener noreferrer" aria-label={t('Chat with us on Messenger')} className={`${base} bg-gradient-to-br from-[#00B2FF] to-[#006AFF]`}>
+          <BrandIcon name="messenger" className="h-7 w-7" />
+        </a>
+      )}
+      {whatsapp && (
+        <a href={`https://wa.me/${number}${text}`} target="_blank" rel="noopener noreferrer" aria-label={t('Chat with us on WhatsApp')} className={`${base} bg-[#25D366]`}>
+          <BrandIcon name="whatsapp" className="h-7 w-7" />
+        </a>
+      )}
+    </div>
   )
 }

@@ -190,6 +190,7 @@ const BN = {
   'Need this service?': 'এই সেবা প্রয়োজন?',
   'Thank you for subscribing to our newsletter!': 'আমাদের নিউজলেটারে সাবস্ক্রাইব করার জন্য ধন্যবাদ!',
   'Chat with us on WhatsApp': 'হোয়াটসঅ্যাপে কথা বলুন',
+  'Chat with us on Messenger': 'মেসেঞ্জারে কথা বলুন',
 }
 
 const DICTIONARY = { bn: BN }

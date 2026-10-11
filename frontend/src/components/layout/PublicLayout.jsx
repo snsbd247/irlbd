@@ -3,7 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { useSettings } from '../../lib/queries'
 import Header from './Header'
 import Footer from './Footer'
-import { Analytics, OrganizationJsonLd, WhatsAppButton } from './Integrations'
+import { Analytics, ChatButtons, OrganizationJsonLd } from './Integrations'
 import { CompareBar } from '../../pages/ComparePage'
 import { useLang } from '../../lib/i18n'
 
@@ -48,7 +48,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <Footer />
-      <WhatsAppButton />
+      <ChatButtons />
       <CompareBar />
       <Analytics />
       <OrganizationJsonLd />
