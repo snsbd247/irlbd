@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
   Award, Boxes, MailPlus, ScrollText, Factory, BriefcaseBusiness, Camera, UserSearch, MessageSquareQuote, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
-  FileSignature, LogOut, Mail, Menu, Navigation, Newspaper, Package, PanelsTopLeft, Settings, Shield, Tags, User, UserCog, Users, X,
+  FileSignature, LogOut, Mail, Menu, Navigation, Newspaper, Package, PanelsTopLeft, Settings, Shield, Store, Tags, User, UserCog, Users, X,
 } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { api } from '../lib/api'
@@ -42,6 +42,7 @@ const NAV = [
       { to: '/admin/r/clients', label: 'Clients', icon: Building2, perm: 'clients' },
       { to: '/admin/r/testimonials', label: 'Testimonials', icon: MessageSquareQuote, perm: 'clients' },
       { to: '/admin/r/offices', label: 'Offices', icon: Building2, perm: 'contact' },
+      { to: '/admin/r/dealers', label: 'Dealers', icon: Store, perm: 'contact' },
       { to: '/admin/r/faqs', label: 'FAQs', icon: CircleHelp, perm: 'contact' },
       { to: '/admin/media', label: 'Media library', icon: Images, perm: 'media' },
     ],

@@ -144,6 +144,15 @@ const BN = {
   'Any size, colour, neck finish or printing on request.': 'চাহিদা অনুযায়ী যেকোনো সাইজ, রং, নেক ফিনিশ বা প্রিন্টিং।',
   'Nationwide delivery': 'দেশব্যাপী ডেলিভারি',
   'On-time delivery across Bangladesh and export on request.': 'সারা বাংলাদেশে সময়মতো ডেলিভারি, চাহিদায় রপ্তানি।',
+  // Dealers
+  'Find a Dealer Near You': 'আপনার কাছের ডিলার খুঁজুন',
+  'District': 'জেলা',
+  'All districts': 'সব জেলা',
+  'No dealers listed yet': 'এখনো কোনো ডিলার যুক্ত করা হয়নি',
+  'Please contact us and we will connect you with the nearest dealer.': 'আমাদের সাথে যোগাযোগ করুন, আমরা আপনাকে নিকটস্থ ডিলারের সাথে যুক্ত করে দেব।',
+  'Dealer': 'ডিলার',
+  'Distributor': 'ডিস্ট্রিবিউটর',
+  'Agent': 'এজেন্ট',
   // Quote tracking
   'Your reference number': 'আপনার রেফারেন্স নম্বর',
   'We have also emailed it to you. Use it to track your request.': 'এটি আপনার ইমেইলেও পাঠানো হয়েছে। এটি দিয়ে অনুরোধের অবস্থা দেখতে পারবেন।',

@@ -1,3 +1,4 @@
+import { DISTRICTS } from '../lib/districts'
 /**
  * Declarative definitions for the generic admin CRUD screens.
  * Every resource maps to /api/v1/admin/{endpoint} and is guarded by `permission`.
@@ -384,6 +385,36 @@ export const RESOURCES = {
     ],
   },
 
+  dealers: {
+    translatable: ['name', 'address', 'contact_person'],
+    title: 'Dealers & distributors',
+    singular: 'dealer',
+    permission: 'contact',
+    sortable: true,
+    description: 'Shown on the "Dealers & Distributors" page (publish that page under Pages once dealers are added).',
+    filters: [
+      { name: 'type', label: 'Type', options: [['dealer', 'Dealer'], ['distributor', 'Distributor'], ['agent', 'Agent']] },
+      { name: 'district', label: 'District', options: DISTRICTS.map(([d]) => [d, d]) },
+    ],
+    columns: [
+      { key: 'name', label: 'Name', sub: (r) => r.phone },
+      { key: 'district', label: 'District' },
+      { key: 'type', label: 'Type' },
+      { key: 'is_active', label: 'Visible', type: 'bool' },
+    ],
+    fields: [
+      { name: 'name', label: 'Business name', type: 'text', required: true },
+      { name: 'type', label: 'Type', type: 'select', required: true, default: 'dealer', options: [['dealer', 'Dealer'], ['distributor', 'Distributor'], ['agent', 'Agent']] },
+      { name: 'district', label: 'District', type: 'select', required: true, options: DISTRICTS.map(([d]) => [d, d]) },
+      { name: 'contact_person', label: 'Contact person', type: 'text' },
+      { name: 'phone', label: 'Phone', type: 'text' },
+      { name: 'email', label: 'Email', type: 'email' },
+      { name: 'address', label: 'Address', type: 'textarea', rows: 3, span: 'full' },
+      { name: 'map_url', label: 'Google Maps link (optional)', type: 'url', span: 'full', placeholder: 'https://maps.app.goo.gl/…' },
+      active,
+    ],
+  },
+
   faqs: {
     translatable: ['question', 'answer'],
     title: 'FAQs',
@@ -426,7 +457,7 @@ export const RESOURCES = {
     filters: [{ name: 'status', label: 'Status', options: [['published', 'Published'], ['draft', 'Draft']] }],
     columns: [
       { key: 'title', label: 'Title', sub: (r) => r.path },
-      { key: 'template', label: 'Type', render: (r) => (r.is_home ? 'Homepage' : { sections: 'Content page', products: 'Product catalog', news: 'News listing', contact: 'Contact page', gallery: 'Photo gallery', careers: 'Careers' }[r.template]) },
+      { key: 'template', label: 'Type', render: (r) => (r.is_home ? 'Homepage' : { sections: 'Content page', products: 'Product catalog', news: 'News listing', contact: 'Contact page', gallery: 'Photo gallery', careers: 'Careers', dealers: 'Dealer finder' }[r.template]) },
       { key: 'sections_count', label: 'Sections' },
       { key: 'status', label: 'Status', type: 'status' },
     ],

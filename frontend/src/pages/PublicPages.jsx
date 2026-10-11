@@ -19,6 +19,7 @@ import ContactModule from './ContactModule'
 import { GalleryModule } from './GalleryPages'
 import { CareersModule } from './CareerPages'
 import { useT } from '../lib/i18n'
+import DealersModule from './DealersModule'
 
 const isNotFound = (error) => error?.response?.status === 404
 
@@ -51,6 +52,7 @@ const MODULES = {
   contact: () => <ContactModule key="contact-module" />,
   gallery: () => <GalleryModule key="gallery-module" />,
   careers: (section) => <CareersModule key="careers-module" section={section} />,
+  dealers: (section) => <DealersModule key="dealers-module" section={section} />,
 }
 
 export function DynamicPage() {

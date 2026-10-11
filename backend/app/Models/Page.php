@@ -17,7 +17,7 @@ class Page extends Model
     /** Fields that can be translated (see HasTranslations). */
     protected array $translatable = ['title', 'hero_title', 'hero_subtitle', 'content', 'meta_title', 'meta_description'];
 
-    public const TEMPLATES = ['sections', 'products', 'news', 'contact', 'gallery', 'careers'];
+    public const TEMPLATES = ['sections', 'products', 'news', 'contact', 'gallery', 'careers', 'dealers'];
 
     protected $fillable = [
         'title', 'slug', 'template', 'hero_title', 'hero_subtitle', 'hero_image', 'content',

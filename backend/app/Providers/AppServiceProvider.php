@@ -36,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         Models\Certification::class => Policies\QualityPolicy::class,
         Models\Office::class => Policies\ContactContentPolicy::class,
         Models\Faq::class => Policies\ContactContentPolicy::class,
+        Models\Dealer::class => Policies\ContactContentPolicy::class,
         Models\ContactSubmission::class => Policies\EnquiryPolicy::class,
         Models\QuoteRequest::class => Policies\EnquiryPolicy::class,
         Models\NewsletterSubscriber::class => Policies\SubscriberPolicy::class,
@@ -58,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Database\Eloquent\Relations\Relation::morphMap(collect([
             'Page', 'PageSection', 'SectionItem', 'MenuItem', 'HeroSlide', 'Product', 'ProductCategory', 'ProductSpecification',
             'ProductVariant', 'Service', 'Client', 'NewsPost', 'NewsCategory', 'TeamMember', 'Milestone', 'Certification',
-            'Office', 'Faq', 'Testimonial', 'GalleryAlbum', 'GalleryImage', 'Industry', 'JobPost',
+            'Office', 'Faq', 'Testimonial', 'GalleryAlbum', 'GalleryImage', 'Industry', 'JobPost', 'Dealer',
         ])->mapWithKeys(fn ($name) => [$name => 'App\\Models\\'.$name])->all());
 
         foreach ($this->policies as $model => $policy) {

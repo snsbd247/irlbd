@@ -49,7 +49,7 @@ class ContentSeeder extends Seeder
         $this->contactContent();
         $pages = $this->pages();
         $this->menus($pages);
-        $this->call([ShowcaseContentSeeder::class, CareersContentSeeder::class, ProductExtrasSeeder::class, BanglaContentSeeder::class]);
+        $this->call([ShowcaseContentSeeder::class, CareersContentSeeder::class, ProductExtrasSeeder::class, DealersContentSeeder::class, BanglaContentSeeder::class]);
     }
 
     // ------------------------------------------------------------------ assets

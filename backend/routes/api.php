@@ -45,6 +45,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
 
         Route::get('contact-info', [PublicApi\ContactController::class, 'info'])->name('contact.info');
 
+        Route::get('dealers', [PublicApi\DealerController::class, 'index'])->name('dealers.index');
         Route::get('jobs', [PublicApi\CareerController::class, 'index'])->name('jobs.index');
         Route::get('jobs/{slug}', [PublicApi\CareerController::class, 'show'])->name('jobs.show');
         Route::get('gallery', [PublicApi\GalleryController::class, 'index'])->name('gallery.index');
@@ -126,6 +127,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
                 'certifications' => Admin\CertificationController::class,
                 'offices' => Admin\OfficeController::class,
                 'faqs' => Admin\FaqController::class,
+                'dealers' => Admin\DealerController::class,
                 'enquiries' => Admin\EnquiryController::class,
                 'quote-requests' => Admin\QuoteRequestController::class,
                 'job-posts' => Admin\JobPostController::class,

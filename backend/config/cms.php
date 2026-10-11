@@ -76,7 +76,7 @@ return [
         'news' => 'News & categories',
         'history' => 'History milestones',
         'quality' => 'Quality control & certifications',
-        'contact' => 'Offices & FAQs',
+        'contact' => 'Offices, dealers & FAQs',
         'enquiries' => 'Contact enquiries',
         'subscribers' => 'Newsletter subscribers',
         'media' => 'Media library',
