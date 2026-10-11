@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Casts\SanitizedHtml;
 use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\Sortable;
@@ -10,7 +11,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductCategory extends Model
 {
-    use HasSlug, Sortable;
+    use HasSlug, Sortable, HasTranslations;
+
+    /** Fields that can be translated (see HasTranslations). */
+    protected array $translatable = ['name', 'short_description', 'description'];
 
     protected string $slugFrom = 'name';
 

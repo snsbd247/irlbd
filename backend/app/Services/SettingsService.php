@@ -37,6 +37,17 @@ class SettingsService
 
         $values['map_embed_url'] = $this->safeMapUrl($values['map_embed_url'] ?? null);
 
+        // Translated text for the current (non-default) language, falling back to the default.
+        $locale = app()->getLocale();
+        if ($locale !== config('cms.default_locale')) {
+            foreach ($this->translations()[$locale] ?? [] as $key => $text) {
+                if (filled($text) && array_key_exists($key, $values)) {
+                    $values[$key] = $text;
+                }
+            }
+        }
+        $values['locale'] = $locale;
+
         return $values;
     }
 
@@ -66,6 +77,51 @@ class SettingsService
         }
 
         return $url;
+    }
+
+    /**
+     * Setting translations: ['bn' => ['footer_about' => '...']]. Stored in the translations
+     * table (type "Setting") and deliberately kept out of the settings cache.
+     */
+    public function translations(): array
+    {
+        $ids = Setting::query()->pluck('key', 'id');
+        $out = [];
+        \App\Models\Translation::where('translatable_type', 'Setting')->get()
+            ->each(function ($t) use ($ids, &$out) {
+                if (isset($ids[$t->translatable_id])) {
+                    $out[$t->locale][$ids[$t->translatable_id]] = $t->value;
+                }
+            });
+
+        return $out;
+    }
+
+    public function saveTranslations(?array $byLocale): void
+    {
+        $allowed = config('cms.translatable_settings');
+        $locales = array_diff(array_keys(config('cms.locales')), [config('cms.default_locale')]);
+
+        foreach ($byLocale ?? [] as $locale => $values) {
+            if (! in_array($locale, $locales, true) || ! is_array($values)) {
+                continue;
+            }
+            foreach ($values as $key => $value) {
+                if (! in_array($key, $allowed, true) || ! isset(config('cms.settings')[$key])) {
+                    continue;
+                }
+                $setting = Setting::firstOrCreate(['key' => $key], [
+                    'group' => config('cms.settings')[$key][0], 'type' => config('cms.settings')[$key][1], 'is_public' => true,
+                ]);
+                $value = is_string($value) ? trim(strip_tags($value)) : null;
+                $match = ['translatable_type' => 'Setting', 'translatable_id' => $setting->id, 'locale' => $locale, 'field' => 'value'];
+                if ($value === null || $value === '') {
+                    \App\Models\Translation::where($match)->delete();
+                } else {
+                    \App\Models\Translation::updateOrCreate($match, ['value' => mb_substr($value, 0, 1000)]);
+                }
+            }
+        }
     }
 
     public function save(array $data): void

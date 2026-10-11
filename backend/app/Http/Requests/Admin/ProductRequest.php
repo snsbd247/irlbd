@@ -32,6 +32,10 @@ class ProductRequest extends AdminRequest
             'variants.*.neck_size' => 'nullable|string|max:60',
             'variants.*.color' => 'nullable|string|max:80',
             'variants.*.moq' => 'nullable|string|max:60',
+            'specifications.*.translations' => 'nullable|array',
+            'specifications.*.translations.*.*' => 'nullable|string|max:255',
+            'variants.*.translations' => 'nullable|array',
+            'variants.*.translations.*.*' => 'nullable|string|max:120',
             'industry_ids' => 'nullable|array|max:30',
             'industry_ids.*' => 'integer|exists:industries,id',
         ];

@@ -26,7 +26,7 @@ class SettingsController extends Controller
             }
         }
 
-        return response()->json(['values' => $values, 'image_urls' => $urls]);
+        return response()->json(['values' => $values, 'image_urls' => $urls, 'translations' => (object) $this->settings->translations()]);
     }
 
     public function update(Request $request): JsonResponse
@@ -52,6 +52,11 @@ class SettingsController extends Controller
         }
 
         $this->settings->save($data);
+
+        if ($request->has('translations')) {
+            $translations = $request->validate(['translations' => 'nullable|array', 'translations.*' => 'array', 'translations.*.*' => 'nullable|string|max:1000'])['translations'] ?? [];
+            $this->settings->saveTranslations($translations);
+        }
 
         return $this->show();
     }

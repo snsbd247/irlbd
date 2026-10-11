@@ -34,6 +34,11 @@ class SectionRequest extends AdminRequest
             'items.*.image' => $this->media(),
             'items.*.link_url' => $this->link(),
             'items.*.is_active' => 'boolean',
+            'items.*.translations' => 'nullable|array',
+            'items.*.translations.*.*' => 'nullable|string|max:5000',
+            'translations' => 'nullable|array',
+            'translations.*' => 'array',
+            'translations.*.*' => 'nullable|string|max:100000',
         ];
     }
 

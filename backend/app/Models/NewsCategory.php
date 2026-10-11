@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\Sortable;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class NewsCategory extends Model
 {
-    use HasSlug, Sortable;
+    use HasSlug, Sortable, HasTranslations;
+
+    /** Fields that can be translated (see HasTranslations). */
+    protected array $translatable = ['name'];
 
     protected string $slugFrom = 'name';
 

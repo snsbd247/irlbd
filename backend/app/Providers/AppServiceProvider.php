@@ -54,6 +54,13 @@ class AppServiceProvider extends ServiceProvider
     {
         JsonResource::withoutWrapping();
 
+        // Short, stable type names in the translations table (not full class names).
+        \Illuminate\Database\Eloquent\Relations\Relation::morphMap(collect([
+            'Page', 'PageSection', 'SectionItem', 'MenuItem', 'HeroSlide', 'Product', 'ProductCategory', 'ProductSpecification',
+            'ProductVariant', 'Service', 'Client', 'NewsPost', 'NewsCategory', 'TeamMember', 'Milestone', 'Certification',
+            'Office', 'Faq', 'Testimonial', 'GalleryAlbum', 'GalleryImage', 'Industry', 'JobPost',
+        ])->mapWithKeys(fn ($name) => [$name => 'App\\Models\\'.$name])->all());
+
         foreach ($this->policies as $model => $policy) {
             Gate::policy($model, $policy);
         }

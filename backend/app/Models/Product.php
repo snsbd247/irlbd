@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Casts\SanitizedHtml;
 use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\Publishable;
@@ -14,7 +15,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
-    use HasSlug, Publishable, Sortable;
+    use HasSlug, Publishable, Sortable, HasTranslations;
+
+    /** Fields that can be translated (see HasTranslations). */
+    protected array $translatable = ['name', 'short_description', 'description', 'meta_title', 'meta_description'];
 
     protected string $slugFrom = 'name';
 
@@ -33,6 +37,15 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    protected static function booted(): void
+    {
+        // Specs and variants are removed by the FK cascade; clear their translations too.
+        static::deleting(function (self $product) {
+            Translation::forget('ProductSpecification', $product->specifications()->pluck('id'));
+            Translation::forget('ProductVariant', $product->variants()->pluck('id'));
+        });
     }
 
     public function variants(): HasMany

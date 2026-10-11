@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Casts\SanitizedHtml;
 use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\Publishable;
@@ -12,7 +13,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JobPost extends Model
 {
-    use HasSlug, Publishable, Sortable;
+    use HasSlug, Publishable, Sortable, HasTranslations;
+
+    /** Fields that can be translated (see HasTranslations). */
+    protected array $translatable = ['title', 'department', 'location', 'summary', 'description'];
 
     public const TYPES = ['full_time', 'part_time', 'contract', 'internship'];
 

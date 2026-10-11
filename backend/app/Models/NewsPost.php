@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Casts\SanitizedHtml;
 use App\Models\Concerns\HasSlug;
 use App\Models\Concerns\Publishable;
@@ -10,7 +11,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NewsPost extends Model
 {
-    use HasSlug, Publishable;
+    use HasSlug, Publishable, HasTranslations;
+
+    /** Fields that can be translated (see HasTranslations). */
+    protected array $translatable = ['title', 'excerpt', 'content', 'meta_title', 'meta_description'];
 
     protected $fillable = [
         'news_category_id', 'author_id', 'title', 'slug', 'excerpt', 'content', 'featured_image',

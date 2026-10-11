@@ -23,7 +23,7 @@ class GalleryAlbumResource extends BaseResource
             'images_count' => $this->whenCounted('images'),
             'images' => $this->whenLoaded('images', fn () => $this->images->map(fn ($i) => [
                 'id' => $i->id, 'path' => $i->path, 'url' => $this->url($i->path), 'alt' => $i->caption, 'caption' => $i->caption,
-            ])),
+            ] + ($this->isAdmin($request) ? ['alt_bn' => $i->translationsArray()['bn']['caption'] ?? null] : []))),
         ];
     }
 }

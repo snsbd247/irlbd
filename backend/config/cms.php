@@ -26,6 +26,18 @@ return [
     // Emails per newsletter batch request. Keep within your host's hourly email limit.
     'newsletter_batch_size' => (int) env('NEWSLETTER_BATCH_SIZE', 20),
 
+    // Website languages. The default language is stored in the records themselves;
+    // other languages are optional translations that fall back to the default.
+    'default_locale' => 'en',
+    'locales' => ['en' => 'English', 'bn' => 'বাংলা'],
+
+    // Public settings whose text can be translated.
+    'translatable_settings' => [
+        'site_tagline', 'topbar_text', 'header_cta_label', 'footer_about', 'copyright_text', 'newsletter_title',
+        'newsletter_text', 'cta_title', 'cta_subtitle', 'cta_button_label', 'contact_address', 'office_hours',
+        'seo_title', 'seo_description', 'brochure_label', 'whatsapp_message',
+    ],
+
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
 
     // Absolute path where the generated sitemap.xml should be written

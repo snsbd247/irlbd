@@ -16,6 +16,7 @@ class GalleryAlbumRequest extends AdminRequest
             'images' => 'nullable|array|max:200',
             'images.*.path' => ['required', ...$this->media()],
             'images.*.alt' => 'nullable|string|max:255',
+            'images.*.alt_bn' => 'nullable|string|max:255',
         ];
     }
 }

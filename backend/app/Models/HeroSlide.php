@@ -2,12 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\Sortable;
 use Illuminate\Database\Eloquent\Model;
 
 class HeroSlide extends Model
 {
-    use Sortable;
+    use Sortable, HasTranslations;
+
+    /** Fields that can be translated (see HasTranslations). */
+    protected array $translatable = ['eyebrow', 'title', 'highlight', 'title_suffix', 'subtitle', 'primary_label', 'secondary_label'];
 
     protected $fillable = [
         'eyebrow', 'title', 'highlight', 'title_suffix', 'subtitle', 'image',

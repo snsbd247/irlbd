@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Requests\Admin\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\Translation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -44,9 +45,11 @@ class ProductController extends CrudController
         }
 
         if ($request->has('variants')) {
+            Translation::forget('ProductVariant', $model->variants()->pluck('id'));
             $model->variants()->delete();
             foreach (array_values($request->validated('variants') ?? []) as $i => $variant) {
-                $model->variants()->create(collect($variant)->only(\App\Models\ProductVariant::FIELDS)->all() + ['sort_order' => $i + 1]);
+                $row = $model->variants()->create(collect($variant)->only(\App\Models\ProductVariant::FIELDS)->all() + ['sort_order' => $i + 1]);
+                $row->syncTranslations($request->input("variants.$i.translations"));
             }
         }
 
@@ -55,9 +58,11 @@ class ProductController extends CrudController
         }
 
         if ($request->has('specifications')) {
+            Translation::forget('ProductSpecification', $model->specifications()->pluck('id'));
             $model->specifications()->delete();
             foreach (array_values($request->validated('specifications') ?? []) as $i => $spec) {
-                $model->specifications()->create(['label' => $spec['label'], 'value' => $spec['value'], 'sort_order' => $i + 1]);
+                $row = $model->specifications()->create(['label' => $spec['label'], 'value' => $spec['value'], 'sort_order' => $i + 1]);
+                $row->syncTranslations($request->input("specifications.$i.translations"));
             }
         }
     }

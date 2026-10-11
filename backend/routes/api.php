@@ -19,12 +19,12 @@ Route::post('install', InstallController::class)->middleware('throttle:5,1')->na
 Route::prefix('v1')->name('v1.')->group(function () {
 
     // ---------------------------------------------------------------- Public
-    Route::middleware('throttle:api')->group(function () {
+    Route::middleware(['throttle:api', \App\Http\Middleware\SetLocale::class])->group(function () {
         Route::get('settings', [PublicApi\SiteController::class, 'settings'])->name('settings');
         Route::get('navigation', [PublicApi\SiteController::class, 'navigation'])->name('navigation');
         Route::get('search', [PublicApi\SiteController::class, 'search'])->name('search');
         Route::get('sitemap.xml', [PublicApi\SiteController::class, 'sitemap'])->name('sitemap');
-        Route::get('meta', PublicApi\MetaController::class)->name('meta');
+        Route::get('meta', PublicApi\MetaController::class)->name('meta'); // honours ?lang via SetLocale
 
         Route::get('home', [PublicApi\PageController::class, 'home'])->name('home');
         Route::get('pages/{slug}', [PublicApi\PageController::class, 'show'])->name('pages.show');

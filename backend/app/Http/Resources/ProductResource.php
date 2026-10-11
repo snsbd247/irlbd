@@ -29,8 +29,9 @@ class ProductResource extends BaseResource
             ])),
             'specifications' => $this->whenLoaded('specifications', fn () => $this->specifications->map(fn ($s) => [
                 'id' => $s->id, 'label' => $s->label, 'value' => $s->value,
-            ])),
-            'variants' => $this->whenLoaded('variants', fn () => $this->variants->map(fn ($v) => $v->only(['id', 'name', 'capacity', 'weight', 'neck_size', 'color', 'moq']))),
+            ] + ($this->isAdmin($request) ? ['translations' => (object) $s->translationsArray()] : []))),
+            'variants' => $this->whenLoaded('variants', fn () => $this->variants->map(fn ($v) => $v->only(['id', 'name', 'capacity', 'weight', 'neck_size', 'color', 'moq'])
+                + ($this->isAdmin($request) ? ['translations' => (object) $v->translationsArray()] : []))),
             'industries' => $this->whenLoaded('industries', fn () => $this->isAdmin($request)
                 ? $this->industries->map(fn ($i) => ['id' => $i->id, 'name' => $i->name, 'slug' => $i->slug, 'icon' => $i->icon])
                 : $this->industries->where('is_active', true)->values()->map(fn ($i) => ['id' => $i->id, 'name' => $i->name, 'slug' => $i->slug, 'icon' => $i->icon])),

@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\SectionRequest;
 use App\Http\Resources\PageSectionResource;
 use App\Models\Page;
 use App\Models\PageSection;
+use App\Models\Translation;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class SectionController extends Controller
     {
         $this->authorize('view', $page);
 
-        return PageSectionResource::collection($page->sections()->with('items')->get());
+        return PageSectionResource::collection($page->sections()->with(['items.translations', 'translations'])->get());
     }
 
     public function store(SectionRequest $request, Page $page): JsonResponse
@@ -37,6 +38,7 @@ class SectionController extends Controller
                 'type' => $request->validated('type'),
                 'sort_order' => (int) $page->sections()->max('sort_order') + 1,
             ]);
+            $section->syncTranslations($request->validated('translations'));
             $this->syncItems($section, $request);
 
             return $section;
@@ -58,6 +60,7 @@ class SectionController extends Controller
 
         DB::transaction(function () use ($request, $section) {
             $section->update($this->fields($request));
+            $section->syncTranslations($request->validated('translations'));
             $this->syncItems($section, $request);
         });
 
@@ -88,7 +91,7 @@ class SectionController extends Controller
 
     protected function fields(SectionRequest $request): array
     {
-        $data = collect($request->validated())->except(['type', 'items', 'settings'])->all();
+        $data = collect($request->validated())->except(['type', 'items', 'settings', 'translations'])->all();
         $data['settings'] = $request->cleanSettings();
 
         return $data;
@@ -118,12 +121,15 @@ class SectionController extends Controller
             $existing = ! empty($item['id']) ? $section->items()->whereKey($item['id'])->first() : null;
             if ($existing) {
                 $existing->update($attributes);
-                $keep[] = $existing->id;
             } else {
-                $keep[] = $section->items()->create($attributes)->id;
+                $existing = $section->items()->create($attributes);
             }
+            $existing->syncTranslations($item['translations'] ?? null);
+            $keep[] = $existing->id;
         }
 
-        $section->items()->whereNotIn('id', $keep)->delete();
+        $removed = $section->items()->whereNotIn('id', $keep);
+        Translation::forget('SectionItem', (clone $removed)->pluck('id'));
+        $removed->delete();
     }
 }

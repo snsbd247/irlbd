@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Shared admin CRUD: paginated + searchable + filterable listing, create, update,
@@ -102,6 +103,7 @@ abstract class CrudController extends Controller
         $model = DB::transaction(function () use ($request) {
             $model = $this->model::create($this->prepare($request->validated(), $request, null));
             $this->afterSave($model, $request);
+            $this->saveTranslations($model, $request);
 
             return $model;
         });
@@ -118,6 +120,7 @@ abstract class CrudController extends Controller
         DB::transaction(function () use ($model, $request) {
             $model->update($this->prepare($request->validated(), $request, $model));
             $this->afterSave($model, $request);
+            $this->saveTranslations($model, $request);
         });
 
         return new $this->resource($model->fresh($this->showWith ?: $this->with));
@@ -163,6 +166,26 @@ abstract class CrudController extends Controller
 
     /** Hook: persist relations after the main model is saved. */
     protected function afterSave(Model $model, FormRequest $request): void {}
+
+    /** Validates and stores `translations: {bn: {field: value}}` for translatable models. */
+    protected function saveTranslations(Model $model, FormRequest $request): void
+    {
+        if (! method_exists($model, 'syncTranslations') || ! $request->has('translations')) {
+            return;
+        }
+
+        $data = Validator::make($request->only('translations'), self::translationRules())->validate();
+        $model->syncTranslations($data['translations'] ?? []);
+    }
+
+    public static function translationRules(string $prefix = 'translations'): array
+    {
+        return [
+            $prefix => 'nullable|array',
+            $prefix.'.*' => 'array',
+            $prefix.'.*.*' => 'nullable|string|max:200000',
+        ];
+    }
 
     /** Hook: guard or clean up before delete. */
     protected function beforeDelete(Model $model): void {}

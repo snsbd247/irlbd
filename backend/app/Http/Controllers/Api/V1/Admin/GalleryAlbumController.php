@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Requests\Admin\GalleryAlbumRequest;
 use App\Http\Resources\GalleryAlbumResource;
 use App\Models\GalleryAlbum;
+use App\Models\Translation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -31,9 +32,11 @@ class GalleryAlbumController extends CrudController
             return;
         }
 
+        Translation::forget('GalleryImage', $model->images()->pluck('id'));
         $model->images()->delete();
         foreach (array_values($request->validated('images') ?? []) as $i => $image) {
-            $model->images()->create(['path' => $image['path'], 'caption' => $image['alt'] ?? null, 'sort_order' => $i + 1]);
+            $row = $model->images()->create(['path' => $image['path'], 'caption' => $image['alt'] ?? null, 'sort_order' => $i + 1]);
+            $row->syncTranslations(isset($image['alt_bn']) ? ['bn' => ['caption' => $image['alt_bn']]] : null);
         }
     }
 }

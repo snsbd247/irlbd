@@ -34,6 +34,9 @@ class MetaController extends Controller
             'upload_max_kb' => config('cms.uploads.max_kb'),
             'contact_subjects' => ContactRequest::SUBJECTS,
             'frontend_url' => config('cms.frontend_url'),
+            'locales' => config('cms.locales'),
+            'default_locale' => config('cms.default_locale'),
+            'translatable_settings' => config('cms.translatable_settings'),
         ]);
     }
 
