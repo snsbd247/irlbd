@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowRight, CalendarDays, CircleCheck, FileSearch, MessageSquareQuote, Tag } from 'lucide-react'
+import { ArrowRight, CalendarDays, CircleCheck, FileDown, FileSearch, MessageSquareQuote, Tag } from 'lucide-react'
+import { JsonLd } from '../components/layout/Integrations'
 import Seo from '../components/Seo'
 import PageHero from '../components/layout/PageHero'
 import SectionRenderer from '../components/sections/SectionRenderer'
@@ -92,6 +93,19 @@ export function ProductDetail() {
   return (
     <>
       <Seo title={product.meta_title || product.name} description={product.meta_description || product.short_description} image={product.image_url} type="product" />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          sku: product.sku || undefined,
+          description: product.short_description || stripHtml(product.description).slice(0, 300) || undefined,
+          image: gallery.map((g) => g.url),
+          category: product.category?.name,
+          brand: { '@type': 'Brand', name: 'IR Limited' },
+          additionalProperty: (product.specifications || []).map((sp) => ({ '@type': 'PropertyValue', name: sp.label, value: sp.value })),
+        }}
+      />
       <PageHero title={product.name} subtitle={product.category?.name} image={product.category?.image_url} crumbs={crumbs} />
       <section className="py-14">
         <div className="container-x grid gap-10 lg:grid-cols-2">
@@ -140,6 +154,11 @@ export function ProductDetail() {
               <Link to={quoteUrl} className="btn-primary px-6 py-3">
                 <MessageSquareQuote className="h-4 w-4" aria-hidden="true" /> Request a Quote
               </Link>
+              {product.datasheet_url && (
+                <a href={product.datasheet_url} target="_blank" rel="noopener noreferrer" className="btn-outline px-6 py-3">
+                  <FileDown className="h-4 w-4" aria-hidden="true" /> Download Datasheet
+                </a>
+              )}
               <Link to="/products" className="btn-outline px-6 py-3">Back to Products</Link>
             </div>
           </div>
@@ -183,6 +202,18 @@ export function NewsDetail() {
   return (
     <>
       <Seo title={post.meta_title || post.title} description={post.meta_description || post.excerpt || stripHtml(post.content).slice(0, 160)} image={post.featured_image_url} type="article" />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'NewsArticle',
+          headline: post.title,
+          datePublished: post.published_at,
+          dateModified: post.updated_at,
+          image: post.featured_image_url ? [post.featured_image_url] : undefined,
+          description: post.excerpt || undefined,
+          publisher: { '@type': 'Organization', name: 'IR Limited' },
+        }}
+      />
       <PageHero title={post.title} crumbs={[{ label: 'News', href: '/news' }, { label: post.title }]}>
         <p className="mt-4 flex flex-wrap items-center gap-4 text-sm text-white/85">
           <span className="flex items-center gap-1.5"><CalendarDays className="h-4 w-4" aria-hidden="true" /> <time dateTime={post.published_at}>{formatDate(post.published_at, { day: 'numeric', month: 'long', year: 'numeric' })}</time></span>

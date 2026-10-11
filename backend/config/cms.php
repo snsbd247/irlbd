@@ -31,6 +31,7 @@ return [
 
     'uploads' => [
         'max_kb' => (int) env('UPLOAD_MAX_KB', 5120),
+        'document_max_kb' => (int) env('UPLOAD_DOCUMENT_MAX_KB', 15360),
         'max_dimension' => (int) env('UPLOAD_MAX_DIMENSION', 2000),
         // Raster images only. SVG is intentionally excluded (it can carry script).
         'mimes' => [
@@ -40,8 +41,10 @@ return [
             'image/gif' => 'gif',
             'image/x-icon' => 'ico',
             'image/vnd.microsoft.icon' => 'ico',
+            // Documents (brochures, datasheets). Stored as-is after a %PDF- signature check.
+            'application/pdf' => 'pdf',
         ],
-        'folders' => ['general', 'branding', 'pages', 'products', 'news', 'team', 'clients', 'certifications', 'history', 'slides'],
+        'folders' => ['general', 'branding', 'pages', 'products', 'news', 'team', 'clients', 'certifications', 'history', 'slides', 'gallery', 'documents'],
     ],
 
     'permission_modules' => [
@@ -131,6 +134,19 @@ return [
         // Map
         'map_embed_url' => ['map', 'map', 'Map embed URL (Google Maps "Embed a map" src or OpenStreetMap embed URL)', 'nullable|url:https|max:1000', true],
         'map_link_url' => ['map', 'url', 'Map link (opens in a new tab)', 'nullable|url:https|max:500', true],
+
+        // WhatsApp chat button
+        'whatsapp_enabled' => ['integrations', 'boolean', 'Show WhatsApp chat button', 'boolean', true],
+        'whatsapp_number' => ['integrations', 'text', 'WhatsApp number (international format, e.g. 8801711000000)', ['nullable', 'regex:/^\+?[0-9]{8,15}$/'], true],
+        'whatsapp_message' => ['integrations', 'text', 'Pre-filled WhatsApp message', 'nullable|string|max:200', true],
+
+        // Analytics (IDs only; the site loads the official scripts itself)
+        'ga4_measurement_id' => ['integrations', 'text', 'Google Analytics 4 measurement ID (G-XXXXXXX)', ['nullable', 'regex:/^G-[A-Z0-9]{4,20}$/'], true],
+        'facebook_pixel_id' => ['integrations', 'text', 'Facebook (Meta) Pixel ID', ['nullable', 'regex:/^[0-9]{6,20}$/'], true],
+
+        // Downloads
+        'brochure_file' => ['downloads', 'file', 'Company brochure / catalog (PDF)', 'nullable|string|max:255', true],
+        'brochure_label' => ['downloads', 'text', 'Brochure button label', 'nullable|string|max:40', true],
     ],
 
     // Hosts allowed for the map iframe. The admin only ever supplies a URL, never HTML.

@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { useSettings } from '../../lib/queries'
 import Header from './Header'
 import Footer from './Footer'
+import { Analytics, OrganizationJsonLd, WhatsAppButton } from './Integrations'
 
 /** Keeps the favicon in sync with the one configured in General Settings. */
 function useFavicon(url) {
@@ -41,6 +42,9 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <Footer />
+      <WhatsAppButton />
+      <Analytics />
+      <OrganizationJsonLd />
     </div>
   )
 }

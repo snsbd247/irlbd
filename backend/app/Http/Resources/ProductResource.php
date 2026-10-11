@@ -17,6 +17,8 @@ class ProductResource extends BaseResource
             'description' => $this->description,
             'image' => $this->image,
             'image_url' => $this->url($this->image),
+            'datasheet' => $this->datasheet,
+            'datasheet_url' => $this->url($this->datasheet),
             'is_featured' => $this->is_featured,
             'status' => $this->when($this->isAdmin($request), $this->status),
             'sort_order' => $this->sort_order,

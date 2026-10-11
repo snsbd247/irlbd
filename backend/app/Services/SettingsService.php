@@ -30,7 +30,7 @@ class SettingsService
         $values = $this->values(true);
 
         foreach (config('cms.settings') as $key => [$group, $type]) {
-            if ($type === 'image' && array_key_exists($key, $values)) {
+            if (in_array($type, ['image', 'file'], true) && array_key_exists($key, $values)) {
                 $values[$key.'_url'] = MediaUrl::url($values[$key]);
             }
         }

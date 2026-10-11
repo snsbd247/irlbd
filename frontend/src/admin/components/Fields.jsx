@@ -6,7 +6,7 @@ import { Icon, ICONS } from '../../lib/icons'
 import { cn } from '../../lib/utils'
 import { Spinner } from '../../components/ui/States'
 import { useMeta } from '../auth'
-import { GalleryField, ImageField } from './Media'
+import { FileField, GalleryField, ImageField } from './Media'
 import { Toggle } from './ui'
 import ErrorBoundary from '../../components/ui/ErrorBoundary'
 
@@ -126,6 +126,9 @@ export function FieldControl({ field, value, onChange, record = {}, error, idPre
       break
     case 'image':
       control = <ImageField id={id} value={value} url={record[field.urlKey || `${field.name}_url`]} onChange={(path) => onChange(path)} folder={field.folder} help={compact ? undefined : field.help} />
+      break
+    case 'file':
+      control = <FileField id={id} value={value} url={record[field.urlKey || `${field.name}_url`]} onChange={(path) => onChange(path)} folder={field.folder || 'documents'} />
       break
     case 'gallery':
       control = <GalleryField value={value || []} onChange={onChange} folder={field.folder} />

@@ -15,6 +15,7 @@ class ProductRequest extends AdminRequest
             'short_description' => 'nullable|string|max:500',
             'description' => 'nullable|string|max:200000',
             'image' => $this->media(),
+            'datasheet' => $this->media(),
             'is_featured' => 'boolean',
             'status' => 'required|in:draft,published',
             ...$this->seo(),

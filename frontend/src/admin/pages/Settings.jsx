@@ -18,9 +18,11 @@ const GROUPS = [
   ['cta', 'Call to action', 'Defaults for CTA banners when a section leaves fields empty.'],
   ['seo', 'SEO', 'Default metadata used when a page has none of its own.'],
   ['map', 'Map', 'Paste the src URL from Google Maps → Share → Embed a map (not the whole <iframe> code).'],
+  ['integrations', 'WhatsApp & analytics', 'WhatsApp chat button and tracking IDs. Only the IDs are stored; the site loads the official scripts itself.'],
+  ['downloads', 'Downloads', 'Company brochure / catalog PDF shown in the footer and on the products page.'],
 ]
 
-const TYPE_MAP = { text: 'text', textarea: 'textarea', email: 'email', url: 'text', image: 'image', boolean: 'toggle', map: 'textarea' }
+const TYPE_MAP = { text: 'text', textarea: 'textarea', email: 'email', url: 'text', image: 'image', file: 'file', boolean: 'toggle', map: 'textarea' }
 
 export default function Settings() {
   const { can } = useAuth()
@@ -55,8 +57,8 @@ export default function Settings() {
         name: s.key,
         label: s.label + (s.public ? '' : ' 🔒'),
         type: TYPE_MAP[s.type] || 'text',
-        folder: 'branding',
-        span: ['textarea', 'image', 'map'].includes(s.type) || s.key.includes('url') ? 'full' : undefined,
+        folder: s.type === 'file' ? 'documents' : 'branding',
+        span: ['textarea', 'image', 'file', 'map'].includes(s.type) || s.key.includes('url') ? 'full' : undefined,
       })
     })
     return out

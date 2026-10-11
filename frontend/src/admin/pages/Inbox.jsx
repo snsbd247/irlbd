@@ -291,7 +291,7 @@ export function MediaLibrary() {
 
   return (
     <div>
-      <PageHeader title="Media library" description="Images are validated, re-encoded and resized on upload. Allowed: JPG, PNG, WebP, GIF, ICO (max 5 MB)." actions={<UploadButton folder="general" />} />
+      <PageHeader title="Media library" description="Images are validated, re-encoded and resized on upload (JPG, PNG, WebP, GIF, ICO, max 5 MB). PDF brochures and datasheets up to 15 MB." actions={<UploadButton folder="general" />} />
       <Card>
         <MediaGrid onSelect={(m, opts) => !opts?.uploaded && setSelected(m)} />
       </Card>

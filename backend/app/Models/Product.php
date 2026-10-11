@@ -18,7 +18,7 @@ class Product extends Model
     protected string $slugFrom = 'name';
 
     protected $fillable = [
-        'product_category_id', 'name', 'slug', 'sku', 'short_description', 'description', 'image',
+        'product_category_id', 'name', 'slug', 'sku', 'short_description', 'description', 'image', 'datasheet',
         'is_featured', 'status', 'sort_order', 'meta_title', 'meta_description',
     ];
 

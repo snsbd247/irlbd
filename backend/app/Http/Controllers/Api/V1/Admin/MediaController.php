@@ -23,6 +23,8 @@ class MediaController extends Controller
 
         $items = Media::query()
             ->when($request->filled('folder'), fn ($q) => $q->where('folder', $request->input('folder')))
+            ->when($request->input('type') === 'document', fn ($q) => $q->where('mime_type', 'application/pdf'))
+            ->when($request->input('type') === 'image', fn ($q) => $q->where('mime_type', 'like', 'image/%'))
             ->when($request->filled('search'), fn ($q) => $q->where('original_name', 'like', '%'.addcslashes($request->input('search'), '%_\\').'%'))
             ->latest('id')
             ->paginate(min((int) $request->input('per_page', 30), 100));
@@ -36,10 +38,16 @@ class MediaController extends Controller
 
         $mimes = implode(',', array_unique(array_values(config('cms.uploads.mimes'))));
         $data = $request->validate([
-            'file' => ['required', 'file', 'max:'.config('cms.uploads.max_kb'), 'mimes:'.$mimes.',jpeg'],
+            // Images are limited to max_kb; PDFs get a separate (larger) limit checked in MediaService.
+            'file' => ['required', 'file', 'max:'.max(config('cms.uploads.max_kb'), config('cms.uploads.document_max_kb')), 'mimes:'.$mimes.',jpeg'],
             'folder' => 'nullable|string|in:'.implode(',', config('cms.uploads.folders')),
             'alt' => 'nullable|string|max:255',
         ]);
+
+        $file = $request->file('file');
+        if ($file->getMimeType() !== 'application/pdf' && $file->getSize() > config('cms.uploads.max_kb') * 1024) {
+            return response()->json(['message' => 'The image is too large.', 'errors' => ['file' => ['The image may not be larger than '.config('cms.uploads.max_kb').' KB.']]], 422);
+        }
 
         $media = $this->media->store($request->file('file'), $data['folder'] ?? 'general', $request->user()->id, $data['alt'] ?? null);
 

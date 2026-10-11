@@ -21,7 +21,7 @@ class SettingsController extends Controller
         $values = $this->settings->values(false);
         $urls = [];
         foreach (config('cms.settings') as $key => [$group, $type]) {
-            if ($type === 'image') {
+            if (in_array($type, ['image', 'file'], true)) {
                 $urls[$key] = MediaUrl::url($values[$key] ?? null);
             }
         }
@@ -35,7 +35,11 @@ class SettingsController extends Controller
 
         $rules = [];
         foreach (config('cms.settings') as $key => [$group, $type, $label, $rule]) {
-            $rules[$key] = $type === 'image' ? ['nullable', 'string', 'max:255', new MediaPath] : 'sometimes|'.$rule;
+            $rules[$key] = match (true) {
+                in_array($type, ['image', 'file'], true) => ['nullable', 'string', 'max:255', new MediaPath],
+                is_array($rule) => ['sometimes', ...$rule],
+                default => 'sometimes|'.$rule,
+            };
         }
 
         $data = $request->validate($rules);

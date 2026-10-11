@@ -6,6 +6,7 @@ import { ProductCard } from '../components/ui/Cards'
 import { CardGridSkeleton, EmptyState, ErrorState } from '../components/ui/States'
 import Pagination from '../components/ui/Pagination'
 import SectionHeading from '../components/ui/SectionHeading'
+import BrochureButton from '../components/ui/BrochureButton'
 import { cn } from '../lib/utils'
 
 /** Searchable, filterable, paginated product catalog. State lives in the URL (?category=&q=&page=). */
@@ -46,7 +47,10 @@ export default function ProductsModule({ section }) {
   return (
     <section id="catalog" className="scroll-mt-24 py-14">
       <div className="container-x">
-        <SectionHeading eyebrow={section?.eyebrow} title={activeCategory ? activeCategory.name : section?.title || 'All Products'} subtitle={activeCategory?.short_description || section?.subtitle} />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <SectionHeading eyebrow={section?.eyebrow} title={activeCategory ? activeCategory.name : section?.title || 'All Products'} subtitle={activeCategory?.short_description || section?.subtitle} />
+          <BrochureButton className="btn-outline shrink-0" />
+        </div>
 
         <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by category">

@@ -85,6 +85,7 @@ export const RESOURCES = {
       { name: 'short_description', label: 'Short description', type: 'textarea', span: 'full', max: 500 },
       { name: 'image', label: 'Main image', type: 'image', folder: 'products', span: 'full' },
       { name: 'images', label: 'Gallery images', type: 'gallery', folder: 'products', span: 'full', default: [] },
+      { name: 'datasheet', label: 'Datasheet (PDF, optional)', type: 'file', folder: 'documents', span: 'full' },
       {
         name: 'specifications', label: 'Specifications', type: 'repeater', span: 'full', addLabel: 'Add specification', default: [],
         fields: [{ name: 'label', label: 'Label', type: 'text' }, { name: 'value', label: 'Value', type: 'text' }],

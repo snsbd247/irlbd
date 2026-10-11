@@ -23,7 +23,7 @@ class MediaService
         $mime = $file->getMimeType();
 
         if (! isset($mimes[$mime])) {
-            throw ValidationException::withMessages(['file' => 'Only JPG, PNG, WebP, GIF and ICO images are allowed.']);
+            throw ValidationException::withMessages(['file' => 'Only JPG, PNG, WebP, GIF, ICO images and PDF documents are allowed.']);
         }
 
         $ext = $mimes[$mime];
@@ -31,7 +31,21 @@ class MediaService
         $relative = $folder.'/'.now()->format('Y/m').'/'.Str::uuid()->toString().'.'.$ext;
         $width = $height = null;
 
-        if ($ext === 'ico') {
+        if ($ext === 'pdf') {
+            // Must really be a PDF (signature in the first bytes), not a renamed script or HTML file.
+            $head = (string) file_get_contents($file->getRealPath(), false, null, 0, 1024);
+            if (! str_contains($head, '%PDF-')) {
+                throw ValidationException::withMessages(['file' => 'The file is not a valid PDF document.']);
+            }
+            if ($file->getSize() > config('cms.uploads.document_max_kb') * 1024) {
+                throw ValidationException::withMessages(['file' => 'The document is too large.']);
+            }
+            if ($folder === 'general') {
+                $folder = 'documents';
+                $relative = $folder.'/'.now()->format('Y/m').'/'.Str::uuid()->toString().'.pdf';
+            }
+            Storage::disk('uploads')->put($relative, file_get_contents($file->getRealPath()));
+        } elseif ($ext === 'ico') {
             Storage::disk('uploads')->put($relative, file_get_contents($file->getRealPath()));
         } else {
             $info = @getimagesize($file->getRealPath());

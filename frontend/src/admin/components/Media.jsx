@@ -1,13 +1,15 @@
 import { useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowDown, ArrowUp, ImagePlus, Images, Search, Trash2, Upload, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, FileText, ImagePlus, Images, Search, Trash2, Upload, X } from 'lucide-react'
 import { api, errorMessage } from '../../lib/api'
 import { cn } from '../../lib/utils'
 import { EmptyState, ErrorState, Spinner } from '../../components/ui/States'
 import Pagination from '../../components/ui/Pagination'
 import { Modal, useToast } from './ui'
 
-const ACCEPT = 'image/jpeg,image/png,image/webp,image/gif,image/x-icon,image/vnd.microsoft.icon,.ico'
+const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp,image/gif,image/x-icon,image/vnd.microsoft.icon,.ico'
+const DOC_ACCEPT = 'application/pdf,.pdf'
+const isPdf = (m) => m?.mime_type === 'application/pdf' || /\.pdf$/i.test(m?.path || '')
 
 export function useUpload(folder = 'general') {
   const queryClient = useQueryClient()
@@ -39,7 +41,7 @@ export function useUpload(folder = 'general') {
   return { upload, uploading }
 }
 
-export function UploadButton({ folder, onUploaded, multiple = true, className = 'btn-primary' }) {
+export function UploadButton({ folder, onUploaded, multiple = true, className = 'btn-primary', accept = `${IMAGE_ACCEPT},${DOC_ACCEPT}` }) {
   const input = useRef(null)
   const { upload, uploading } = useUpload(folder)
   return (
@@ -51,7 +53,7 @@ export function UploadButton({ folder, onUploaded, multiple = true, className = 
       <input
         ref={input}
         type="file"
-        accept={ACCEPT}
+        accept={accept}
         multiple={multiple}
         className="hidden"
         onChange={async (e) => {
@@ -69,13 +71,13 @@ export function UploadButton({ folder, onUploaded, multiple = true, className = 
 
 /** Paginated media grid used by the Media Library page and the picker. */
 /** `uploadFolder` is where new uploads go; the grid itself shows every folder unless filtered. */
-export function MediaGrid({ onSelect, selectedPath, folder: uploadFolder = 'general' }) {
+export function MediaGrid({ onSelect, selectedPath, folder: uploadFolder = 'general', type }) {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [folder, setFolder] = useState('')
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['admin', 'media', { page, search, folder }],
-    queryFn: () => api.get('/admin/media', { params: { page, search: search || undefined, folder: folder || undefined, per_page: 24 } }).then((r) => r.data),
+    queryKey: ['admin', 'media', { page, search, folder, type }],
+    queryFn: () => api.get('/admin/media', { params: { page, search: search || undefined, folder: folder || undefined, type, per_page: 24 } }).then((r) => r.data),
     placeholderData: (prev) => prev,
   })
 
@@ -88,18 +90,18 @@ export function MediaGrid({ onSelect, selectedPath, folder: uploadFolder = 'gene
         </div>
         <select aria-label="Folder" className="input sm:w-44" value={folder} onChange={(e) => { setFolder(e.target.value); setPage(1) }}>
           <option value="">All folders</option>
-          {['general', 'branding', 'pages', 'products', 'news', 'team', 'clients', 'certifications', 'history', 'slides'].map((f) => (
+          {['general', 'branding', 'pages', 'products', 'news', 'team', 'clients', 'certifications', 'history', 'slides', 'gallery', 'documents'].map((f) => (
             <option key={f} value={f}>{f}</option>
           ))}
         </select>
-        <UploadButton folder={folder || uploadFolder} onUploaded={(files) => files[0] && onSelect?.(files[0], { uploaded: true })} />
+        <UploadButton folder={folder || uploadFolder} accept={type === 'document' ? DOC_ACCEPT : type === 'image' ? IMAGE_ACCEPT : undefined} onUploaded={(files) => files[0] && onSelect?.(files[0], { uploaded: true })} />
       </div>
       {isLoading ? (
         <div className="flex justify-center py-12"><Spinner /></div>
       ) : isError ? (
         <ErrorState onRetry={refetch} />
       ) : !data?.data?.length ? (
-        <EmptyState icon={Images} title="No images yet" message="Upload JPG, PNG, WebP, GIF or ICO images (max 5 MB)." />
+        <EmptyState icon={Images} title={type === 'document' ? 'No documents yet' : 'No files yet'} message={type === 'document' ? 'Upload PDF documents (max 15 MB).' : 'Upload JPG, PNG, WebP, GIF or ICO images (max 5 MB) or PDF documents.'} />
       ) : (
         <>
           <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
@@ -112,7 +114,14 @@ export function MediaGrid({ onSelect, selectedPath, folder: uploadFolder = 'gene
                   title={m.original_name}
                 >
                   <span className="block aspect-square bg-[repeating-conic-gradient(#f1f5f9_0_25%,#fff_0_50%)] bg-[length:16px_16px]">
-                    <img src={m.url} alt={m.alt || m.original_name} loading="lazy" className="h-full w-full object-contain" />
+                    {isPdf(m) ? (
+                      <span className="flex h-full w-full flex-col items-center justify-center gap-1 bg-red-50 text-red-600">
+                        <FileText className="h-10 w-10" aria-hidden="true" />
+                        <span className="text-xs font-bold">PDF</span>
+                      </span>
+                    ) : (
+                      <img src={m.url} alt={m.alt || m.original_name} loading="lazy" className="h-full w-full object-contain" />
+                    )}
                   </span>
                   <span className="block truncate px-2 py-1 text-[11px] text-slate-600">{m.original_name}</span>
                 </button>
@@ -126,11 +135,12 @@ export function MediaGrid({ onSelect, selectedPath, folder: uploadFolder = 'gene
   )
 }
 
-export function MediaPickerModal({ open, onClose, onPick, folder, selectedPath }) {
+export function MediaPickerModal({ open, onClose, onPick, folder, selectedPath, type = 'image', title = 'Choose an image' }) {
   return (
-    <Modal open={open} onClose={onClose} title="Choose an image" size="xl">
+    <Modal open={open} onClose={onClose} title={title} size="xl">
       <MediaGrid
         folder={folder}
+        type={type}
         selectedPath={selectedPath}
         onSelect={(media) => {
           onPick(media)
@@ -175,6 +185,37 @@ export function ImageField({ id, value, url, onChange, folder = 'general', help 
           setPreview(m.url)
         }}
       />
+    </div>
+  )
+}
+
+/** Single PDF document field storing a media-library path. */
+export function FileField({ id, value, url, onChange, folder = 'documents' }) {
+  const [open, setOpen] = useState(false)
+  const [picked, setPicked] = useState(null)
+  const shownUrl = value ? picked?.url || url : null
+  const name = value ? picked?.original_name || value.split('/').pop() : null
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <span className="flex h-14 w-14 items-center justify-center rounded-lg border border-slate-200 bg-red-50 text-red-600">
+        <FileText className="h-6 w-6" aria-hidden="true" />
+      </span>
+      <div className="min-w-0 flex-1">
+        {value ? (
+          <a href={shownUrl} target="_blank" rel="noopener noreferrer" className="block truncate text-sm font-medium text-brand-700 hover:underline">{name}</a>
+        ) : (
+          <p className="text-sm text-muted">No document selected</p>
+        )}
+        <div className="mt-1 flex gap-3">
+          <button id={id} type="button" className="text-sm font-medium text-brand-600 hover:underline" onClick={() => setOpen(true)}>
+            {value ? 'Change PDF' : 'Choose PDF'}
+          </button>
+          {value && (
+            <button type="button" className="text-sm text-red-600 hover:underline" onClick={() => { onChange(null); setPicked(null) }}>Remove</button>
+          )}
+        </div>
+      </div>
+      <MediaPickerModal open={open} onClose={() => setOpen(false)} folder={folder} type="document" title="Choose a PDF document" selectedPath={value} onPick={(m) => { onChange(m.path); setPicked(m) }} />
     </div>
   )
 }
@@ -237,7 +278,14 @@ export function MediaDetails({ media, onClose, onDeleted }) {
 
   return (
     <div className="grid gap-5 md:grid-cols-2">
-      <img src={media.url} alt={media.alt || ''} className="max-h-80 w-full rounded-lg border border-slate-200 bg-slate-50 object-contain" />
+      {isPdf(media) ? (
+        <a href={media.url} target="_blank" rel="noopener noreferrer" className="flex h-64 flex-col items-center justify-center gap-2 rounded-lg border border-slate-200 bg-red-50 text-red-600 hover:bg-red-100">
+          <FileText className="h-14 w-14" aria-hidden="true" />
+          <span className="text-sm font-semibold">Open PDF</span>
+        </a>
+      ) : (
+        <img src={media.url} alt={media.alt || ''} className="max-h-80 w-full rounded-lg border border-slate-200 bg-slate-50 object-contain" />
+      )}
       <div className="space-y-3 text-sm">
         <p className="font-medium break-all text-navy-900">{media.original_name}</p>
         <p className="text-muted">

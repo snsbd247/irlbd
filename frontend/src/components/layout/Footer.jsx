@@ -5,6 +5,7 @@ import { BrandIcon, SOCIALS } from '../../lib/icons'
 import { safeHref, telHref } from '../../lib/utils'
 import SmartLink from '../ui/SmartLink'
 import NewsletterForm from './NewsletterForm'
+import BrochureButton from '../ui/BrochureButton'
 import { Logo } from './Header'
 
 function LinkColumn({ title, items }) {
@@ -56,6 +57,7 @@ export default function Footer() {
         <div className="lg:col-span-4 lg:border-r lg:border-white/10 lg:pr-8">
           <Logo settings={s} light className="h-14" />
           {s.footer_about && <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">{s.footer_about}</p>}
+          <BrochureButton className="btn mt-5 border border-white/30 px-4 py-2 text-white hover:border-brand-500 hover:bg-brand-600" />
           <div className="mt-5 flex gap-3">
             {SOCIALS.filter(([key]) => safeHref(s[key])).map(([key, icon, label]) => (
               <a
