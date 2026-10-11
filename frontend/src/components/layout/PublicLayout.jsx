@@ -4,6 +4,7 @@ import { useSettings } from '../../lib/queries'
 import Header from './Header'
 import Footer from './Footer'
 import { Analytics, OrganizationJsonLd, WhatsAppButton } from './Integrations'
+import { CompareBar } from '../../pages/ComparePage'
 
 /** Keeps the favicon in sync with the one configured in General Settings. */
 function useFavicon(url) {
@@ -43,6 +44,7 @@ export default function PublicLayout() {
       </main>
       <Footer />
       <WhatsAppButton />
+      <CompareBar />
       <Analytics />
       <OrganizationJsonLd />
     </div>

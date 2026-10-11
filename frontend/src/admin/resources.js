@@ -86,6 +86,15 @@ export const RESOURCES = {
       { name: 'image', label: 'Main image', type: 'image', folder: 'products', span: 'full' },
       { name: 'images', label: 'Gallery images', type: 'gallery', folder: 'products', span: 'full', default: [] },
       { name: 'datasheet', label: 'Datasheet (PDF, optional)', type: 'file', folder: 'documents', span: 'full' },
+      { name: 'industry_ids', label: 'Industries (used for filtering)', type: 'checkboxes', endpoint: '/admin/industries', span: 'full', default: [] },
+      {
+        name: 'variants', label: 'Sizes & variants (optional)', type: 'repeater', span: 'full', addLabel: 'Add variant', default: [],
+        fields: [
+          { name: 'name', label: 'Variant (e.g. 500 ml)', type: 'text' }, { name: 'capacity', label: 'Capacity', type: 'text' },
+          { name: 'weight', label: 'Weight', type: 'text' }, { name: 'neck_size', label: 'Neck size', type: 'text' },
+          { name: 'color', label: 'Colour', type: 'text' }, { name: 'moq', label: 'MOQ', type: 'text' },
+        ],
+      },
       {
         name: 'specifications', label: 'Specifications', type: 'repeater', span: 'full', addLabel: 'Add specification', default: [],
         fields: [{ name: 'label', label: 'Label', type: 'text' }, { name: 'value', label: 'Value', type: 'text' }],
@@ -96,6 +105,26 @@ export const RESOURCES = {
       ...seo,
     ],
     // API returns images as [{path,url,alt}] already.
+  },
+
+  industries: {
+    title: 'Industries',
+    singular: 'industry',
+    permission: 'products',
+    description: 'Industries served (Beverage, Pharma...). Visitors can filter products by industry.',
+    sortable: true,
+    columns: [
+      { key: 'icon', type: 'icon' },
+      { key: 'name', label: 'Industry' },
+      { key: 'products_count', label: 'Products' },
+      { key: 'is_active', label: 'Visible', type: 'bool' },
+    ],
+    fields: [
+      { name: 'name', label: 'Name', type: 'text', required: true },
+      { name: 'slug', label: 'URL slug', type: 'text', help: 'Leave empty to generate from the name.' },
+      { name: 'icon', label: 'Icon', type: 'icon' },
+      { name: 'is_active', label: 'Visible on website', type: 'toggle', default: true },
+    ],
   },
 
   services: {

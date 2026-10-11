@@ -42,6 +42,31 @@ function RelationSelect({ id, field, value, onChange }) {
   )
 }
 
+function CheckboxesField({ field, value = [], onChange }) {
+  const { data = [], isLoading } = useQuery({
+    queryKey: ['admin', 'options', field.endpoint],
+    queryFn: () => api.get(field.endpoint, { params: { all: 1 } }).then((r) => r.data.data ?? r.data),
+    staleTime: 60 * 1000,
+  })
+  if (isLoading) return <Spinner className="h-5 w-5" />
+  if (!data.length) return <p className="text-sm text-muted">Nothing to choose yet.</p>
+  return (
+    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      {data.map((o) => (
+        <label key={o.id} className="flex items-center gap-2 rounded-md border border-slate-200 p-2.5 text-sm hover:bg-slate-50">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-brand-600"
+            checked={value.includes(o.id)}
+            onChange={(e) => onChange(e.target.checked ? [...value, o.id] : value.filter((v) => v !== o.id))}
+          />
+          <span>{o[field.labelKey || 'name']}</span>
+        </label>
+      ))}
+    </div>
+  )
+}
+
 function PermissionsField({ value = [], onChange }) {
   const { data: meta } = useMeta()
   const perms = meta?.permissions || []
@@ -172,6 +197,9 @@ export function FieldControl({ field, value, onChange, record = {}, error, idPre
       break
     case 'repeater':
       control = <Repeater field={field} value={value || []} onChange={onChange} errors={field.errors} name={field.name} />
+      break
+    case 'checkboxes':
+      control = <CheckboxesField field={field} value={value || []} onChange={onChange} />
       break
     case 'permissions':
       control = <PermissionsField value={value || []} onChange={onChange} />

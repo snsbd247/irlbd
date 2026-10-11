@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PackageSearch, Search, X } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '../lib/api'
 import { useProductCategories, useProducts } from '../lib/queries'
 import { ProductCard } from '../components/ui/Cards'
 import { CardGridSkeleton, EmptyState, ErrorState } from '../components/ui/States'
@@ -13,12 +15,14 @@ import { cn } from '../lib/utils'
 export default function ProductsModule({ section }) {
   const [params, setParams] = useSearchParams()
   const category = params.get('category') || ''
+  const industry = params.get('industry') || ''
   const q = params.get('q') || ''
   const page = Number(params.get('page')) || 1
   const [term, setTerm] = useState(q)
 
   const { data: categories = [] } = useProductCategories()
-  const { data, isLoading, isError, refetch, isFetching } = useProducts({ category: category || undefined, q: q || undefined, page, per_page: 9 })
+  const { data: industries = [] } = useQuery({ queryKey: ['industries'], queryFn: () => api.get('/industries').then((r) => r.data), staleTime: 5 * 60 * 1000 })
+  const { data, isLoading, isError, refetch, isFetching } = useProducts({ category: category || undefined, industry: industry || undefined, q: q || undefined, page, per_page: 9 })
 
   useEffect(() => setTerm(q), [q])
 
@@ -70,7 +74,14 @@ export default function ProductsModule({ section }) {
               </button>
             ))}
           </div>
-          <div className="relative w-full lg:w-80">
+          <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+          {industries.length > 0 && (
+            <select aria-label="Filter by industry" className="input sm:w-56" value={industry} onChange={(e) => update({ industry: e.target.value, page: '' })}>
+              <option value="">All industries</option>
+              {industries.map((i) => <option key={i.slug} value={i.slug}>{i.name} ({i.products_count})</option>)}
+            </select>
+          )}
+          <div className="relative w-full lg:w-72">
             <label htmlFor="product-search" className="sr-only">Search products</label>
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
             <input id="product-search" type="search" value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search products…" className="input pr-9 pl-9" />
@@ -79,6 +90,7 @@ export default function ProductsModule({ section }) {
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
             )}
+          </div>
           </div>
         </div>
 
@@ -89,7 +101,7 @@ export default function ProductsModule({ section }) {
             <ErrorState onRetry={refetch} />
           ) : products.length === 0 ? (
             <EmptyState icon={PackageSearch} title="No products found" message="Try another category or search term.">
-              {(q || category) && (
+              {(q || category || industry) && (
                 <button type="button" className="btn-outline mt-2" onClick={() => setParams({})}>Clear filters</button>
               )}
             </EmptyState>

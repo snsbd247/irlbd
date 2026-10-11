@@ -30,6 +30,8 @@ Route::prefix('v1')->name('v1.')->group(function () {
 
         Route::get('product-categories', [PublicApi\ProductController::class, 'categories'])->name('product-categories.index');
         Route::get('products', [PublicApi\ProductController::class, 'index'])->name('products.index');
+        Route::get('products/compare', [PublicApi\ProductController::class, 'compare'])->name('products.compare');
+        Route::get('industries', [PublicApi\ProductController::class, 'industries'])->name('industries.index');
         Route::get('products/{slug}', [PublicApi\ProductController::class, 'show'])->name('products.show');
 
         Route::get('services', [PublicApi\ServiceController::class, 'index'])->name('services.index');
@@ -96,6 +98,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
                 'menu-items' => Admin\MenuItemController::class,
                 'product-categories' => Admin\ProductCategoryController::class,
                 'products' => Admin\ProductController::class,
+                'industries' => Admin\IndustryController::class,
                 'services' => Admin\ServiceController::class,
                 'clients' => Admin\ClientController::class,
                 'testimonials' => Admin\TestimonialController::class,

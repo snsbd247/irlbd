@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, CalendarDays, X } from 'lucide-react'
 import { Icon } from '../../lib/icons'
 import { dateParts, formatDate } from '../../lib/utils'
+import { CompareToggle } from '../../pages/ComparePage'
 
 export function ProductCard({ product }) {
   return (
@@ -18,9 +19,12 @@ export function ProductCard({ product }) {
           <Link to={`/products/${product.slug}`} className="hover:text-brand-600">{product.name}</Link>
         </h3>
         {product.short_description && <p className="mt-2 line-clamp-2 text-sm text-muted">{product.short_description}</p>}
-        <Link to={`/products/${product.slug}`} className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-brand-600 hover:gap-2.5" aria-label={`View details of ${product.name}`}>
-          View Details <ArrowRight className="h-4 w-4 transition-all" aria-hidden="true" />
-        </Link>
+        <div className="mt-auto flex items-center justify-between gap-2 pt-4">
+          <Link to={`/products/${product.slug}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:gap-2.5" aria-label={`View details of ${product.name}`}>
+            View Details <ArrowRight className="h-4 w-4 transition-all" aria-hidden="true" />
+          </Link>
+          <CompareToggle slug={product.slug} compact />
+        </div>
       </div>
     </article>
   )

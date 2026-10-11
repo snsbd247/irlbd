@@ -25,6 +25,15 @@ class ProductRequest extends AdminRequest
             'specifications' => 'nullable|array|max:50',
             'specifications.*.label' => 'required|string|max:120',
             'specifications.*.value' => 'required|string|max:255',
+            'variants' => 'nullable|array|max:50',
+            'variants.*.name' => 'required|string|max:120',
+            'variants.*.capacity' => 'nullable|string|max:60',
+            'variants.*.weight' => 'nullable|string|max:60',
+            'variants.*.neck_size' => 'nullable|string|max:60',
+            'variants.*.color' => 'nullable|string|max:80',
+            'variants.*.moq' => 'nullable|string|max:60',
+            'industry_ids' => 'nullable|array|max:30',
+            'industry_ids.*' => 'integer|exists:industries,id',
         ];
     }
 }

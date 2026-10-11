@@ -20,9 +20,16 @@ class ProductController extends CrudController
 
     protected array $filters = ['status' => 'status', 'category' => 'product_category_id', 'is_featured' => 'is_featured'];
 
+    protected function scopeIndex(\Illuminate\Database\Eloquent\Builder $query, \Illuminate\Http\Request $request): void
+    {
+        if ($request->filled('industry')) {
+            $query->whereHas('industries', fn ($q) => $q->where('industries.id', $request->integer('industry')));
+        }
+    }
+
     protected array $with = ['category'];
 
-    protected array $showWith = ['category', 'images', 'specifications'];
+    protected array $showWith = ['category', 'images', 'specifications', 'variants', 'industries'];
 
     protected array $sortableColumns = ['id', 'created_at', 'updated_at', 'sort_order', 'name'];
 
@@ -34,6 +41,17 @@ class ProductController extends CrudController
             foreach (array_values($request->validated('images') ?? []) as $i => $image) {
                 $model->images()->create(['path' => $image['path'], 'alt' => $image['alt'] ?? null, 'sort_order' => $i + 1]);
             }
+        }
+
+        if ($request->has('variants')) {
+            $model->variants()->delete();
+            foreach (array_values($request->validated('variants') ?? []) as $i => $variant) {
+                $model->variants()->create(collect($variant)->only(\App\Models\ProductVariant::FIELDS)->all() + ['sort_order' => $i + 1]);
+            }
+        }
+
+        if ($request->has('industry_ids')) {
+            $model->industries()->sync($request->validated('industry_ids') ?? []);
         }
 
         if ($request->has('specifications')) {

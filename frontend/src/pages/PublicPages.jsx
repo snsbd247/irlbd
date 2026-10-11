@@ -13,6 +13,7 @@ import { Icon } from '../lib/icons'
 import { useHomePage, useNavigation, useNewsPost, usePage, useProduct, useSearch, useService } from '../lib/queries'
 import { cn, formatDate, stripHtml } from '../lib/utils'
 import ProductsModule from './ProductsModule'
+import { CompareToggle } from './ComparePage'
 import NewsModule, { NewsSidebar } from './NewsModule'
 import ContactModule from './ContactModule'
 import { GalleryModule } from './GalleryPages'
@@ -138,6 +139,20 @@ export function ProductDetail() {
             <h2 className="heading-lg mt-2">{product.name}</h2>
             {product.sku && <p className="mt-1 text-sm text-muted">Product code: {product.sku}</p>}
             {product.short_description && <p className="mt-4 text-[15px] text-slate-700">{product.short_description}</p>}
+            {product.industries?.length > 0 && (
+              <div className="mt-4">
+                <p className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">Suitable for</p>
+                <ul className="flex flex-wrap gap-2">
+                  {product.industries.map((i) => (
+                    <li key={i.id}>
+                      <Link to={`/products?industry=${i.slug}`} className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 hover:bg-brand-100">
+                        <Icon name={i.icon} className="h-3.5 w-3.5" /> {i.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {product.specifications?.length > 0 && (
               <div className="mt-6 overflow-hidden rounded-xl border border-slate-200">
@@ -158,6 +173,7 @@ export function ProductDetail() {
               <Link to={quoteUrl} className="btn-primary px-6 py-3">
                 <MessageSquareQuote className="h-4 w-4" aria-hidden="true" /> Request a Quote
               </Link>
+              <CompareToggle slug={product.slug} />
               {product.datasheet_url && (
                 <a href={product.datasheet_url} target="_blank" rel="noopener noreferrer" className="btn-outline px-6 py-3">
                   <FileDown className="h-4 w-4" aria-hidden="true" /> Download Datasheet
@@ -167,6 +183,28 @@ export function ProductDetail() {
             </div>
           </div>
         </div>
+        {product.variants?.length > 0 && (
+          <div className="container-x mt-12">
+            <h2 className="mb-4 text-xl font-semibold text-navy-900">Available Sizes & Variants</h2>
+            <div className="overflow-x-auto rounded-xl border border-slate-200">
+              <table className="w-full min-w-[560px] text-sm">
+                <thead className="bg-brand-50/60 text-left text-xs font-semibold tracking-wide text-navy-900 uppercase">
+                  <tr>
+                    {['Variant', 'Capacity', 'Weight', 'Neck size', 'Colour', 'MOQ'].map((h) => <th key={h} scope="col" className="px-4 py-3">{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {product.variants.map((v) => (
+                    <tr key={v.id} className="border-t border-slate-100">
+                      <th scope="row" className="px-4 py-3 text-left font-semibold text-navy-900">{v.name}</th>
+                      {['capacity', 'weight', 'neck_size', 'color', 'moq'].map((k) => <td key={k} className="px-4 py-3 text-slate-700">{v[k] || '—'}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
         {product.description && (
           <div className="container-x mt-12">
             <div className="rounded-2xl border border-slate-100 p-6 sm:p-8">

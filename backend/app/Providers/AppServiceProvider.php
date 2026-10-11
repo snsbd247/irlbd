@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
         Models\MenuItem::class => Policies\MenuPolicy::class,
         Models\Product::class => Policies\ProductPolicy::class,
         Models\ProductCategory::class => Policies\ProductPolicy::class,
+        Models\Industry::class => Policies\ProductPolicy::class,
         Models\Service::class => Policies\ServicePolicy::class,
         Models\Client::class => Policies\ClientPolicy::class,
         Models\Testimonial::class => Policies\ClientPolicy::class,

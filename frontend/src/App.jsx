@@ -4,6 +4,7 @@ import PublicLayout from './components/layout/PublicLayout'
 import { PageLoader } from './components/ui/States'
 import ErrorBoundary from './components/ui/ErrorBoundary'
 import QuotePage from './pages/QuotePage'
+import ComparePage from './pages/ComparePage'
 import { AlbumPage } from './pages/GalleryPages'
 import { JobDetailPage } from './pages/CareerPages'
 import { DynamicPage, HomePage, NewsDetail, NotFound, ProductDetail, SearchPage, ServiceDetail, UnsubscribePage } from './pages/PublicPages'
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="services/:slug" element={<ServiceDetail />} />
         <Route path="search" element={<SearchPage />} />
         <Route path="request-quote" element={<QuotePage />} />
+        <Route path="compare" element={<ComparePage />} />
         <Route path="gallery/:slug" element={<AlbumPage />} />
         <Route path="careers/:slug" element={<JobDetailPage />} />
         <Route path="newsletter/unsubscribe" element={<UnsubscribePage />} />

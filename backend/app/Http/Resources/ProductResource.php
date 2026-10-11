@@ -30,6 +30,11 @@ class ProductResource extends BaseResource
             'specifications' => $this->whenLoaded('specifications', fn () => $this->specifications->map(fn ($s) => [
                 'id' => $s->id, 'label' => $s->label, 'value' => $s->value,
             ])),
+            'variants' => $this->whenLoaded('variants', fn () => $this->variants->map(fn ($v) => $v->only(['id', 'name', 'capacity', 'weight', 'neck_size', 'color', 'moq']))),
+            'industries' => $this->whenLoaded('industries', fn () => $this->isAdmin($request)
+                ? $this->industries->map(fn ($i) => ['id' => $i->id, 'name' => $i->name, 'slug' => $i->slug, 'icon' => $i->icon])
+                : $this->industries->where('is_active', true)->values()->map(fn ($i) => ['id' => $i->id, 'name' => $i->name, 'slug' => $i->slug, 'icon' => $i->icon])),
+            'industry_ids' => $this->when($this->isAdmin($request) && $this->relationLoaded('industries'), fn () => $this->industries->pluck('id')),
             'meta_title' => $this->meta_title,
             'meta_description' => $this->meta_description,
             'updated_at' => $this->date($this->updated_at),
