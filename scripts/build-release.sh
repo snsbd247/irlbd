@@ -41,6 +41,10 @@ if [[ "$API_URL" =~ ^(https?://[^/]+)/.+ ]]; then
   SITE_ORIGIN="${BASH_REMATCH[1]}"
   sed -i "s#^Sitemap: .*#Sitemap: $SITE_ORIGIN/sitemap.xml#" "$OUT/frontend/robots.txt"
   sed -i '/^# Replace example.com/,/^# Admin > Settings > SEO/d' "$OUT/frontend/robots.txt"
+  # Limit the website's response headers to its own host (not sub-folder sites).
+  SITE_HOST="${SITE_ORIGIN#*://}"; SITE_HOST="${SITE_HOST#www.}"; SITE_HOST="${SITE_HOST%%:*}"
+  HOST_RE="^(www[.])?$(printf '%s' "$SITE_HOST" | sed 's/[.]/[.]/g')(:[0-9]+)?\$"
+  sed -i "s|^SetEnvIfNoCase Host \".\*\" IR_SITE|SetEnvIfNoCase Host \"$HOST_RE\" IR_SITE|" "$OUT/frontend/.htaccess"
 fi
 
 echo "==> Preparing Laravel API (production dependencies only)"
