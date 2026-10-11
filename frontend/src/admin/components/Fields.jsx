@@ -115,6 +115,19 @@ function Repeater({ field, value = [], onChange, errors, name }) {
                 compact
               />
             ))}
+            {field.fields.filter((sub) => sub.t).map((sub) => (
+              <div key={`bn-${sub.name}`}>
+                <label htmlFor={`${name}-${i}-bn-${sub.name}`} className="label text-xs">{sub.label} <span lang="bn" className="text-brand-600">(বাংলা)</span></label>
+                <input
+                  id={`${name}-${i}-bn-${sub.name}`}
+                  lang="bn"
+                  className="input"
+                  value={row.translations?.bn?.[sub.name] ?? ''}
+                  placeholder={row[sub.name] || ''}
+                  onChange={(e) => update(i, 'translations', withTranslation(row.translations, 'bn', sub.name, e.target.value))}
+                />
+              </div>
+            ))}
           </div>
           <div className="flex gap-1 sm:flex-col">
             <button type="button" className="rounded p-1.5 hover:bg-slate-200 disabled:opacity-30" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move up"><ArrowUp className="h-4 w-4" /></button>
@@ -156,7 +169,7 @@ export function FieldControl({ field, value, onChange, record = {}, error, idPre
       control = <FileField id={id} value={value} url={record[field.urlKey || `${field.name}_url`]} onChange={(path) => onChange(path)} folder={field.folder || 'documents'} />
       break
     case 'gallery':
-      control = <GalleryField value={value || []} onChange={onChange} folder={field.folder} />
+      control = <GalleryField value={value || []} onChange={onChange} folder={field.folder} bengali={field.bengali} />
       break
     case 'icon':
       control = <IconSelect id={id} value={value} onChange={onChange} />
@@ -257,6 +270,35 @@ export function FieldGrid({ fields, record, setRecord, errors = {}, idPrefix = '
             idPrefix={idPrefix}
           />
         ))}
+    </div>
+  )
+}
+
+/** Returns a copy of a `{bn: {field: value}}` translations object with one value changed. */
+export function withTranslation(translations, locale, name, value) {
+  const all = translations && !Array.isArray(translations) ? translations : {}
+  return { ...all, [locale]: { ...(all[locale] || {}), [name]: value } }
+}
+
+/**
+ * Bengali versions of a record's text fields. Empty fields fall back to English on
+ * the website, so translations can be added gradually.
+ */
+export function TranslationCard({ fields, names, translations, onChange, english = {}, idPrefix = 't' }) {
+  const shown = fields.filter((f) => names.includes(f.name) && ['text', 'textarea', 'richtext', undefined].includes(f.type))
+  if (!shown.length) return null
+  const bn = (translations && !Array.isArray(translations) && translations.bn) || {}
+  return (
+    <div className="grid gap-5 sm:grid-cols-2" lang="bn">
+      {shown.map((f) => (
+        <FieldControl
+          key={f.name}
+          field={{ ...f, required: false, help: undefined, label: `${f.label} (বাংলা)`, placeholder: f.type === 'richtext' ? undefined : english[f.name] || '' }}
+          value={bn[f.name] ?? ''}
+          onChange={(v) => onChange(withTranslation(translations, 'bn', f.name, v))}
+          idPrefix={`${idPrefix}-bn`}
+        />
+      ))}
     </div>
   )
 }

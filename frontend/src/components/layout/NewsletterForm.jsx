@@ -3,8 +3,10 @@ import { CircleCheck } from 'lucide-react'
 import { api, errorMessage, fieldErrors } from '../../lib/api'
 import { cn } from '../../lib/utils'
 import { Spinner } from '../ui/States'
+import { useT } from '../../lib/i18n'
 
 export default function NewsletterForm({ dark = false, compact = false, idPrefix = 'newsletter' }) {
+  const t = useT()
   const [email, setEmail] = useState('')
   const [website, setWebsite] = useState('') // honeypot
   const [state, setState] = useState({ status: 'idle', message: '' })
@@ -14,7 +16,7 @@ export default function NewsletterForm({ dark = false, compact = false, idPrefix
     setState({ status: 'loading', message: '' })
     try {
       const { data } = await api.post('/newsletter/subscribe', { email, website })
-      setState({ status: 'success', message: data.message })
+      setState({ status: 'success', message: t(data.message) })
       setEmail('')
     } catch (error) {
       setState({ status: 'error', message: fieldErrors(error).email || errorMessage(error) })
@@ -25,7 +27,7 @@ export default function NewsletterForm({ dark = false, compact = false, idPrefix
   return (
     <form onSubmit={submit} noValidate className="w-full">
       <div className={cn('flex overflow-hidden rounded-md', compact ? 'flex-col gap-2 sm:flex-row sm:gap-0' : 'flex-row')}>
-        <label htmlFor={inputId} className="sr-only">Email address</label>
+        <label htmlFor={inputId} className="sr-only">{t('Email address')}</label>
         <input
           id={inputId}
           type="email"
@@ -33,7 +35,7 @@ export default function NewsletterForm({ dark = false, compact = false, idPrefix
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email address"
+          placeholder={t('Enter your email address')}
           aria-invalid={state.status === 'error'}
           aria-describedby={`${inputId}-msg`}
           className={cn(
@@ -44,7 +46,7 @@ export default function NewsletterForm({ dark = false, compact = false, idPrefix
         />
         <input type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} className="hidden" aria-hidden="true" />
         <button type="submit" disabled={state.status === 'loading'} className={cn('btn-primary rounded-none px-6', compact ? 'rounded-md sm:rounded-l-none' : 'rounded-r-md')}>
-          {state.status === 'loading' ? <Spinner className="h-4 w-4 text-white" label="Subscribing" /> : 'Subscribe'}
+          {state.status === 'loading' ? <Spinner className="h-4 w-4 text-white" label="Subscribing" /> : t('Subscribe')}
         </button>
       </div>
       <p id={`${inputId}-msg`} role="status" className={cn('mt-2 min-h-5 text-xs', state.status === 'error' ? 'text-red-400' : dark ? 'text-emerald-300' : 'text-emerald-600')}>

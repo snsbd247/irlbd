@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { useSettings } from '../../lib/queries'
 import { safeHref } from '../../lib/utils'
 import { BrandIcon, SOCIALS } from '../../lib/icons'
+import { useT } from '../../lib/i18n'
 
 const GA_ID = /^G-[A-Z0-9]{4,20}$/
 const PIXEL_ID = /^[0-9]{6,20}$/
@@ -92,6 +93,7 @@ export function OrganizationJsonLd() {
 
 /** Floating WhatsApp chat button (bottom-left; back-to-top lives bottom-right). */
 export function WhatsAppButton() {
+  const t = useT()
   const { data: s = {} } = useSettings()
   const number = (s.whatsapp_number || '').replace(/[^\d]/g, '')
   if (!s.whatsapp_enabled || number.length < 8) return null
@@ -101,7 +103,7 @@ export function WhatsAppButton() {
       href={`https://wa.me/${number}${text}`}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Chat with us on WhatsApp"
+      aria-label={t('Chat with us on WhatsApp')}
       className="fixed bottom-5 left-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-105 focus-visible:outline-offset-4"
     >
       <BrandIcon name="whatsapp" className="h-7 w-7" />

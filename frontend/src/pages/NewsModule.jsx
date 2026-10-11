@@ -7,8 +7,10 @@ import { CardGridSkeleton, EmptyState, ErrorState } from '../components/ui/State
 import Pagination from '../components/ui/Pagination'
 import NewsletterForm from '../components/layout/NewsletterForm'
 import { cn, formatDate } from '../lib/utils'
+import { useT } from '../lib/i18n'
 
 export function NewsSidebar({ activeCategory, onCategory }) {
+  const t = useT()
   const { data: categories = [] } = useNewsCategories()
   const { data: recent } = useRecentNews()
   const total = categories.reduce((sum, c) => sum + (c.posts_count || 0), 0)
@@ -16,9 +18,9 @@ export function NewsSidebar({ activeCategory, onCategory }) {
   return (
     <aside className="space-y-6">
       <div className="card p-5">
-        <h2 className="text-lg font-semibold text-navy-900">Categories</h2>
+        <h2 className="text-lg font-semibold text-navy-900">{t('Categories')}</h2>
         <ul className="mt-3 space-y-1 text-sm">
-          {[{ slug: '', name: 'All News', posts_count: total }, ...categories].map((c) => (
+          {[{ slug: '', name: t('All News'), posts_count: total }, ...categories].map((c) => (
             <li key={c.slug || 'all'}>
               {onCategory ? (
                 <button
@@ -40,7 +42,7 @@ export function NewsSidebar({ activeCategory, onCategory }) {
 
       {recent?.data?.length > 0 && (
         <div className="card p-5">
-          <h2 className="text-lg font-semibold text-navy-900">Recent News</h2>
+          <h2 className="text-lg font-semibold text-navy-900">{t('Recent News')}</h2>
           <ul className="mt-4 space-y-4">
             {recent.data.map((post) => (
               <li key={post.id} className="flex gap-3">
@@ -61,8 +63,8 @@ export function NewsSidebar({ activeCategory, onCategory }) {
         <div className="flex items-start gap-3">
           <Mail className="h-9 w-9 shrink-0 text-brand-600" aria-hidden="true" />
           <div>
-            <h2 className="text-lg font-semibold text-navy-900">Newsletter</h2>
-            <p className="mt-1 text-sm text-muted">Subscribe to get the latest news and updates.</p>
+            <h2 className="text-lg font-semibold text-navy-900">{t('Newsletter')}</h2>
+            <p className="mt-1 text-sm text-muted">{t('Subscribe to get the latest news and updates.')}</p>
           </div>
         </div>
         <div className="mt-4">
@@ -74,6 +76,7 @@ export function NewsSidebar({ activeCategory, onCategory }) {
 }
 
 export default function NewsModule() {
+  const t = useT()
   const [params, setParams] = useSearchParams()
   const category = params.get('category') || ''
   const q = params.get('q') || ''
@@ -97,7 +100,7 @@ export default function NewsModule() {
       <div className="container-x">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2" role="group" aria-label="Filter news by category">
-            {[{ slug: '', name: 'All News' }, ...categories.filter((c) => c.posts_count > 0)].map((c) => (
+            {[{ slug: '', name: t('All News') }, ...categories.filter((c) => c.posts_count > 0)].map((c) => (
               <button
                 key={c.slug || 'all'}
                 type="button"
@@ -118,7 +121,7 @@ export default function NewsModule() {
             }}
           >
             <label htmlFor="news-search" className="sr-only">Search news</label>
-            <input id="news-search" type="search" value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search news…" className="input rounded-r-none" />
+            <input id="news-search" type="search" value={term} onChange={(e) => setTerm(e.target.value)} placeholder={t('Search news…')} className="input rounded-r-none" />
             <button type="submit" className="btn-primary rounded-l-none px-4" aria-label="Search news">
               <Search className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -132,7 +135,7 @@ export default function NewsModule() {
             ) : isError ? (
               <ErrorState onRetry={refetch} />
             ) : posts.length === 0 ? (
-              <EmptyState icon={Newspaper} title="No news found" message={q ? `No results for "${q}".` : 'There are no published news posts in this category yet.'} />
+              <EmptyState icon={Newspaper} title={t('No news found')} message={q ? `No results for "${q}".` : 'There are no published news posts in this category yet.'} />
             ) : (
               <>
                 <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">

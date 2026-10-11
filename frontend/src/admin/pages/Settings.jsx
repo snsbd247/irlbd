@@ -4,7 +4,7 @@ import { RefreshCw } from 'lucide-react'
 import { api, errorMessage, fieldErrors } from '../../lib/api'
 import { cn } from '../../lib/utils'
 import { ErrorState, Spinner } from '../../components/ui/States'
-import { FieldGrid } from '../components/Fields'
+import { FieldGrid, TranslationCard } from '../components/Fields'
 import { Card, PageHeader, SaveButton, useToast } from '../components/ui'
 import { useAuth, useMeta } from '../auth'
 import { NotAllowed } from './Misc'
@@ -20,6 +20,7 @@ const GROUPS = [
   ['map', 'Map', 'Paste the src URL from Google Maps → Share → Embed a map (not the whole <iframe> code).'],
   ['integrations', 'WhatsApp & analytics', 'WhatsApp chat button and tracking IDs. Only the IDs are stored; the site loads the official scripts itself.'],
   ['downloads', 'Downloads', 'Company brochure / catalog PDF shown in the footer and on the products page.'],
+  ['translations', 'বাংলা (Bengali)', 'Bengali versions of site-wide texts, shown when a visitor switches the website to বাংলা. Empty fields show the English text.'],
 ]
 
 const TYPE_MAP = { text: 'text', textarea: 'textarea', email: 'email', url: 'text', image: 'image', file: 'file', boolean: 'toggle', map: 'textarea' }
@@ -31,6 +32,7 @@ export default function Settings() {
   const queryClient = useQueryClient()
   const [tab, setTab] = useState('branding')
   const [values, setValues] = useState({})
+  const [translations, setTranslations] = useState({})
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
   const [sitemapBusy, setSitemapBusy] = useState(false)
@@ -46,6 +48,7 @@ export default function Settings() {
       const withUrls = { ...data.values }
       Object.entries(data.image_urls || {}).forEach(([k, url]) => (withUrls[`${k}_url`] = url))
       setValues(withUrls)
+      setTranslations(data.translations && !Array.isArray(data.translations) ? data.translations : {})
     }
   }, [data])
 
@@ -73,6 +76,7 @@ export default function Settings() {
     setSaving(true)
     setErrors({})
     const payload = Object.fromEntries(meta.settings.map((s) => [s.key, s.type === 'boolean' ? !!values[s.key] : values[s.key] ?? null]))
+    payload.translations = translations
     try {
       await api.put('/admin/settings', payload)
       toast('Settings saved. Changes are live on the website.')
@@ -124,7 +128,18 @@ export default function Settings() {
         </nav>
         <Card title={group[1]}>
           <p className="mb-5 text-sm text-muted">{group[2]}</p>
-          <FieldGrid fields={fieldsByGroup[tab] || []} record={values} setRecord={setValues} errors={errors} idPrefix={`settings-${tab}`} />
+          {tab === 'translations' ? (
+            <TranslationCard
+              fields={Object.values(fieldsByGroup).flat().map((f) => ({ ...f, label: f.label.replace(' 🔒', '') }))}
+              names={meta.translatable_settings || []}
+              translations={translations}
+              english={values}
+              onChange={setTranslations}
+              idPrefix="settings"
+            />
+          ) : (
+            <FieldGrid fields={fieldsByGroup[tab] || []} record={values} setRecord={setValues} errors={errors} idPrefix={`settings-${tab}`} />
+          )}
           {tab === 'seo' && (
             <div className="mt-6 rounded-lg border border-slate-200 p-4">
               <p className="text-sm font-medium text-navy-900">Sitemap</p>

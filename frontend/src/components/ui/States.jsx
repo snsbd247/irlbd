@@ -1,5 +1,6 @@
 import { CircleAlert, Inbox, LoaderCircle, RefreshCw } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { translate } from '../../lib/i18n'
 
 export function Spinner({ className = 'h-6 w-6', label = 'Loading' }) {
   return (
@@ -18,7 +19,7 @@ export function PageLoader() {
   )
 }
 
-export function ErrorState({ title = 'Something went wrong', message = 'We could not load this content. Please try again.', onRetry, className }) {
+export function ErrorState({ title = translate('Something went wrong'), message = translate('We could not load this content. Please try again.'), onRetry, className }) {
   return (
     <div role="alert" className={cn('flex flex-col items-center justify-center gap-3 rounded-xl border border-red-100 bg-red-50/60 px-6 py-10 text-center', className)}>
       <CircleAlert className="h-8 w-8 text-red-500" aria-hidden="true" />
@@ -28,7 +29,7 @@ export function ErrorState({ title = 'Something went wrong', message = 'We could
       </div>
       {onRetry && (
         <button type="button" onClick={onRetry} className="btn-outline mt-1">
-          <RefreshCw className="h-4 w-4" aria-hidden="true" /> Try again
+          <RefreshCw className="h-4 w-4" aria-hidden="true" /> {translate('Try again')}
         </button>
       )}
     </div>

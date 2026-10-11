@@ -1,12 +1,14 @@
 import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
+import { useT } from '../../lib/i18n'
 
 /**
  * Dark navy banner with breadcrumbs used on every inner page.
  * crumbs: [{ label, href? }] — the last crumb is the current page.
  */
 export default function PageHero({ title, subtitle, image, crumbs = [], children }) {
+  const t = useT()
   return (
     <section className="relative overflow-hidden bg-navy-900 text-white">
       {image && <img src={image} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-60" />}
@@ -15,7 +17,7 @@ export default function PageHero({ title, subtitle, image, crumbs = [], children
         <nav aria-label="Breadcrumb">
           <ol className="flex flex-wrap items-center gap-1.5 text-sm">
             <li>
-              <Link to="/" className="text-white/90 hover:text-white">Home</Link>
+              <Link to="/" className="text-white/90 hover:text-white">{t('Home')}</Link>
             </li>
             {crumbs.map((c, i) => (
               <Fragment key={i}>

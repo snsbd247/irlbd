@@ -9,11 +9,13 @@ import { CardGridSkeleton, EmptyState, ErrorState, PageLoader } from '../compone
 import { api } from '../lib/api'
 import { formatDate } from '../lib/utils'
 import { NotFound } from './PublicPages'
+import { useT } from '../lib/i18n'
 
 const get = (url) => api.get(url).then((r) => r.data)
 
 /** Album grid rendered inside the "Gallery" CMS page (template: gallery). */
 export function GalleryModule() {
+  const t = useT()
   const { data: albums, isLoading, isError, refetch } = useQuery({ queryKey: ['gallery'], queryFn: () => get('/gallery') })
   return (
     <section className="py-14">
@@ -23,7 +25,7 @@ export function GalleryModule() {
         ) : isError ? (
           <ErrorState onRetry={refetch} />
         ) : !albums.length ? (
-          <EmptyState icon={Images} title="No albums yet" message="Photo albums will appear here soon." />
+          <EmptyState icon={Images} title={t('No albums yet')} message="Photo albums will appear here soon." />
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {albums.map((album) => <AlbumCard key={album.id} album={album} />)}
@@ -35,6 +37,7 @@ export function GalleryModule() {
 }
 
 export function AlbumPage() {
+  const t = useT()
   const { slug } = useParams()
   const { data: album, isLoading, isError, error, refetch } = useQuery({ queryKey: ['gallery', slug], queryFn: () => get(`/gallery/${encodeURIComponent(slug)}`) })
   const [open, setOpen] = useState(null)
@@ -47,7 +50,7 @@ export function AlbumPage() {
   return (
     <>
       <Seo title={album.title} description={album.description} image={album.cover_image_url} />
-      <PageHero title={album.title} subtitle={album.description} image={album.cover_image_url} crumbs={[{ label: 'Gallery', href: '/gallery' }, { label: album.title }]}>
+      <PageHero title={album.title} subtitle={album.description} image={album.cover_image_url} crumbs={[{ label: t('Gallery'), href: '/gallery' }, { label: album.title }]}>
         <p className="mt-3 text-sm text-white/80">
           {images.length} photo{images.length === 1 ? '' : 's'}{album.event_date ? ` · ${formatDate(album.event_date)}` : ''}
         </p>
@@ -55,7 +58,7 @@ export function AlbumPage() {
       <section className="py-12">
         <div className="container-x">
           {images.length === 0 ? (
-            <EmptyState icon={Images} title="This album is empty" />
+            <EmptyState icon={Images} title={t('This album is empty')} />
           ) : (
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {images.map((img, i) => (
@@ -69,7 +72,7 @@ export function AlbumPage() {
             </ul>
           )}
           <Link to="/gallery" className="mt-10 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> All albums
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {t('All albums')}
           </Link>
         </div>
       </section>

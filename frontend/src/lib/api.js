@@ -15,6 +15,19 @@ export const api = axios.create({
   timeout: 30000,
 })
 
+// Current website language for public content requests (admin requests are never translated).
+let apiLanguage = 'en'
+export function setApiLanguage(lang) {
+  apiLanguage = lang
+}
+api.interceptors.request.use((config) => {
+  const method = (config.method || 'get').toLowerCase()
+  if (method === 'get' && apiLanguage !== 'en' && !String(config.url || '').startsWith('/admin')) {
+    config.params = { ...(config.params || {}), lang: apiLanguage }
+  }
+  return config
+})
+
 const hasXsrfCookie = () => document.cookie.split('; ').some((c) => c.startsWith('XSRF-TOKEN='))
 
 let csrfPromise = null

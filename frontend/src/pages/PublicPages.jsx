@@ -18,6 +18,7 @@ import NewsModule, { NewsSidebar } from './NewsModule'
 import ContactModule from './ContactModule'
 import { GalleryModule } from './GalleryPages'
 import { CareersModule } from './CareerPages'
+import { useT } from '../lib/i18n'
 
 const isNotFound = (error) => error?.response?.status === 404
 
@@ -80,6 +81,7 @@ export function DynamicPage() {
 }
 
 export function ProductDetail() {
+  const t = useT()
   const { slug } = useParams()
   const { data, isLoading, isError, error, refetch } = useProduct(slug)
   const [active, setActive] = useState(0)
@@ -93,7 +95,7 @@ export function ProductDetail() {
   const product = data.data
   const gallery = product.images?.length ? product.images : product.image_url ? [{ id: 0, url: product.image_url, alt: product.name }] : []
   const quoteUrl = `/request-quote?product=${encodeURIComponent(product.slug)}`
-  const crumbs = [{ label: 'Our Products', href: '/products' }, ...(product.category ? [{ label: product.category.name, href: `/products?category=${product.category.slug}` }] : []), { label: product.name }]
+  const crumbs = [{ label: t('Our Products'), href: '/products' }, ...(product.category ? [{ label: product.category.name, href: `/products?category=${product.category.slug}` }] : []), { label: product.name }]
 
   return (
     <>
@@ -137,11 +139,11 @@ export function ProductDetail() {
               </Link>
             )}
             <h2 className="heading-lg mt-2">{product.name}</h2>
-            {product.sku && <p className="mt-1 text-sm text-muted">Product code: {product.sku}</p>}
+            {product.sku && <p className="mt-1 text-sm text-muted">{t('Product code')}: {product.sku}</p>}
             {product.short_description && <p className="mt-4 text-[15px] text-slate-700">{product.short_description}</p>}
             {product.industries?.length > 0 && (
               <div className="mt-4">
-                <p className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">Suitable for</p>
+                <p className="mb-2 text-xs font-semibold tracking-wide text-muted uppercase">{t('Suitable for')}</p>
                 <ul className="flex flex-wrap gap-2">
                   {product.industries.map((i) => (
                     <li key={i.id}>
@@ -157,7 +159,7 @@ export function ProductDetail() {
             {product.specifications?.length > 0 && (
               <div className="mt-6 overflow-hidden rounded-xl border border-slate-200">
                 <table className="w-full text-sm">
-                  <caption className="bg-brand-50 px-4 py-3 text-left font-semibold text-navy-900">Specifications</caption>
+                  <caption className="bg-brand-50 px-4 py-3 text-left font-semibold text-navy-900">{t('Specifications')}</caption>
                   <tbody>
                     {product.specifications.map((spec) => (
                       <tr key={spec.id} className="border-t border-slate-100">
@@ -171,26 +173,26 @@ export function ProductDetail() {
             )}
             <div className="mt-6 flex flex-wrap gap-3">
               <Link to={quoteUrl} className="btn-primary px-6 py-3">
-                <MessageSquareQuote className="h-4 w-4" aria-hidden="true" /> Request a Quote
+                <MessageSquareQuote className="h-4 w-4" aria-hidden="true" /> {t('Request a Quote')}
               </Link>
               <CompareToggle slug={product.slug} />
               {product.datasheet_url && (
                 <a href={product.datasheet_url} target="_blank" rel="noopener noreferrer" className="btn-outline px-6 py-3">
-                  <FileDown className="h-4 w-4" aria-hidden="true" /> Download Datasheet
+                  <FileDown className="h-4 w-4" aria-hidden="true" /> {t('Download Datasheet')}
                 </a>
               )}
-              <Link to="/products" className="btn-outline px-6 py-3">Back to Products</Link>
+              <Link to="/products" className="btn-outline px-6 py-3">{t('Back to Products')}</Link>
             </div>
           </div>
         </div>
         {product.variants?.length > 0 && (
           <div className="container-x mt-12">
-            <h2 className="mb-4 text-xl font-semibold text-navy-900">Available Sizes & Variants</h2>
+            <h2 className="mb-4 text-xl font-semibold text-navy-900">{t('Available Sizes & Variants')}</h2>
             <div className="overflow-x-auto rounded-xl border border-slate-200">
               <table className="w-full min-w-[560px] text-sm">
                 <thead className="bg-brand-50/60 text-left text-xs font-semibold tracking-wide text-navy-900 uppercase">
                   <tr>
-                    {['Variant', 'Capacity', 'Weight', 'Neck size', 'Colour', 'MOQ'].map((h) => <th key={h} scope="col" className="px-4 py-3">{h}</th>)}
+                    {['Variant', 'Capacity', 'Weight', 'Neck size', 'Colour', 'MOQ'].map((h) => <th key={h} scope="col" className="px-4 py-3">{t(h)}</th>)}
                   </tr>
                 </thead>
                 <tbody>
@@ -208,7 +210,7 @@ export function ProductDetail() {
         {product.description && (
           <div className="container-x mt-12">
             <div className="rounded-2xl border border-slate-100 p-6 sm:p-8">
-              <h2 className="mb-4 text-xl font-semibold text-navy-900">Product Details</h2>
+              <h2 className="mb-4 text-xl font-semibold text-navy-900">{t('Product Details')}</h2>
               <RichText html={product.description} />
             </div>
           </div>
@@ -217,7 +219,7 @@ export function ProductDetail() {
       {data.related?.length > 0 && (
         <section className="bg-brand-50/50 py-14">
           <div className="container-x">
-            <h2 className="heading-lg">Related Products</h2>
+            <h2 className="heading-lg">{t('Related Products')}</h2>
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {data.related.map((p) => (
                 <ProductCard key={p.id} product={p} />
@@ -231,6 +233,7 @@ export function ProductDetail() {
 }
 
 export function NewsDetail() {
+  const t = useT()
   const { slug } = useParams()
   const { data, isLoading, isError, error, refetch } = useNewsPost(slug)
 
@@ -256,7 +259,7 @@ export function NewsDetail() {
           publisher: { '@type': 'Organization', name: 'IR Limited' },
         }}
       />
-      <PageHero title={post.title} crumbs={[{ label: 'News', href: '/news' }, { label: post.title }]}>
+      <PageHero title={post.title} crumbs={[{ label: t('News'), href: '/news' }, { label: post.title }]}>
         <p className="mt-4 flex flex-wrap items-center gap-4 text-sm text-white/85">
           <span className="flex items-center gap-1.5"><CalendarDays className="h-4 w-4" aria-hidden="true" /> <time dateTime={post.published_at}>{formatDate(post.published_at, { day: 'numeric', month: 'long', year: 'numeric' })}</time></span>
           {post.category && <span className="rounded bg-white/15 px-2 py-0.5 text-xs font-semibold uppercase">{post.category.name}</span>}
@@ -269,12 +272,12 @@ export function NewsDetail() {
             {post.excerpt && <p className="mb-6 text-lg leading-relaxed text-slate-700">{post.excerpt}</p>}
             <RichText html={post.content} />
             <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-6 text-sm">
-              <span className="font-semibold text-navy-900">Share:</span>
+              <span className="font-semibold text-navy-900">{t('Share:')}</span>
               <a className="btn-outline py-1.5" href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" rel="noopener noreferrer">Facebook</a>
               <a className="btn-outline py-1.5" href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`} target="_blank" rel="noopener noreferrer">LinkedIn</a>
               <a className="btn-outline py-1.5" href={`https://x.com/intent/post?url=${shareUrl}&text=${encodeURIComponent(post.title)}`} target="_blank" rel="noopener noreferrer">X</a>
             </div>
-            <Link to="/news" className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">← Back to all news</Link>
+            <Link to="/news" className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">{t('← Back to all news')}</Link>
           </article>
           <NewsSidebar />
         </div>
@@ -284,6 +287,7 @@ export function NewsDetail() {
 }
 
 export function ServiceDetail() {
+  const t = useT()
   const { slug } = useParams()
   const { data: service, isLoading, isError, error, refetch } = useService(slug)
 
@@ -302,10 +306,10 @@ export function ServiceDetail() {
             <RichText html={service.description || `<p>${service.short_description || ''}</p>`} className="mt-6" />
           </div>
           <aside className="card h-fit p-6">
-            <h2 className="text-lg font-semibold text-navy-900">Need this service?</h2>
+            <h2 className="text-lg font-semibold text-navy-900">{t('Need this service?')}</h2>
             <p className="mt-2 text-sm text-muted">Tell us about your packaging requirements and our team will get back to you within 24 hours.</p>
             <Link to={`/contact?subject=${encodeURIComponent('Custom Packaging')}`} className="btn-primary mt-5 w-full">
-              Contact Us <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              {t('Contact Us')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </aside>
         </div>
@@ -315,6 +319,7 @@ export function ServiceDetail() {
 }
 
 export function SearchPage() {
+  const t = useT()
   const [params, setParams] = useSearchParams()
   const q = params.get('q') || ''
   const [term, setTerm] = useState(q)
@@ -338,13 +343,13 @@ export function SearchPage() {
           </form>
           <div className="mt-8" aria-live="polite">
             {q.length < 2 ? (
-              <p className="text-sm text-muted">Enter at least 2 characters to search.</p>
+              <p className="text-sm text-muted">{t('Enter at least 2 characters to search.')}</p>
             ) : isFetching ? (
               <div className="flex justify-center py-10"><Spinner /></div>
             ) : isError ? (
               <ErrorState onRetry={refetch} />
             ) : results.length === 0 ? (
-              <EmptyState icon={FileSearch} title="No results found" message="Try a different keyword, or browse our products." />
+              <EmptyState icon={FileSearch} title={t('No results found')} message="Try a different keyword, or browse our products." />
             ) : (
               <ul className="space-y-4">
                 {results.map((r) => (
@@ -406,16 +411,17 @@ export function UnsubscribePage() {
 }
 
 export function NotFound() {
+  const t = useT()
   return (
     <>
-      <Seo title="Page not found" noindex />
+      <Seo title={t('Page not found')} noindex />
       <section className="container-x flex min-h-[60vh] flex-col items-center justify-center py-16 text-center">
         <p className="text-7xl font-bold text-brand-600">404</p>
-        <h1 className="heading-lg mt-4">Page not found</h1>
-        <p className="mt-3 max-w-md text-muted">The page you are looking for doesn’t exist or has been moved.</p>
+        <h1 className="heading-lg mt-4">{t('Page not found')}</h1>
+        <p className="mt-3 max-w-md text-muted">{t('The page you are looking for doesn’t exist or has been moved.')}</p>
         <div className="mt-8 flex gap-3">
-          <Link to="/" className="btn-primary">Go to homepage</Link>
-          <Link to="/products" className="btn-outline">View products</Link>
+          <Link to="/" className="btn-primary">{t('Go to homepage')}</Link>
+          <Link to="/products" className="btn-outline">{t('View products')}</Link>
         </div>
       </section>
     </>

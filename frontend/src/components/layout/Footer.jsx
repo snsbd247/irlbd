@@ -7,6 +7,7 @@ import SmartLink from '../ui/SmartLink'
 import NewsletterForm from './NewsletterForm'
 import BrochureButton from '../ui/BrochureButton'
 import { Logo } from './Header'
+import { useT } from '../../lib/i18n'
 
 function LinkColumn({ title, items }) {
   if (!items?.length) return null
@@ -27,6 +28,7 @@ function LinkColumn({ title, items }) {
 }
 
 function BackToTop() {
+  const t = useT()
   const [visible, setVisible] = useState(false)
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 600)
@@ -39,7 +41,7 @@ function BackToTop() {
       type="button"
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       className="fixed right-5 bottom-5 z-30 flex h-11 w-11 items-center justify-center rounded-md bg-brand-600 text-white shadow-lg hover:bg-brand-700"
-      aria-label="Back to top"
+      aria-label={t('Back to top')}
     >
       <ArrowUp className="h-5 w-5" aria-hidden="true" />
     </button>
@@ -47,6 +49,7 @@ function BackToTop() {
 }
 
 export default function Footer() {
+  const t = useT()
   const { data: s = {} } = useSettings()
   const { data: nav } = useNavigation()
   const copyright = (s.copyright_text || `© {year} ${s.site_name || 'IR Limited'}. All Rights Reserved.`).replace('{year}', new Date().getFullYear())
@@ -74,11 +77,11 @@ export default function Footer() {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-8 lg:col-span-4 lg:border-r lg:border-white/10 lg:px-4">
-          <LinkColumn title="Quick Links" items={nav?.footer_quick} />
-          <LinkColumn title="Our Products" items={nav?.footer_products} />
+          <LinkColumn title={t('Quick Links')} items={nav?.footer_quick} />
+          <LinkColumn title={t('Our Products')} items={nav?.footer_products} />
         </div>
         <div className="md:col-span-2 lg:col-span-4">
-          <h2 className="mb-2 text-sm font-semibold">{s.newsletter_title || 'Newsletter'}</h2>
+          <h2 className="mb-2 text-sm font-semibold">{s.newsletter_title || t('Newsletter')}</h2>
           {s.newsletter_text && <p className="mb-4 text-sm text-white/70">{s.newsletter_text}</p>}
           <NewsletterForm dark idPrefix="footer-newsletter" />
         </div>

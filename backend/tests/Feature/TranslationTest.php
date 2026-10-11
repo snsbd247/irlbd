@@ -138,4 +138,18 @@ class TranslationTest extends TestCase
 
         $this->assertSame(0, Translation::count());
     }
+
+    public function test_bangla_seeder_adds_missing_translations_without_overwriting(): void
+    {
+        $home = MenuItem::create(['location' => 'header', 'label' => 'Home', 'link_type' => 'url', 'url' => '/', 'is_active' => true]);
+        $news = MenuItem::create(['location' => 'header', 'label' => 'News', 'link_type' => 'url', 'url' => '/news', 'is_active' => true]);
+        $news->syncTranslations(['bn' => ['label' => 'খবর']]);
+
+        $this->seed(\Database\Seeders\BanglaContentSeeder::class);
+        $this->seed(\Database\Seeders\BanglaContentSeeder::class);
+
+        $this->assertSame('হোম', $home->translationsArray()['bn']['label']);
+        $this->assertSame('খবর', $news->translationsArray()['bn']['label']);
+        $this->assertSame(2, Translation::count());
+    }
 }

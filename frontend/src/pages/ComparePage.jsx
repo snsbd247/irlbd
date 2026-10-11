@@ -7,9 +7,11 @@ import { EmptyState, ErrorState, PageLoader } from '../components/ui/States'
 import { api } from '../lib/api'
 import { COMPARE_MAX, useCompare } from '../lib/compare'
 import { cn } from '../lib/utils'
+import { useT } from '../lib/i18n'
 
 /** "Add to compare" toggle used on product cards and product pages. */
 export function CompareToggle({ slug, className, compact = false }) {
+  const t = useT()
   const { has, toggle, full } = useCompare()
   const selected = has(slug)
   const disabled = !selected && full
@@ -30,13 +32,14 @@ export function CompareToggle({ slug, className, compact = false }) {
         className,
       )}
     >
-      <GitCompareArrows className="h-4 w-4" aria-hidden="true" /> {selected ? 'Added to compare' : 'Compare'}
+      <GitCompareArrows className="h-4 w-4" aria-hidden="true" /> {selected ? t('Added to compare') : t('Compare')}
     </button>
   )
 }
 
 /** Floating bar shown while products are selected for comparison. */
 export function CompareBar() {
+  const t = useT()
   const { list, clear } = useCompare()
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -46,10 +49,10 @@ export function CompareBar() {
     <div className="fixed inset-x-0 bottom-4 z-30 flex justify-center px-4" role="region" aria-label="Product comparison">
       <div className="flex items-center gap-3 rounded-full bg-navy-900 py-2 pr-2 pl-5 text-sm text-white shadow-2xl">
         <GitCompareArrows className="h-4 w-4 text-brand-500" aria-hidden="true" />
-        <span>{list.length} product{list.length > 1 ? 's' : ''} selected</span>
-        <button type="button" onClick={clear} className="text-white/70 hover:text-white">Clear</button>
+        <span>{t('{n} product(s) selected', { n: list.length })}</span>
+        <button type="button" onClick={clear} className="text-white/70 hover:text-white">{t('Clear')}</button>
         <button type="button" onClick={() => navigate('/compare')} disabled={list.length < 2} className="btn-primary rounded-full px-4 py-1.5 disabled:opacity-50" title={list.length < 2 ? 'Select at least 2 products' : undefined}>
-          Compare <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          {t('Compare')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
     </div>
@@ -64,6 +67,7 @@ const ROW_LABELS = [
 ]
 
 export default function ComparePage() {
+  const t = useT()
   const { list, remove } = useCompare()
   const slugs = list.join(',')
   const { data: products, isLoading, isError, refetch } = useQuery({
@@ -76,13 +80,13 @@ export default function ComparePage() {
 
   return (
     <>
-      <Seo title="Compare Products" noindex />
-      <PageHero title="Compare Products" subtitle="Side-by-side specifications of the products you selected." crumbs={[{ label: 'Our Products', href: '/products' }, { label: 'Compare' }]} />
+      <Seo title={t('Compare Products')} noindex />
+      <PageHero title={t('Compare Products')} subtitle={t('Side-by-side specifications of the products you selected.')} crumbs={[{ label: t('Our Products'), href: '/products' }, { label: t('Compare') }]} />
       <section className="py-12">
         <div className="container-x">
           {list.length === 0 ? (
-            <EmptyState icon={GitCompareArrows} title="No products selected" message={`Use the “Compare” button on up to ${COMPARE_MAX} products, then come back here.`}>
-              <Link to="/products" className="btn-primary mt-3">Browse products</Link>
+            <EmptyState icon={GitCompareArrows} title={t('No products selected')} message={`Use the “Compare” button on up to ${COMPARE_MAX} products, then come back here.`}>
+              <Link to="/products" className="btn-primary mt-3">{t('Browse products')}</Link>
             </EmptyState>
           ) : isLoading ? (
             <PageLoader />
@@ -94,7 +98,7 @@ export default function ComparePage() {
                 <caption className="sr-only">Product comparison</caption>
                 <thead>
                   <tr className="bg-brand-50/60">
-                    <th scope="col" className="w-44 p-4 text-left text-xs font-semibold text-muted uppercase">Product</th>
+                    <th scope="col" className="w-44 p-4 text-left text-xs font-semibold text-muted uppercase">{t('Product')}</th>
                     {products.map((p) => (
                       <th key={p.id} scope="col" className="p-4 text-left align-top">
                         <div className="relative">
@@ -111,7 +115,7 @@ export default function ComparePage() {
                 <tbody>
                   {ROW_LABELS.map(([key, label, value]) => (
                     <tr key={key} className="border-t border-slate-100">
-                      <th scope="row" className="bg-slate-50/60 p-4 text-left font-medium text-navy-900">{label}</th>
+                      <th scope="row" className="bg-slate-50/60 p-4 text-left font-medium text-navy-900">{t(label)}</th>
                       {products.map((p) => <td key={p.id} className="p-4 align-top text-slate-700">{value(p) || '—'}</td>)}
                     </tr>
                   ))}
@@ -126,7 +130,7 @@ export default function ComparePage() {
                     {products.map((p) => (
                       <td key={p.id} className="p-4">
                         <Link to={`/request-quote?product=${encodeURIComponent(p.slug)}`} className="btn-primary w-full py-2">
-                          <MessageSquareQuote className="h-4 w-4" aria-hidden="true" /> Get a Quote
+                          <MessageSquareQuote className="h-4 w-4" aria-hidden="true" /> {t('Get a Quote')}
                         </Link>
                       </td>
                     ))}

@@ -221,7 +221,7 @@ export function FileField({ id, value, url, onChange, folder = 'documents' }) {
 }
 
 /** Ordered gallery: [{ path, url, alt }] */
-export function GalleryField({ value = [], onChange, folder = 'products' }) {
+export function GalleryField({ value = [], onChange, folder = 'products', bengali = false }) {
   const [open, setOpen] = useState(false)
   const move = (i, dir) => {
     const next = [...value]
@@ -237,6 +237,9 @@ export function GalleryField({ value = [], onChange, folder = 'products' }) {
             <img src={img.url} alt={img.alt || ''} className="aspect-square w-full bg-slate-50 object-contain" />
             <div className="space-y-1.5 p-2">
               <input aria-label={`Alt text for image ${i + 1}`} className="input py-1 text-xs" placeholder="Alt text" value={img.alt || ''} onChange={(e) => onChange(value.map((v, j) => (j === i ? { ...v, alt: e.target.value } : v)))} />
+              {bengali && (
+                <input aria-label={`Bengali caption for image ${i + 1}`} lang="bn" className="input py-1 text-xs" placeholder="বাংলা ক্যাপশন" value={img.alt_bn || ''} onChange={(e) => onChange(value.map((v, j) => (j === i ? { ...v, alt_bn: e.target.value } : v)))} />
+              )}
               <div className="flex justify-between">
                 <div className="flex gap-1">
                   <button type="button" className="rounded p-1 hover:bg-slate-100 disabled:opacity-30" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Move left"><ArrowUp className="h-3.5 w-3.5 -rotate-90" aria-hidden="true" /></button>

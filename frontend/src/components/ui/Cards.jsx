@@ -4,8 +4,10 @@ import { ArrowRight, CalendarDays, X } from 'lucide-react'
 import { Icon } from '../../lib/icons'
 import { dateParts, formatDate } from '../../lib/utils'
 import { CompareToggle } from '../../pages/ComparePage'
+import { useT } from '../../lib/i18n'
 
 export function ProductCard({ product }) {
+  const t = useT()
   return (
     <article className="card group flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
       <Link to={`/products/${product.slug}`} className="block aspect-[4/3] overflow-hidden bg-brand-50" tabIndex={-1} aria-hidden="true">
@@ -21,7 +23,7 @@ export function ProductCard({ product }) {
         {product.short_description && <p className="mt-2 line-clamp-2 text-sm text-muted">{product.short_description}</p>}
         <div className="mt-auto flex items-center justify-between gap-2 pt-4">
           <Link to={`/products/${product.slug}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:gap-2.5" aria-label={`View details of ${product.name}`}>
-            View Details <ArrowRight className="h-4 w-4 transition-all" aria-hidden="true" />
+            {t('View Details')} <ArrowRight className="h-4 w-4 transition-all" aria-hidden="true" />
           </Link>
           <CompareToggle slug={product.slug} compact />
         </div>
@@ -45,6 +47,7 @@ export function MiniProductCard({ product }) {
 }
 
 export function NewsCard({ post }) {
+  const t = useT()
   const d = dateParts(post.published_at)
   return (
     <article className="card group flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
@@ -64,7 +67,7 @@ export function NewsCard({ post }) {
         </h3>
         {post.excerpt && <p className="mt-2 line-clamp-3 text-sm text-muted">{post.excerpt}</p>}
         <Link to={`/news/${post.slug}`} className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-brand-600" aria-label={`Read more: ${post.title}`}>
-          Read More <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          {t('Read More')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
     </article>
@@ -72,6 +75,7 @@ export function NewsCard({ post }) {
 }
 
 export function NewsRowCard({ post }) {
+  const t = useT()
   return (
     <article className="card flex gap-4 p-3">
       <Link to={`/news/${post.slug}`} className="block w-28 shrink-0 overflow-hidden rounded-lg bg-brand-50 sm:w-36" tabIndex={-1} aria-hidden="true">
@@ -86,7 +90,7 @@ export function NewsRowCard({ post }) {
         </h3>
         {post.excerpt && <p className="mt-1 line-clamp-2 text-xs text-muted">{post.excerpt}</p>}
         <Link to={`/news/${post.slug}`} className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-brand-600">
-          Read More <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          {t('Read More')} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>
       </div>
     </article>

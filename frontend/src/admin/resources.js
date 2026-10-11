@@ -13,6 +13,7 @@ const seo = [
 
 export const RESOURCES = {
   'hero-slides': {
+    translatable: ['eyebrow', 'title', 'highlight', 'title_suffix', 'subtitle', 'primary_label', 'secondary_label'],
     title: 'Hero Slides',
     singular: 'slide',
     permission: 'pages',
@@ -39,6 +40,7 @@ export const RESOURCES = {
   },
 
   'product-categories': {
+    translatable: ['name', 'short_description', 'description'],
     title: 'Product Categories',
     singular: 'category',
     permission: 'products',
@@ -62,6 +64,7 @@ export const RESOURCES = {
   },
 
   products: {
+    translatable: ['name', 'short_description', 'description', 'meta_title', 'meta_description'],
     title: 'Products',
     singular: 'product',
     permission: 'products',
@@ -90,14 +93,14 @@ export const RESOURCES = {
       {
         name: 'variants', label: 'Sizes & variants (optional)', type: 'repeater', span: 'full', addLabel: 'Add variant', default: [],
         fields: [
-          { name: 'name', label: 'Variant (e.g. 500 ml)', type: 'text' }, { name: 'capacity', label: 'Capacity', type: 'text' },
+          { name: 'name', label: 'Variant (e.g. 500 ml)', type: 'text', t: true }, { name: 'capacity', label: 'Capacity', type: 'text' },
           { name: 'weight', label: 'Weight', type: 'text' }, { name: 'neck_size', label: 'Neck size', type: 'text' },
-          { name: 'color', label: 'Colour', type: 'text' }, { name: 'moq', label: 'MOQ', type: 'text' },
+          { name: 'color', label: 'Colour', type: 'text', t: true }, { name: 'moq', label: 'MOQ', type: 'text' },
         ],
       },
       {
         name: 'specifications', label: 'Specifications', type: 'repeater', span: 'full', addLabel: 'Add specification', default: [],
-        fields: [{ name: 'label', label: 'Label', type: 'text' }, { name: 'value', label: 'Value', type: 'text' }],
+        fields: [{ name: 'label', label: 'Label', type: 'text', t: true }, { name: 'value', label: 'Value', type: 'text', t: true }],
       },
       { name: 'description', label: 'Full description', type: 'richtext', span: 'full' },
       status,
@@ -108,6 +111,7 @@ export const RESOURCES = {
   },
 
   industries: {
+    translatable: ['name'],
     title: 'Industries',
     singular: 'industry',
     permission: 'products',
@@ -128,6 +132,7 @@ export const RESOURCES = {
   },
 
   services: {
+    translatable: ['title', 'short_description', 'description'],
     title: 'Services',
     singular: 'service',
     permission: 'services',
@@ -149,6 +154,7 @@ export const RESOURCES = {
   },
 
   clients: {
+    translatable: ['name'],
     title: 'Clients',
     singular: 'client',
     permission: 'clients',
@@ -168,6 +174,7 @@ export const RESOURCES = {
   },
 
   'gallery-albums': {
+    translatable: ['title', 'description'],
     title: 'Gallery Albums',
     singular: 'album',
     permission: 'gallery',
@@ -185,12 +192,13 @@ export const RESOURCES = {
       { name: 'event_date', label: 'Date (optional)', type: 'date' },
       { name: 'cover_image', label: 'Cover image (defaults to the first photo)', type: 'image', folder: 'gallery' },
       { name: 'description', label: 'Description', type: 'textarea', span: 'full', max: 500 },
-      { name: 'images', label: 'Photos (the text box under each photo is its caption)', type: 'gallery', folder: 'gallery', span: 'full', default: [] },
+      { name: 'images', label: 'Photos (the text boxes under each photo are its English and Bengali captions)', type: 'gallery', folder: 'gallery', span: 'full', default: [], bengali: true },
       { name: 'is_active', label: 'Visible on website', type: 'toggle', default: true },
     ],
   },
 
   testimonials: {
+    translatable: ['name', 'designation', 'company', 'quote'],
     title: 'Testimonials',
     singular: 'testimonial',
     permission: 'clients',
@@ -214,6 +222,7 @@ export const RESOURCES = {
   },
 
   'job-posts': {
+    translatable: ['title', 'department', 'location', 'summary', 'description'],
     title: 'Job Posts',
     singular: 'job post',
     permission: 'careers',
@@ -244,6 +253,7 @@ export const RESOURCES = {
   },
 
   'team-members': {
+    translatable: ['name', 'designation', 'message', 'quote'],
     title: 'Team & Founder',
     singular: 'member',
     permission: 'team',
@@ -268,6 +278,7 @@ export const RESOURCES = {
   },
 
   'news-categories': {
+    translatable: ['name'],
     title: 'News Categories',
     singular: 'category',
     permission: 'news',
@@ -281,6 +292,7 @@ export const RESOURCES = {
   },
 
   'news-posts': {
+    translatable: ['title', 'excerpt', 'content', 'meta_title', 'meta_description'],
     title: 'News & Notices',
     singular: 'post',
     permission: 'news',
@@ -309,6 +321,7 @@ export const RESOURCES = {
   },
 
   milestones: {
+    translatable: ['title', 'description'],
     title: 'History Milestones',
     singular: 'milestone',
     permission: 'history',
@@ -329,6 +342,7 @@ export const RESOURCES = {
   },
 
   certifications: {
+    translatable: ['name', 'description'],
     title: 'Certifications',
     singular: 'certification',
     permission: 'quality',
@@ -350,6 +364,7 @@ export const RESOURCES = {
   },
 
   offices: {
+    translatable: ['name', 'address'],
     title: 'Offices',
     singular: 'office',
     permission: 'contact',
@@ -370,6 +385,7 @@ export const RESOURCES = {
   },
 
   faqs: {
+    translatable: ['question', 'answer'],
     title: 'FAQs',
     singular: 'FAQ',
     permission: 'contact',

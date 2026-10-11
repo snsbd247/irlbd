@@ -22,6 +22,10 @@
 }
 
 @layer base {
+  /* Poppins has no Bengali glyphs: use Hind Siliguri for Bengali text. */
+  html[lang="bn"] body {
+    font-family: "Hind Siliguri", "Poppins", ui-sans-serif, system-ui, sans-serif;
+  }
   html {
     scroll-behavior: smooth;
   }

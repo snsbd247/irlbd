@@ -8,7 +8,7 @@ import { cn, formatDate } from '../../lib/utils'
 import { EmptyState, ErrorState, Spinner } from '../../components/ui/States'
 import Pagination from '../../components/ui/Pagination'
 import { RESOURCES } from '../resources'
-import { FieldGrid } from '../components/Fields'
+import { FieldGrid, TranslationCard } from '../components/Fields'
 import { Badge, Card, PageHeader, SaveButton, statusTone, useConfirm, useToast } from '../components/ui'
 import { useAuth } from '../auth'
 import { NotAllowed } from './Misc'
@@ -231,15 +231,16 @@ function toForm(record) {
 }
 
 /** Only fields declared in the schema are sent back to the API. */
-function toPayload(fields, record) {
+function toPayload(fields, record, translatable) {
   const payload = {}
   fields.forEach((f) => {
     if (f.showIf && !f.showIf(record)) return
     let v = record[f.name]
-    if (f.type === 'gallery') v = (v || []).map(({ path, alt }) => ({ path, alt }))
+    if (f.type === 'gallery') v = (v || []).map(({ path, alt, alt_bn }) => (f.bengali ? { path, alt, alt_bn: alt_bn || null } : { path, alt }))
     if (f.type === 'password' && !v) return
     payload[f.name] = v === undefined ? null : v
   })
+  if (translatable?.length) payload.translations = record.translations && !Array.isArray(record.translations) ? record.translations : {}
   return payload
 }
 
@@ -272,7 +273,7 @@ export function ResourceForm({ resourceKey }) {
     setSaving(true)
     setErrors({})
     try {
-      const payload = toPayload(config.fields, record)
+      const payload = toPayload(config.fields, record, config.translatable)
       const res = isNew ? await api.post(`/admin/${resourceKey}`, payload) : await api.put(`/admin/${resourceKey}/${id}`, payload)
       queryClient.invalidateQueries({ queryKey: ['admin', resourceKey] })
       queryClient.invalidateQueries({ queryKey: ['admin', 'options'] })
@@ -312,6 +313,19 @@ export function ResourceForm({ resourceKey }) {
         <Card>
           <FieldGrid fields={main} record={record} setRecord={setRecord} errors={errors} idPrefix={resourceKey} />
         </Card>
+        {config.translatable?.length > 0 && (
+          <Card title="বাংলা (Bengali translation)">
+            <p className="mb-4 text-sm text-muted">Optional. Shown when a visitor switches the website to বাংলা — empty fields show the English text.</p>
+            <TranslationCard
+              fields={config.fields}
+              names={config.translatable}
+              translations={record.translations}
+              english={record}
+              onChange={(translations) => setRecord((r) => ({ ...r, translations }))}
+              idPrefix={resourceKey}
+            />
+          </Card>
+        )}
         {seoFields.length > 0 && (
           <Card title="Search engine optimisation">
             <FieldGrid fields={seoFields} record={record} setRecord={setRecord} errors={errors} idPrefix={`${resourceKey}-seo`} />

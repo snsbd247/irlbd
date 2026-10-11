@@ -5,7 +5,7 @@ import { ArrowDown, ArrowLeft, ArrowUp, Eye, EyeOff, ExternalLink, LayoutTemplat
 import { api, errorMessage, fieldErrors } from '../../lib/api'
 import { cn } from '../../lib/utils'
 import { ErrorState, Spinner } from '../../components/ui/States'
-import { FieldGrid } from '../components/Fields'
+import { FieldGrid, TranslationCard } from '../components/Fields'
 import { Badge, Card, Modal, PageHeader, SaveButton, statusTone, useConfirm, useToast } from '../components/ui'
 import { useAuth, useMeta } from '../auth'
 import { NotAllowed } from './Misc'
@@ -41,6 +41,10 @@ const FIELD_LABELS = {
   button_label: ['Button label', 'text'],
   button_url: ['Button link', 'text'],
 }
+
+const PAGE_TRANSLATABLE = ['title', 'hero_title', 'hero_subtitle', 'content', 'meta_title', 'meta_description']
+const SECTION_TRANSLATABLE = ['eyebrow', 'title', 'subtitle', 'content', 'button_label', 'image_alt']
+const ITEM_TRANSLATABLE = ['title', 'subtitle', 'description', 'value']
 
 const ITEM_FIELD_LABELS = {
   icon: ['Icon', 'icon'],
@@ -87,7 +91,7 @@ function SectionEditor({ section, type, onClose, onSaved }) {
     span: 'full',
     addLabel: 'Add item',
     defaults: { is_active: true },
-    fields: type.items.map((f) => ({ name: f, label: ITEM_FIELD_LABELS[f][0], type: ITEM_FIELD_LABELS[f][1], folder: 'pages' })),
+    fields: type.items.map((f) => ({ name: f, label: ITEM_FIELD_LABELS[f][0], type: ITEM_FIELD_LABELS[f][1], folder: 'pages', t: ITEM_TRANSLATABLE.includes(f) })),
   }
 
   async function save() {
@@ -95,7 +99,13 @@ function SectionEditor({ section, type, onClose, onSaved }) {
     setErrors({})
     const payload = { ...record, settings }
     delete payload.data
-    payload.items = type.items ? (record.items || []).map(({ id, title, subtitle, description, value, icon, image, link_url, is_active }) => ({ id, title, subtitle, description, value, icon, image, link_url, is_active: is_active !== false })) : undefined
+    payload.translations = record.translations && !Array.isArray(record.translations) ? record.translations : {}
+    payload.items = type.items
+      ? (record.items || []).map(({ id, title, subtitle, description, value, icon, image, link_url, is_active, translations }) => ({
+          id, title, subtitle, description, value, icon, image, link_url, is_active: is_active !== false,
+          translations: translations && !Array.isArray(translations) ? translations : {},
+        }))
+      : undefined
     try {
       const { data } = await api.put(`/admin/sections/${section.id}`, payload)
       toast('Section saved.')
@@ -124,6 +134,14 @@ function SectionEditor({ section, type, onClose, onSaved }) {
       <p className="mb-5 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-800">{type.description}</p>
       <div className="space-y-6">
         <FieldGrid fields={fields} record={record} setRecord={setRecord} errors={errors} idPrefix={`section-${section.id}`} />
+        {type.fields.some((f) => SECTION_TRANSLATABLE.includes(f)) && (
+          <details className="rounded-lg border border-slate-200 p-4" open={!!record.translations?.bn}>
+            <summary className="cursor-pointer text-sm font-semibold text-navy-900">বাংলা (Bengali translation) <span className="font-normal text-muted">— optional, empty fields show English</span></summary>
+            <div className="mt-4">
+              <TranslationCard fields={fields} names={SECTION_TRANSLATABLE} translations={record.translations} english={record} onChange={(translations) => setRecord((r) => ({ ...r, translations }))} idPrefix={`section-${section.id}`} />
+            </div>
+          </details>
+        )}
         {settingFields.length > 0 && (
           <div>
             <h3 className="mb-3 text-sm font-semibold text-navy-900">Layout options</h3>
@@ -304,6 +322,7 @@ export default function PageEditor() {
     setErrors({})
     const payload = Object.fromEntries([...PAGE_FIELDS, ...SEO_FIELDS].map((f) => [f.name, record[f.name] ?? null]))
     payload.is_home = !!record.is_home
+    payload.translations = record.translations && !Array.isArray(record.translations) ? record.translations : {}
     try {
       const res = isNew ? await api.post('/admin/pages', payload) : await api.put(`/admin/pages/${id}`, payload)
       toast('Page saved.')
@@ -343,6 +362,10 @@ export default function PageEditor() {
         />
         <Card title="Page details">
           <FieldGrid fields={fields} record={record} setRecord={setRecord} errors={errors} idPrefix="page" />
+        </Card>
+        <Card title="বাংলা (Bengali translation)">
+          <p className="mb-4 text-sm text-muted">Optional. Shown when a visitor switches the website to বাংলা — empty fields show the English text. Section texts are translated inside each section.</p>
+          <TranslationCard fields={[...PAGE_FIELDS, ...SEO_FIELDS]} names={PAGE_TRANSLATABLE} translations={record.translations} english={record} onChange={(translations) => setRecord((r) => ({ ...r, translations }))} idPrefix="page" />
         </Card>
         <Card title="Search engine optimisation">
           <FieldGrid fields={SEO_FIELDS} record={record} setRecord={setRecord} errors={errors} idPrefix="page-seo" />

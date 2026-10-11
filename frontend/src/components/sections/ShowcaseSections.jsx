@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { translate } from '../../lib/i18n'
 import { Link } from 'react-router-dom'
 import { ArrowRight, ChevronLeft, ChevronRight, Images, Play, Quote, Star, X } from 'lucide-react'
 import SectionHeading from '../ui/SectionHeading'
@@ -33,7 +34,7 @@ export function Lightbox({ images, index, onClose, onIndex }) {
     <div className="fixed inset-0 z-50 flex flex-col bg-black/95" role="dialog" aria-modal="true" aria-label="Image viewer">
       <div className="flex items-center justify-between px-4 py-3 text-sm text-white/80">
         <span aria-live="polite">{index + 1} / {images.length}</span>
-        <button ref={closeRef} type="button" onClick={onClose} className="rounded-full p-2 hover:bg-white/10" aria-label="Close viewer">
+        <button ref={closeRef} type="button" onClick={onClose} className="rounded-full p-2 hover:bg-white/10" aria-label={translate('Close viewer')}>
           <X className="h-6 w-6" aria-hidden="true" />
         </button>
       </div>
@@ -41,10 +42,10 @@ export function Lightbox({ images, index, onClose, onIndex }) {
         <img src={image.url} alt={image.caption || image.alt || ''} className="max-h-full max-w-full object-contain" />
         {images.length > 1 && (
           <>
-            <button type="button" onClick={() => go(-1)} className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20" aria-label="Previous image">
+            <button type="button" onClick={() => go(-1)} className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20" aria-label={translate('Previous image')}>
               <ChevronLeft className="h-6 w-6" aria-hidden="true" />
             </button>
-            <button type="button" onClick={() => go(1)} className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20" aria-label="Next image">
+            <button type="button" onClick={() => go(1)} className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-white hover:bg-white/20" aria-label={translate('Next image')}>
               <ChevronRight className="h-6 w-6" aria-hidden="true" />
             </button>
           </>

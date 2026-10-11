@@ -10,6 +10,7 @@ import { api, errorMessage, fieldErrors } from '../lib/api'
 import { useSettings } from '../lib/queries'
 import { cn, formatDate } from '../lib/utils'
 import { NotFound } from './PublicPages'
+import { useT } from '../lib/i18n'
 
 export const JOB_TYPES = { full_time: 'Full-time', part_time: 'Part-time', contract: 'Contract', internship: 'Internship' }
 const CV_MAX_BYTES = 5 * 1024 * 1024
@@ -35,6 +36,7 @@ function JobMeta({ job, className }) {
 
 /** Job list rendered inside the "Careers" CMS page (template: careers). */
 export function CareersModule({ section }) {
+  const t = useT()
   const { data: s = {} } = useSettings()
   const { data: jobs, isLoading, isError, refetch } = useQuery({ queryKey: ['jobs'], queryFn: () => api.get('/jobs').then((r) => r.data) })
 
@@ -52,7 +54,7 @@ export function CareersModule({ section }) {
         ) : isError ? (
           <ErrorState onRetry={refetch} />
         ) : !jobs.length ? (
-          <EmptyState icon={Briefcase} title="No open positions right now" message={`We are always happy to hear from talented people.${s.contact_email ? ` Send your CV to ${s.contact_email}.` : ''}`} />
+          <EmptyState icon={Briefcase} title={t('No open positions right now')} message={`We are always happy to hear from talented people.${s.contact_email ? ` Send your CV to ${s.contact_email}.` : ''}`} />
         ) : (
           <ul className="space-y-4">
             {jobs.map((job) => (
@@ -63,7 +65,7 @@ export function CareersModule({ section }) {
                     <JobMeta job={job} className="mt-2 text-muted" />
                     {job.summary && <p className="mt-2 text-sm text-slate-600">{job.summary}</p>}
                   </div>
-                  <span className="btn-primary shrink-0">View & Apply <ArrowRight className="h-4 w-4" aria-hidden="true" /></span>
+                  <span className="btn-primary shrink-0">{t('View & Apply')} <ArrowRight className="h-4 w-4" aria-hidden="true" /></span>
                 </Link>
               </li>
             ))}
@@ -75,6 +77,7 @@ export function CareersModule({ section }) {
 }
 
 function ApplyForm({ job }) {
+  const t = useT()
   const fileRef = useRef(null)
   const [form, setForm] = useState({ name: '', email: '', phone: '', cover_letter: '', consent: false, website: '' })
   const [cv, setCv] = useState(null)
@@ -119,7 +122,7 @@ function ApplyForm({ job }) {
     return (
       <div role="status" className="flex flex-col items-center gap-3 rounded-xl bg-emerald-50 px-6 py-12 text-center">
         <CircleCheck className="h-12 w-12 text-emerald-600" aria-hidden="true" />
-        <p className="text-lg font-semibold text-navy-900">Application sent</p>
+        <p className="text-lg font-semibold text-navy-900">{t('Application sent')}</p>
         <p className="max-w-sm text-sm text-muted">{status.message}</p>
       </div>
     )
@@ -131,24 +134,24 @@ function ApplyForm({ job }) {
   return (
     <form onSubmit={submit} noValidate className="space-y-4">
       <div>
-        <label htmlFor="apply-name" className="label">Full name <span className="text-red-500">*</span></label>
+        <label htmlFor="apply-name" className="label">{t('Full name')} <span className="text-red-500">*</span></label>
         <input id="apply-name" className={cn('input', errors.name && 'border-red-400')} value={form.name} onChange={set('name')} autoComplete="name" maxLength={120} {...aria('name')} />
         {err('name')}
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="apply-email" className="label">Email <span className="text-red-500">*</span></label>
+          <label htmlFor="apply-email" className="label">{t('Email')} <span className="text-red-500">*</span></label>
           <input id="apply-email" type="email" className={cn('input', errors.email && 'border-red-400')} value={form.email} onChange={set('email')} autoComplete="email" maxLength={150} {...aria('email')} />
           {err('email')}
         </div>
         <div>
-          <label htmlFor="apply-phone" className="label">Phone <span className="text-red-500">*</span></label>
+          <label htmlFor="apply-phone" className="label">{t('Phone')} <span className="text-red-500">*</span></label>
           <input id="apply-phone" type="tel" className={cn('input', errors.phone && 'border-red-400')} value={form.phone} onChange={set('phone')} autoComplete="tel" maxLength={30} {...aria('phone')} />
           {err('phone')}
         </div>
       </div>
       <div>
-        <span className="label">CV / Resume <span className="text-red-500">*</span></span>
+        <span className="label">{t('CV / Resume')} <span className="text-red-500">*</span></span>
         <button
           id="apply-cv"
           type="button"
@@ -158,7 +161,7 @@ function ApplyForm({ job }) {
         >
           <FileUp className="h-6 w-6 shrink-0 text-brand-600" aria-hidden="true" />
           <span>
-            <span className="block font-medium text-navy-900">{cv ? cv.name : 'Choose file'}</span>
+            <span className="block font-medium text-navy-900">{cv ? cv.name : t('Choose file')}</span>
             <span className="block text-xs text-muted">{cv ? `${(cv.size / 1024).toFixed(0)} KB` : 'PDF or Word (.doc / .docx), max 5 MB'}</span>
           </span>
         </button>
@@ -166,7 +169,7 @@ function ApplyForm({ job }) {
         {err('cv')}
       </div>
       <div>
-        <label htmlFor="apply-cover_letter" className="label">Cover letter (optional)</label>
+        <label htmlFor="apply-cover_letter" className="label">{t('Cover letter (optional)')}</label>
         <textarea id="apply-cover_letter" rows={5} className="input" value={form.cover_letter} onChange={set('cover_letter')} maxLength={5000} />
       </div>
       <div className="hidden" aria-hidden="true">
@@ -180,13 +183,14 @@ function ApplyForm({ job }) {
       {err('consent')}
       {status.state === 'error' && <p role="alert" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">{status.message}</p>}
       <button type="submit" className="btn-primary w-full py-3" disabled={status.state === 'loading'}>
-        {status.state === 'loading' && <Spinner className="h-4 w-4 text-white" label="Sending" />} Submit Application
+        {status.state === 'loading' && <Spinner className="h-4 w-4 text-white" label="Sending" />} {t('Submit Application')}
       </button>
     </form>
   )
 }
 
 export function JobDetailPage() {
+  const t = useT()
   const { slug } = useParams()
   const { data: job, isLoading, isError, error, refetch } = useQuery({ queryKey: ['job', slug], queryFn: () => api.get(`/jobs/${encodeURIComponent(slug)}`).then((r) => r.data) })
 
@@ -197,7 +201,7 @@ export function JobDetailPage() {
   return (
     <>
       <Seo title={job.meta_title || `${job.title} – Careers`} description={job.meta_description || job.summary} />
-      <PageHero title={job.title} crumbs={[{ label: 'Careers', href: '/careers' }, { label: job.title }]}>
+      <PageHero title={job.title} crumbs={[{ label: t('Careers'), href: '/careers' }, { label: job.title }]}>
         <JobMeta job={job} className="mt-4 text-white/85" />
       </PageHero>
       <section className="py-12">
@@ -206,15 +210,15 @@ export function JobDetailPage() {
             {job.summary && <p className="mb-6 text-lg text-slate-700">{job.summary}</p>}
             <RichText html={job.description} />
             <Link to="/careers" className="mt-10 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" /> All openings
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" /> {t('All openings')}
             </Link>
           </article>
           <aside className="card h-fit p-6 lg:sticky lg:top-24">
-            <h2 className="mb-4 text-lg font-semibold text-navy-900">Apply for this position</h2>
+            <h2 className="mb-4 text-lg font-semibold text-navy-900">{t('Apply for this position')}</h2>
             {job.is_open ? (
               <ApplyForm job={job} />
             ) : (
-              <p className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800">Applications for this position are closed.</p>
+              <p className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800">{t('Applications for this position are closed.')}</p>
             )}
           </aside>
         </div>

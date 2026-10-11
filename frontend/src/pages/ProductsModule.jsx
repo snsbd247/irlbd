@@ -10,9 +10,11 @@ import Pagination from '../components/ui/Pagination'
 import SectionHeading from '../components/ui/SectionHeading'
 import BrochureButton from '../components/ui/BrochureButton'
 import { cn } from '../lib/utils'
+import { useT } from '../lib/i18n'
 
 /** Searchable, filterable, paginated product catalog. State lives in the URL (?category=&q=&page=). */
 export default function ProductsModule({ section }) {
+  const t = useT()
   const [params, setParams] = useSearchParams()
   const category = params.get('category') || ''
   const industry = params.get('industry') || ''
@@ -52,13 +54,13 @@ export default function ProductsModule({ section }) {
     <section id="catalog" className="scroll-mt-24 py-14">
       <div className="container-x">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <SectionHeading eyebrow={section?.eyebrow} title={activeCategory ? activeCategory.name : section?.title || 'All Products'} subtitle={activeCategory?.short_description || section?.subtitle} />
+          <SectionHeading eyebrow={section?.eyebrow} title={activeCategory ? activeCategory.name : section?.title || t('All Products')} subtitle={activeCategory?.short_description || section?.subtitle} />
           <BrochureButton className="btn-outline shrink-0" />
         </div>
 
         <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
-            {[{ slug: '', name: 'All Products' }, ...categories].map((c) => (
+            {[{ slug: '', name: t('All Products') }, ...categories].map((c) => (
               <button
                 key={c.slug || 'all'}
                 type="button"
@@ -77,14 +79,14 @@ export default function ProductsModule({ section }) {
           <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
           {industries.length > 0 && (
             <select aria-label="Filter by industry" className="input sm:w-56" value={industry} onChange={(e) => update({ industry: e.target.value, page: '' })}>
-              <option value="">All industries</option>
+              <option value="">{t('All industries')}</option>
               {industries.map((i) => <option key={i.slug} value={i.slug}>{i.name} ({i.products_count})</option>)}
             </select>
           )}
           <div className="relative w-full lg:w-72">
             <label htmlFor="product-search" className="sr-only">Search products</label>
             <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-            <input id="product-search" type="search" value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Search products…" className="input pr-9 pl-9" />
+            <input id="product-search" type="search" value={term} onChange={(e) => setTerm(e.target.value)} placeholder={t('Search products…')} className="input pr-9 pl-9" />
             {term && (
               <button type="button" onClick={() => setTerm('')} className="absolute top-1/2 right-2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600" aria-label="Clear search">
                 <X className="h-4 w-4" aria-hidden="true" />
@@ -100,15 +102,15 @@ export default function ProductsModule({ section }) {
           ) : isError ? (
             <ErrorState onRetry={refetch} />
           ) : products.length === 0 ? (
-            <EmptyState icon={PackageSearch} title="No products found" message="Try another category or search term.">
+            <EmptyState icon={PackageSearch} title={t('No products found')} message={t('Try another category or search term.')}>
               {(q || category || industry) && (
-                <button type="button" className="btn-outline mt-2" onClick={() => setParams({})}>Clear filters</button>
+                <button type="button" className="btn-outline mt-2" onClick={() => setParams({})}>{t('Clear filters')}</button>
               )}
             </EmptyState>
           ) : (
             <>
               <p className="mb-4 text-sm text-muted">
-                Showing {data.meta.from}–{data.meta.to} of {data.meta.total} products
+                {t('Showing {from}–{to} of {total} products', { from: data.meta.from, to: data.meta.to, total: data.meta.total })}
               </p>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {products.map((product) => (

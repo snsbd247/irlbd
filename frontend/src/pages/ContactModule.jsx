@@ -5,6 +5,7 @@ import { api, errorMessage, fieldErrors } from '../lib/api'
 import { useContactInfo, useSettings } from '../lib/queries'
 import { cn, telHref } from '../lib/utils'
 import { Spinner } from '../components/ui/States'
+import { translate, useT } from '../lib/i18n'
 
 function InfoCard({ icon: IconComponent, title, children }) {
   return (
@@ -24,11 +25,11 @@ const EMPTY = { name: '', email: '', phone: '', subject: '', message: '', websit
 
 function validate(form) {
   const e = {}
-  if (form.name.trim().length < 2) e.name = 'Please enter your name.'
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = 'Please enter a valid email address.'
-  if (form.phone && !/^[0-9+\-\s()]{6,30}$/.test(form.phone.trim())) e.phone = 'Please enter a valid phone number.'
-  if (!form.subject) e.subject = 'Please select a subject.'
-  if (form.message.trim().length < 10) e.message = 'Your message must be at least 10 characters.'
+  if (form.name.trim().length < 2) e.name = translate('Please enter your name.')
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = translate('Please enter a valid email address.')
+  if (form.phone && !/^[0-9+\-\s()]{6,30}$/.test(form.phone.trim())) e.phone = translate('Please enter a valid phone number.')
+  if (!form.subject) e.subject = translate('Please select a subject.')
+  if (form.message.trim().length < 10) e.message = translate('Your message must be at least 10 characters.')
   return e
 }
 
@@ -47,6 +48,7 @@ function Field({ id, label, required, error, children }) {
 }
 
 export function ContactForm({ subjects }) {
+  const t = useT()
   const [params] = useSearchParams()
   const product = params.get('product')
   const [form, setForm] = useState(() => ({
@@ -83,9 +85,9 @@ export function ContactForm({ subjects }) {
     return (
       <div role="status" className="flex flex-col items-center gap-3 rounded-xl bg-emerald-50 px-6 py-12 text-center">
         <CircleCheck className="h-12 w-12 text-emerald-600" aria-hidden="true" />
-        <p className="text-lg font-semibold text-navy-900">Message sent</p>
+        <p className="text-lg font-semibold text-navy-900">{t('Message sent')}</p>
         <p className="max-w-sm text-sm text-muted">{status.message}</p>
-        <button type="button" className="btn-outline mt-2" onClick={() => setStatus({ state: 'idle', message: '' })}>Send another message</button>
+        <button type="button" className="btn-outline mt-2" onClick={() => setStatus({ state: 'idle', message: '' })}>{t('Send another message')}</button>
       </div>
     )
   }
@@ -93,25 +95,25 @@ export function ContactForm({ subjects }) {
   return (
     <form onSubmit={submit} noValidate className="space-y-4 rounded-xl bg-white p-5 sm:p-6">
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="contact-name" label="Your Name" required error={errors.name}>
+        <Field id="contact-name" label={t('Your Name')} required error={errors.name}>
           <input id="contact-name" className={cn('input', errors.name && 'border-red-400')} value={form.name} onChange={set('name')} placeholder="Enter your name" autoComplete="name" required aria-invalid={!!errors.name} aria-describedby={describedBy('name')} maxLength={120} />
         </Field>
-        <Field id="contact-email" label="Your Email" required error={errors.email}>
+        <Field id="contact-email" label={t('Your Email')} required error={errors.email}>
           <input id="contact-email" type="email" className={cn('input', errors.email && 'border-red-400')} value={form.email} onChange={set('email')} placeholder="Enter your email" autoComplete="email" required aria-invalid={!!errors.email} aria-describedby={describedBy('email')} maxLength={150} />
         </Field>
-        <Field id="contact-phone" label="Phone Number" error={errors.phone}>
+        <Field id="contact-phone" label={t('Phone Number')} error={errors.phone}>
           <input id="contact-phone" type="tel" className={cn('input', errors.phone && 'border-red-400')} value={form.phone} onChange={set('phone')} placeholder="Enter your phone number" autoComplete="tel" aria-invalid={!!errors.phone} aria-describedby={describedBy('phone')} maxLength={30} />
         </Field>
-        <Field id="contact-subject" label="Subject" required error={errors.subject}>
+        <Field id="contact-subject" label={t('Subject')} required error={errors.subject}>
           <select id="contact-subject" className={cn('input', errors.subject && 'border-red-400', !form.subject && 'text-slate-400')} value={form.subject} onChange={set('subject')} required aria-invalid={!!errors.subject} aria-describedby={describedBy('subject')}>
-            <option value="">Select a subject</option>
+            <option value="">{t('Select a subject')}</option>
             {(subjects || []).map((s) => (
               <option key={s} value={s} className="text-ink">{s}</option>
             ))}
           </select>
         </Field>
       </div>
-      <Field id="contact-message" label="Message" required error={errors.message}>
+      <Field id="contact-message" label={t('Message')} required error={errors.message}>
         <textarea id="contact-message" rows={5} className={cn('input', errors.message && 'border-red-400')} value={form.message} onChange={set('message')} placeholder="Write your message here…" required aria-invalid={!!errors.message} aria-describedby={describedBy('message')} maxLength={5000} />
       </Field>
       {/* Honeypot: hidden from people, filled by bots. */}
@@ -123,7 +125,7 @@ export function ContactForm({ subjects }) {
       <div className="flex justify-end">
         <button type="submit" className="btn-primary px-7 py-3" disabled={status.state === 'loading'}>
           {status.state === 'loading' ? <Spinner className="h-4 w-4 text-white" label="Sending" /> : null}
-          Send Message <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          {t('Send Message')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
     </form>
@@ -131,6 +133,7 @@ export function ContactForm({ subjects }) {
 }
 
 export default function ContactModule() {
+  const t = useT()
   const { data: s = {} } = useSettings()
   const { data: info } = useContactInfo()
 
@@ -138,23 +141,23 @@ export default function ContactModule() {
     <>
       <section className="py-10">
         <div className="container-x grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          <InfoCard icon={Phone} title="Call Us">
+          <InfoCard icon={Phone} title={t('Call Us')}>
             {[s.contact_phone, s.contact_phone_secondary].filter(Boolean).map((p) => (
               <a key={p} href={telHref(p)} className="block text-navy-900 hover:text-brand-600">{p}</a>
             ))}
             {s.office_hours && <p className="mt-1 text-xs text-muted">{s.office_hours}</p>}
           </InfoCard>
-          <InfoCard icon={Mail} title="Email Us">
+          <InfoCard icon={Mail} title={t('Email Us')}>
             {[s.contact_email, s.contact_email_secondary].filter(Boolean).map((m) => (
               <a key={m} href={`mailto:${m}`} className="block break-all text-navy-900 hover:text-brand-600">{m}</a>
             ))}
-            <p className="mt-1 text-xs text-muted">We reply within 24 hours</p>
+            <p className="mt-1 text-xs text-muted">{t('We reply within 24 hours')}</p>
           </InfoCard>
-          <InfoCard icon={MapPin} title="Our Location">
+          <InfoCard icon={MapPin} title={t('Our Location')}>
             <p className="whitespace-pre-line text-muted">{s.contact_address}</p>
           </InfoCard>
-          <InfoCard icon={Headphones} title="Support">
-            <p className="text-muted">For product inquiries, quotations or other support, our team is ready to help you.</p>
+          <InfoCard icon={Headphones} title={t('Support')}>
+            <p className="text-muted">{t('For product inquiries, quotations or other support, our team is ready to help you.')}</p>
           </InfoCard>
         </div>
       </section>
@@ -162,15 +165,15 @@ export default function ContactModule() {
       <section className="pb-14">
         <div className="container-x grid gap-6 lg:grid-cols-2">
           <div className="rounded-2xl bg-brand-50/70 p-5 sm:p-6">
-            <p className="eyebrow">Send us a message</p>
-            <h2 className="heading-lg mt-2">Get in Touch</h2>
-            <p className="mt-2 mb-5 text-sm text-muted">Fill out the form below and our team will get back to you shortly.</p>
+            <p className="eyebrow">{t('Send us a message')}</p>
+            <h2 className="heading-lg mt-2">{t('Get in Touch')}</h2>
+            <p className="mt-2 mb-5 text-sm text-muted">{t('Fill out the form below and our team will get back to you shortly.')}</p>
             <ContactForm key={info ? 'ready' : 'loading'} subjects={info?.subjects} />
           </div>
           <div className="flex flex-col rounded-2xl bg-brand-50/70 p-5 sm:p-6">
-            <p className="eyebrow">Find us here</p>
-            <h2 className="heading-lg mt-2">Our Location</h2>
-            <p className="mt-2 mb-5 text-sm text-muted">Visit our office or factory.</p>
+            <p className="eyebrow">{t('Find us here')}</p>
+            <h2 className="heading-lg mt-2">{t('Our Location')}</h2>
+            <p className="mt-2 mb-5 text-sm text-muted">{t('Visit our office or factory.')}</p>
             {s.map_embed_url ? (
               <iframe
                 src={s.map_embed_url}
@@ -185,7 +188,7 @@ export default function ContactModule() {
             )}
             {s.map_link_url && (
               <a href={s.map_link_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
-                Open in Google Maps <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                {t('Open in Google Maps')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             )}
           </div>
@@ -195,9 +198,9 @@ export default function ContactModule() {
       {info?.offices?.length > 0 && (
         <section className="pb-6">
           <div className="container-x">
-            <p className="eyebrow">Our Offices</p>
-            <h2 className="heading-lg mt-2">Our Offices</h2>
-            <p className="mt-2 text-sm text-muted">We look forward to hearing from you and exploring how we can work together.</p>
+            <p className="eyebrow">{t('Our Offices')}</p>
+            <h2 className="heading-lg mt-2">{t('Our Offices')}</h2>
+            <p className="mt-2 text-sm text-muted">{t('We look forward to hearing from you and exploring how we can work together.')}</p>
             <div className="mt-6 grid gap-5 md:grid-cols-2">
               {info.offices.map((office) => (
                 <article key={office.id} className="card flex flex-col gap-4 p-4 sm:flex-row">

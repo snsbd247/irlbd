@@ -5,6 +5,7 @@ import Header from './Header'
 import Footer from './Footer'
 import { Analytics, OrganizationJsonLd, WhatsAppButton } from './Integrations'
 import { CompareBar } from '../../pages/ComparePage'
+import { useLang } from '../../lib/i18n'
 
 /** Keeps the favicon in sync with the one configured in General Settings. */
 function useFavicon(url) {
@@ -30,12 +31,16 @@ function ScrollToTop() {
 
 export default function PublicLayout() {
   const { data: s } = useSettings()
+  const { lang, t } = useLang()
   useFavicon(s?.favicon_url)
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
 
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#main" className="sr-only z-50 rounded bg-brand-600 px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-2 focus:left-2">
-        Skip to content
+        {t('Skip to content')}
       </a>
       <ScrollToTop />
       <Header />

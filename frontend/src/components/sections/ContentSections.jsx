@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { translate } from '../../lib/i18n'
 import { ArrowRight, ChartColumn, CircleCheck, Play } from 'lucide-react'
 import SectionHeading from '../ui/SectionHeading'
 import SmartLink from '../ui/SmartLink'
@@ -24,7 +25,7 @@ function PlayableImage({ src, alt, videoUrl, className, children }) {
           type="button"
           onClick={() => (embed ? setOpen(true) : window.open(videoUrl, '_blank', 'noopener'))}
           className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-brand-600 shadow-xl ring-8 ring-white/30 transition-transform hover:scale-105"
-          aria-label="Play video"
+          aria-label={translate('Play video')}
         >
           <Play className="ml-1 h-6 w-6 fill-current" aria-hidden="true" />
         </button>

@@ -5,6 +5,7 @@ import { useNavigation, useSettings } from '../../lib/queries'
 import { BrandIcon, SOCIALS } from '../../lib/icons'
 import { cn, safeHref, telHref } from '../../lib/utils'
 import SmartLink from '../ui/SmartLink'
+import { LanguageSwitcher, useT } from '../../lib/i18n'
 
 export function Logo({ settings, light = false, className = 'h-12 sm:h-14' }) {
   const src = light ? settings?.logo_light_url || settings?.logo_footer_url : settings?.logo_header_url || settings?.logo_dark_url
@@ -29,6 +30,7 @@ function TopBar({ s }) {
               <Mail className="h-3.5 w-3.5 text-brand-500" aria-hidden="true" /> {s.contact_email}
             </a>
           )}
+          <LanguageSwitcher dark />
           <div className="flex items-center gap-3">
             {SOCIALS.filter(([key]) => safeHref(s[key])).map(([key, icon, label]) => (
               <a key={key} href={safeHref(s[key])} target="_blank" rel="noopener noreferrer" aria-label={label} className="hover:text-brand-500">
@@ -115,6 +117,7 @@ function DesktopNav({ items, pathname }) {
 }
 
 function MobileNav({ items, open, onClose, s, pathname }) {
+  const t = useT()
   const [expanded, setExpanded] = useState(null)
   if (!open) return null
   return (
@@ -123,7 +126,7 @@ function MobileNav({ items, open, onClose, s, pathname }) {
       <div className="absolute inset-y-0 right-0 flex w-[85%] max-w-sm flex-col overflow-y-auto bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <Logo settings={s} className="h-11" />
-          <button type="button" onClick={onClose} className="rounded-md p-2 text-navy-900 hover:bg-slate-100" aria-label="Close menu">
+          <button type="button" onClick={onClose} className="rounded-md p-2 text-navy-900 hover:bg-slate-100" aria-label={t('Close menu')}>
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
@@ -166,6 +169,7 @@ function MobileNav({ items, open, onClose, s, pathname }) {
           ))}
         </ul>
         <div className="space-y-3 border-t border-slate-100 p-5 text-sm">
+          <LanguageSwitcher className="text-sm" />
           {s.contact_phone && (
             <a href={telHref(s.contact_phone)} className="flex items-center gap-2 text-navy-900">
               <Phone className="h-4 w-4 text-brand-600" aria-hidden="true" /> {s.contact_phone}
@@ -188,6 +192,7 @@ function MobileNav({ items, open, onClose, s, pathname }) {
 }
 
 function SearchOverlay({ open, onClose }) {
+  const t = useT()
   const [q, setQ] = useState('')
   const navigate = useNavigate()
   const input = useRef(null)
@@ -214,18 +219,18 @@ function SearchOverlay({ open, onClose }) {
           }
         }}
       >
-        <label htmlFor="site-search" className="sr-only">Search the website</label>
+        <label htmlFor="site-search" className="sr-only">{t('Search the website')}</label>
         <input
           ref={input}
           id="site-search"
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search products, news and pages…"
+          placeholder={t('Search products, news and pages…')}
           minLength={2}
           className="flex-1 px-5 py-4 text-base outline-none"
         />
-        <button type="submit" className="bg-brand-600 px-5 text-white hover:bg-brand-700" aria-label="Search">
+        <button type="submit" className="bg-brand-600 px-5 text-white hover:bg-brand-700" aria-label={t('Search')}>
           <Search className="h-5 w-5" aria-hidden="true" />
         </button>
       </form>
@@ -234,6 +239,7 @@ function SearchOverlay({ open, onClose }) {
 }
 
 export default function Header() {
+  const t = useT()
   const { data: s = {} } = useSettings()
   const { data: nav } = useNavigation()
   const { pathname } = useLocation()
@@ -258,7 +264,7 @@ export default function Header() {
           </Link>
           <DesktopNav items={items} pathname={pathname} />
           <div className="flex items-center gap-2 sm:gap-3">
-            <button type="button" onClick={() => setSearchOpen(true)} className="icon-circle h-10 w-10 bg-slate-100 text-navy-900 hover:bg-brand-50 hover:text-brand-600" aria-label="Search">
+            <button type="button" onClick={() => setSearchOpen(true)} className="icon-circle h-10 w-10 bg-slate-100 text-navy-900 hover:bg-brand-50 hover:text-brand-600" aria-label={t('Search')}>
               <Search className="h-4 w-4" aria-hidden="true" />
             </button>
             {s.header_cta_label && (
@@ -266,7 +272,7 @@ export default function Header() {
                 {s.header_cta_label} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </SmartLink>
             )}
-            <button type="button" onClick={() => setMobileOpen(true)} className="rounded-md p-2 text-navy-900 hover:bg-slate-100 lg:hidden" aria-label="Open menu" aria-expanded={mobileOpen}>
+            <button type="button" onClick={() => setMobileOpen(true)} className="rounded-md p-2 text-navy-900 hover:bg-slate-100 lg:hidden" aria-label={t('Open menu')} aria-expanded={mobileOpen}>
               <Menu className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>

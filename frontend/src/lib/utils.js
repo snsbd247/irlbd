@@ -2,19 +2,22 @@ import DOMPurify from 'dompurify'
 
 export const cn = (...classes) => classes.filter(Boolean).join(' ')
 
+/** Date locale follows the website language (<html lang>), e.g. Bengali digits for "bn". */
+const dateLocale = () => (typeof document !== 'undefined' && document.documentElement.lang === 'bn' ? 'bn-BD' : 'en-GB')
+
 export function formatDate(value, options = { day: '2-digit', month: 'short', year: 'numeric' }) {
   if (!value) return ''
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString('en-GB', options)
+  return Number.isNaN(date.getTime()) ? '' : date.toLocaleDateString(dateLocale(), options)
 }
 
 export function dateParts(value) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return null
   return {
-    day: String(date.getDate()).padStart(2, '0'),
-    month: date.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase(),
-    year: date.getFullYear(),
+    day: date.toLocaleDateString(dateLocale(), { day: '2-digit' }),
+    month: date.toLocaleDateString(dateLocale(), { month: 'short' }).toUpperCase(),
+    year: date.toLocaleDateString(dateLocale(), { year: 'numeric' }),
   }
 }
 

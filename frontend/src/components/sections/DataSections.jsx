@@ -7,6 +7,7 @@ import { IconBadge, MiniProductCard, NewsRowCard } from '../ui/Cards'
 import { Icon } from '../../lib/icons'
 import { cn, safeHref } from '../../lib/utils'
 import { RichText } from './ContentSections'
+import { useT } from '../../lib/i18n'
 
 function HeaderRow({ section, align = 'left' }) {
   return (
@@ -22,6 +23,7 @@ function HeaderRow({ section, align = 'left' }) {
 }
 
 export function ServicesGrid({ section }) {
+  const t = useT()
   const services = section.data || []
   if (!services.length) return null
   return (
@@ -35,7 +37,7 @@ export function ServicesGrid({ section }) {
               <h3 className="mt-4 text-[15px] leading-snug font-semibold text-navy-900">{service.title}</h3>
               {service.short_description && <p className="mt-2 text-sm text-muted">{service.short_description}</p>}
               <Link to={`/services/${service.slug}`} className="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-semibold text-brand-600" aria-label={`Learn more about ${service.title}`}>
-                Learn More <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                {t('Learn More')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </article>
           ))}
@@ -46,6 +48,7 @@ export function ServicesGrid({ section }) {
 }
 
 export function ProductCategories({ section }) {
+  const t = useT()
   const categories = section.data || []
   if (!categories.length) return null
   const banners = section.settings?.layout === 'banners'
@@ -64,7 +67,7 @@ export function ProductCategories({ section }) {
                     <h3 className="text-lg font-semibold text-navy-900">{cat.name}</h3>
                     {cat.short_description && <p className="mt-1 text-sm text-muted">{cat.short_description}</p>}
                     <Link to={`/products?category=${cat.slug}`} className="btn-primary mt-4 py-2" aria-label={`View ${cat.name} products`}>
-                      View Products <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      {t('View Products')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
                   </div>
                 </div>
@@ -106,6 +109,7 @@ export function ProductCategories({ section }) {
 }
 
 export function FeaturedProducts({ section }) {
+  const t = useT()
   const products = section.data || []
   if (!products.length) return null
   return (
@@ -116,11 +120,11 @@ export function FeaturedProducts({ section }) {
             {section.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
             <h2 className="mt-1 flex items-center gap-3 text-xl font-bold text-navy-900 sm:text-2xl">
               {!section.eyebrow && <span className="h-0.5 w-8 bg-brand-600" aria-hidden="true" />}
-              {section.title || 'Featured Products'}
+              {section.title || t('Featured Products')}
             </h2>
           </div>
           <SmartLink href={section.button_url || '/products'} className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
-            {section.button_label || 'View All Products'} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            {section.button_label || t('View All Products')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </SmartLink>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">

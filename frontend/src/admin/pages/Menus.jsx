@@ -17,12 +17,15 @@ const LOCATIONS = [
 
 function MenuItemModal({ item, location, parents, onClose, onSaved }) {
   const toast = useToast()
-  const [record, setRecord] = useState(item || { location, link_type: 'page', is_active: true, open_in_new_tab: false, parent_id: null })
+  const [record, setRecord] = useState(() =>
+    item ? { ...item, label_bn: item.translations?.bn?.label || '' } : { location, link_type: 'page', is_active: true, open_in_new_tab: false, parent_id: null, label_bn: '' },
+  )
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
 
   const fields = [
     { name: 'label', label: 'Label', type: 'text', required: true },
+    { name: 'label_bn', label: 'Label (বাংলা)', type: 'text', placeholder: record.label || '', help: 'Optional. Shown when the website is switched to বাংলা.' },
     { name: 'link_type', label: 'Link to', type: 'select', required: true, options: [['page', 'A website page'], ['url', 'Custom URL']] },
     { name: 'page_id', label: 'Page', type: 'relation', endpoint: '/admin/pages', labelKey: 'title', showIf: (r) => r.link_type === 'page' },
     { name: 'url', label: 'URL', type: 'text', placeholder: '/products?category=… or https://…', help: 'Relative paths (/…), https://, mailto: or tel: links.', showIf: (r) => r.link_type === 'url' },
@@ -43,6 +46,7 @@ function MenuItemModal({ item, location, parents, onClose, onSaved }) {
       parent_id: record.parent_id ? Number(record.parent_id) : null,
       open_in_new_tab: !!record.open_in_new_tab,
       is_active: record.is_active !== false,
+      translations: { bn: { label: record.label_bn || '' } },
     }
     try {
       if (item) await api.put(`/admin/menu-items/${item.id}`, payload)

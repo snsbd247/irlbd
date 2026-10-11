@@ -122,6 +122,10 @@ export default function AdminLayout() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => setOpen(false), [pathname])
+  // The admin panel is always English (even if the visitor chose Bengali on the website).
+  useEffect(() => {
+    document.documentElement.lang = 'en'
+  }, [pathname])
 
   async function signOut() {
     await logout()
