@@ -25,6 +25,7 @@ class ShareMetaTest extends TestCase
 
         $this->getJson('/api/v1/meta?path=/')->assertOk()->assertJsonPath('title', 'IR Limited | Packaging')->assertJsonPath('url', 'http://localhost:5173/');
         $this->getJson('/api/v1/meta?path=/our-mission')->assertJsonPath('title', 'Our Mission | IR Limited')->assertJsonPath('description', 'Quality first');
+        $this->getJson('/api/v1/meta?path=/our-mission&lang=bn')->assertJsonPath('url', 'http://localhost:5173/our-mission?lang=bn');
         $this->getJson('/api/v1/meta?path=/products/pet-bottle')->assertJsonPath('title', 'PET Bottle | IR Limited')->assertJsonPath('type', 'product');
         $this->getJson('/api/v1/meta?path=/news/big-news')->assertJsonPath('description', 'Long story')->assertJsonPath('type', 'article');
     }

@@ -256,6 +256,15 @@ export function LanguageProvider({ children }) {
         // storage unavailable: choice lasts for this visit only
       }
       setLangState(next)
+      // Shareable/indexable URL: /page?lang=bn for Bengali, plain /page for English.
+      try {
+        const u = new URL(window.location.href)
+        if (next === 'en') u.searchParams.delete('lang')
+        else u.searchParams.set('lang', next)
+        window.history.replaceState(window.history.state, '', `${u.pathname}${u.search}${u.hash}`)
+      } catch {
+        // URL API unavailable: the choice still applies, only the address bar is unchanged
+      }
       // Refetch public content in the new language (admin data is language-independent).
       queryClient.invalidateQueries({ predicate: (q) => q.queryKey[0] !== 'admin' })
     },

@@ -25,7 +25,8 @@ if (! preg_match('#^/[A-Za-z0-9/_-]*$#', $path) || strlen($path) > 300) {
 
 $meta = [];
 if ($api !== '' && preg_match('#^https?://#', $api)) {
-    $url = $api.'/api/v1/meta?path='.rawurlencode($path);
+    $lang = ($_GET['lang'] ?? '') === 'bn' ? 'bn' : null;
+    $url = $api.'/api/v1/meta?path='.rawurlencode($path).($lang ? '&lang='.$lang : '');
     $body = false;
     if (function_exists('curl_init')) {
         $ch = curl_init($url);
@@ -47,7 +48,7 @@ $title = $meta['title'] ?? 'IR Limited';
 $description = $meta['description'] ?? '';
 $image = isset($meta['image']) && preg_match('#^https?://#', (string) $meta['image']) ? $meta['image'] : null;
 ?><!doctype html>
-<html lang="en">
+<html lang="<?= (($_GET['lang'] ?? '') === 'bn') ? 'bn' : 'en' ?>">
 <head>
 <meta charset="utf-8">
 <title><?= $e($title) ?></title>

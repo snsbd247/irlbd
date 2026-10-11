@@ -58,6 +58,9 @@ class MetaController extends Controller
 
         $meta['site_name'] = $siteName;
         $meta['url'] = rtrim(config('cms.frontend_url'), '/').($path === '/' ? '/' : $path);
+        if (app()->getLocale() !== config('cms.default_locale')) {
+            $meta['url'] .= '?lang='.app()->getLocale();
+        }
         $meta['description'] = Html::plain($meta['description'] ?? '', 300);
 
         return response()->json($meta)->setPublic()->setMaxAge(600);

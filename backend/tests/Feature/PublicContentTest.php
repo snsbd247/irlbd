@@ -97,8 +97,11 @@ class PublicContentTest extends TestCase
 
         $xml = $this->get('/api/v1/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml; charset=UTF-8')->getContent();
 
-        $this->assertStringContainsString('http://localhost:5173/public', $xml);
+        $this->assertStringContainsString('<loc>http://localhost:5173/public</loc>', $xml);
+        $this->assertStringContainsString('<loc>http://localhost:5173/public?lang=bn</loc>', $xml);
+        $this->assertStringContainsString('hreflang="bn" href="http://localhost:5173/public?lang=bn"', $xml);
         $this->assertStringNotContainsString('/private', $xml);
+        $this->assertNotFalse(simplexml_load_string($xml), 'sitemap must be valid XML');
     }
 
     public function test_errors_do_not_leak_stack_traces(): void

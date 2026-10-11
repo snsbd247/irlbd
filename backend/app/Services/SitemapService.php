@@ -36,13 +36,21 @@ class SitemapService
         }
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
+        $e = fn (string $s) => htmlspecialchars($s, ENT_XML1);
         foreach ($urls as [$loc, $updated, $priority]) {
-            $xml .= '  <url><loc>'.htmlspecialchars($loc, ENT_XML1).'</loc>';
-            if ($updated) {
-                $xml .= '<lastmod>'.$updated->toAtomString().'</lastmod>';
+            // Every page exists in English and Bengali (?lang=bn); list both, each with its alternates.
+            $bn = $loc.(str_contains($loc, '?') ? '&' : '?').'lang=bn';
+            $alternates = '<xhtml:link rel="alternate" hreflang="en" href="'.$e($loc).'"/>'
+                .'<xhtml:link rel="alternate" hreflang="bn" href="'.$e($bn).'"/>'
+                .'<xhtml:link rel="alternate" hreflang="x-default" href="'.$e($loc).'"/>';
+            foreach ([$loc, $bn] as $i => $url) {
+                $xml .= '  <url><loc>'.$e($url).'</loc>'.$alternates;
+                if ($updated) {
+                    $xml .= '<lastmod>'.$updated->toAtomString().'</lastmod>';
+                }
+                $xml .= '<priority>'.($i === 0 ? $priority : number_format(max(0.1, (float) $priority - 0.1), 1)).'</priority></url>'."\n";
             }
-            $xml .= '<priority>'.$priority.'</priority></url>'."\n";
         }
 
         return $xml.'</urlset>'."\n";
