@@ -62,7 +62,7 @@ class DealerTest extends TestCase
         $this->seed(\Database\Seeders\DealersContentSeeder::class);
         $this->seed(\Database\Seeders\DemoDealersSeeder::class);
 
-        $this->assertSame(5, Dealer::count());
+        $this->assertSame(['Dhaka', 'Gazipur'], Dealer::orderBy('district')->pluck('district')->all());
         $this->assertSame(['+880 9633917362'], Dealer::distinct()->pluck('phone')->all());
         $this->getJson('/api/v1/pages/dealers')->assertOk();
 

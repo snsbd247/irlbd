@@ -140,7 +140,7 @@ The seeded content reproduces the approved design so the site is complete on day
 - **Bengali text** (menus, interface, page names) was written without a native-speaker review. Check it, and add Bengali versions of the main page content in the admin.
 - **Social previews:** seeded images are SVG placeholders, which Facebook/WhatsApp don't show. Set a JPG/PNG *Social share image* (Settings → SEO, or per page).
 - **WhatsApp number, Messenger page and GA4 / Pixel IDs** are empty until set in Settings; their buttons/scripts stay off until then.
-- **Demo content on irlbd.com:** the brochure is a PDF of `/catalog` (seeded products), the share image (`branding/irlbd-share.png`) was generated from the logo and hero art, and the Dealers page lists the head office and factory plus three dealers marked "(Demo)" that use the company phone/email (`DemoDealersSeeder`). Replace or delete them once real data exists.
+- **Demo content on irlbd.com:** the brochure is a PDF of `/catalog` (seeded products), the share image (`branding/irlbd-share.png`) was generated from the logo and hero art, and the Dealers page lists the company's only two sales points, the Dhaka head office and the Gazipur factory (`DemoDealersSeeder`). Replace the brochure and share image once real material exists.
 
 ---
 
