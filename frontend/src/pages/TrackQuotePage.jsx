@@ -31,7 +31,9 @@ export default function TrackQuotePage() {
       setState({ status: 'done', result: data, message: '' })
     } catch (error) {
       setErrors(fieldErrors(error))
-      setState({ status: 'error', result: null, message: errorMessage(error, 'We could not find a quotation request with this reference and email address.') })
+      // A 404 here means "no match", which the generic helper would word as a missing page.
+      const notFound = error?.response?.status === 404
+      setState({ status: 'error', result: null, message: notFound ? 'We could not find a quotation request with this reference and email address.' : errorMessage(error) })
     }
   }
 
