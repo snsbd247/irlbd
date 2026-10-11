@@ -59,6 +59,18 @@ class AppServiceProvider extends ServiceProvider
 
         // Non-model abilities.
         Gate::define('manage-settings', fn (User $user) => $user->hasPermission('settings.manage'));
+        Gate::define('view-activity-log', fn (User $user) => $user->hasPermission('users.manage'));
+
+        // Audit trail: admin changes to content, inbox items and accounts. Public form
+        // submissions are not logged because no admin is signed in for those requests.
+        foreach (array_keys($this->policies) as $model) {
+            $model::observe(\App\Observers\AdminActivityObserver::class);
+        }
+        Models\Setting::observe(\App\Observers\AdminActivityObserver::class);
+
+        // Password reset links point to the admin SPA, not to a Laravel route.
+        \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(fn (User $user, string $token) => rtrim(config('cms.frontend_url'), '/')
+            .'/admin/reset-password?token='.$token.'&email='.urlencode($user->email));
 
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(180)->by($request->user()?->id ?: $request->ip()));
 
@@ -71,6 +83,11 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('forms', fn (Request $request) => [
             Limit::perMinute(5)->by($request->ip()),
             Limit::perDay(50)->by($request->ip()),
+        ]);
+
+        RateLimiter::for('password-reset', fn (Request $request) => [
+            Limit::perMinute(3)->by(strtolower((string) $request->input('email')).'|'.$request->ip()),
+            Limit::perHour(10)->by($request->ip()),
         ]);
 
         RateLimiter::for('uploads', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->id ?: $request->ip()));

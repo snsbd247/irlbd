@@ -41,6 +41,8 @@ class SubscriberController extends CrudController
     {
         $this->authorize('viewAny', NewsletterSubscriber::class);
 
+        app(\App\Services\ActivityLogger::class)->log('exported', null, null, null, 'subscribers');
+
         return response()->streamDownload(function () {
             $out = fopen('php://output', 'w');
             fputcsv($out, ['Email', 'Status', 'Subscribed at']);

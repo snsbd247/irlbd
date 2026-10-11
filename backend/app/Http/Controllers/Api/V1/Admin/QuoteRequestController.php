@@ -45,6 +45,8 @@ class QuoteRequestController extends CrudController
     {
         $this->authorize('viewAny', QuoteRequest::class);
 
+        app(\App\Services\ActivityLogger::class)->log('exported', null, null, null, 'quote requests');
+
         return response()->streamDownload(function () {
             $out = fopen('php://output', 'w');
             fputcsv($out, ['ID', 'Date', 'Product', 'Quantity', 'Specification', 'Needed by', 'Name', 'Company', 'Email', 'Phone', 'Message', 'Status']);

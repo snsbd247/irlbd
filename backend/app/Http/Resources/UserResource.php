@@ -13,6 +13,7 @@ class UserResource extends BaseResource
             'name' => $this->name,
             'email' => $this->email,
             'is_active' => $this->is_active,
+            'two_factor_enabled' => $this->hasTwoFactor(),
             'role_id' => $this->role_id,
             'role' => new RoleResource($this->whenLoaded('role')),
             'last_login_at' => $this->date($this->last_login_at),

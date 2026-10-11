@@ -180,6 +180,26 @@ export function ResourceList({ resourceKey }) {
                         <Link to={editPath(row)} className="rounded-md p-2 text-slate-600 hover:bg-brand-50 hover:text-brand-700" aria-label="Edit">
                           <Pencil className="h-4 w-4" aria-hidden="true" />
                         </Link>
+                        {(config.rowActions || []).filter((a) => !a.show || a.show(row)).map((a) => (
+                          <button
+                            key={a.label}
+                            type="button"
+                            className="rounded-md px-2 py-1 text-xs font-medium text-slate-600 hover:bg-amber-50 hover:text-amber-700"
+                            onClick={async () => {
+                              if (a.confirm && !(await confirm(a.confirm(row), { title: a.label, confirmLabel: a.label }))) return
+                              try {
+                                const [method, url] = a.request(row)
+                                const res = await api.request({ method, url })
+                                toast(res.data?.message || 'Done.')
+                                queryClient.invalidateQueries({ queryKey: ['admin', resourceKey] })
+                              } catch (e) {
+                                toast(errorMessage(e), 'error')
+                              }
+                            }}
+                          >
+                            {a.label}
+                          </button>
+                        ))}
                         {(!config.canDelete || config.canDelete(row)) && (
                           <button type="button" onClick={() => remove(row)} className="rounded-md p-2 text-slate-600 hover:bg-red-50 hover:text-red-600" aria-label="Delete">
                             <Trash2 className="h-4 w-4" aria-hidden="true" />

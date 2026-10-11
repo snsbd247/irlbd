@@ -30,6 +30,16 @@ export function AuthProvider({ children }) {
     async (credentials) => {
       await fetchCsrfCookie()
       const { data } = await api.post('/admin/login', credentials)
+      if (data.two_factor) return { twoFactor: true }
+      queryClient.setQueryData(['admin', 'me'], data.user)
+      return data.user
+    },
+    [queryClient],
+  )
+
+  const completeTwoFactor = useCallback(
+    async (payload) => {
+      const { data } = await api.post('/admin/two-factor-challenge', payload)
       queryClient.setQueryData(['admin', 'me'], data.user)
       return data.user
     },
@@ -52,11 +62,12 @@ export function AuthProvider({ children }) {
       user,
       isLoading,
       login,
+      completeTwoFactor,
       logout,
       can: (module) => !!user && (user.is_super || user.permissions.includes(`${module}.manage`)),
       setUser: (u) => queryClient.setQueryData(['admin', 'me'], u),
     }),
-    [user, isLoading, login, logout, queryClient],
+    [user, isLoading, login, completeTwoFactor, logout, queryClient],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

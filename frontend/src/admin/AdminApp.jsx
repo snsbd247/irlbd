@@ -12,6 +12,7 @@ import Menus from './pages/Menus'
 import Settings from './pages/Settings'
 import { Enquiries, JobApplications, MediaLibrary, QuoteRequests, Subscribers } from './pages/Inbox'
 import { Dashboard, Login, Profile } from './pages/Misc'
+import { ActivityLogPage, ForgotPassword, ResetPassword } from './pages/Security'
 
 function ResourceRoute({ form = false }) {
   const { resource, id } = useParams()
@@ -37,6 +38,8 @@ export default function AdminApp() {
         <AuthProvider>
           <Routes>
             <Route path="login" element={<Login />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
             <Route
               element={
                 <RequireAuth>
@@ -55,6 +58,7 @@ export default function AdminApp() {
               <Route path="quote-requests" element={<QuoteRequests />} />
               <Route path="job-applications" element={<JobApplications />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="activity-log" element={<ActivityLogPage />} />
               <Route path="r/:resource" element={<ResourceRoute />} />
               <Route path="r/:resource/:id" element={<ResourceRoute form />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />

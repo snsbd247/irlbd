@@ -8,6 +8,7 @@ import { ErrorState, Spinner } from '../../components/ui/States'
 import { useAuth } from '../auth'
 import { Badge, Card, PageHeader, SaveButton, statusTone, useToast } from '../components/ui'
 import { useSettings } from '../../lib/queries'
+import { TwoFactorCard, TwoFactorStep } from './Security'
 
 export function NotAllowed() {
   return (
@@ -28,6 +29,7 @@ export function Login() {
   const [form, setForm] = useState({ email: '', password: '', remember: false })
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [twoFactor, setTwoFactor] = useState(false)
 
   if (user) return <Navigate to={location.state?.from || '/admin'} replace />
 
@@ -36,8 +38,13 @@ export function Login() {
     setBusy(true)
     setError('')
     try {
-      await login(form)
-      navigate(location.state?.from || '/admin', { replace: true })
+      const result = await login(form)
+      if (result?.twoFactor) {
+        setTwoFactor(true)
+        setForm((f) => ({ ...f, password: '' }))
+      } else {
+        navigate(location.state?.from || '/admin', { replace: true })
+      }
     } catch (err) {
       setError(fieldErrors(err).email || errorMessage(err, 'Login failed.'))
     }
@@ -46,6 +53,15 @@ export function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-navy-950 via-navy-900 to-brand-800 px-4">
+      {twoFactor ? (
+        <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl">
+          <h1 className="mb-4 text-center text-lg font-semibold text-navy-900">Two-step verification</h1>
+          <TwoFactorStep
+            onDone={() => navigate(location.state?.from || '/admin', { replace: true })}
+            onCancel={(msg) => { setTwoFactor(false); setError(msg || '') }}
+          />
+        </div>
+      ) : (
       <form onSubmit={submit} className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl" noValidate>
         <div className="mb-6 text-center">
           {s.logo_header_url ? <img src={s.logo_header_url} alt={s.site_name} className="mx-auto h-14 w-auto" /> : <p className="text-xl font-bold text-navy-900">{s.site_name || 'IR Limited'}</p>}
@@ -69,10 +85,12 @@ export function Login() {
             {busy ? <Spinner className="h-4 w-4 text-white" label="Signing in" /> : <Lock className="h-4 w-4" aria-hidden="true" />} Sign in
           </button>
         </div>
-        <p className="mt-6 text-center text-xs text-muted">
+        <p className="mt-6 flex justify-between text-xs text-muted">
           <Link to="/" className="hover:text-brand-600">← Back to website</Link>
+          <Link to="/admin/forgot-password" className="hover:text-brand-600">Forgot password?</Link>
         </p>
       </form>
+      )}
     </div>
   )
 }
@@ -176,22 +194,26 @@ export function Profile() {
   )
 
   return (
-    <form onSubmit={submit} className="max-w-2xl space-y-6" noValidate>
-      <PageHeader title="My profile" description={`Role: ${user.role}`} actions={<SaveButton saving={saving} />} />
-      <Card title="Account">
-        <div className="grid gap-4 sm:grid-cols-2">
-          {input('name', 'Name')}
-          {input('email', 'Email', 'email', 'username')}
-        </div>
-      </Card>
-      <Card title="Change password">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2">{input('current_password', 'Current password', 'password', 'current-password')}</div>
-          {input('password', 'New password', 'password', 'new-password')}
-          {input('password_confirmation', 'Confirm new password', 'password', 'new-password')}
-        </div>
-        <p className="mt-3 text-xs text-muted">At least 10 characters including letters and numbers.</p>
-      </Card>
-    </form>
+    <div className="max-w-2xl space-y-6">
+      <form onSubmit={submit} className="max-w-2xl space-y-6" noValidate>
+        <PageHeader title="My profile" description={`Role: ${user.role}`} actions={<SaveButton saving={saving} />} />
+        <Card title="Account">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {input('name', 'Name')}
+            {input('email', 'Email', 'email', 'username')}
+          </div>
+        </Card>
+        <Card title="Change password">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">{input('current_password', 'Current password', 'password', 'current-password')}</div>
+            {input('password', 'New password', 'password', 'new-password')}
+            {input('password_confirmation', 'Confirm new password', 'password', 'new-password')}
+          </div>
+          <p className="mt-3 text-xs text-muted">At least 10 characters including letters and numbers.</p>
+        </Card>
+      </form>
+      {/* Outside the profile <form>: the 2FA dialog has its own forms and forms cannot be nested. */}
+      <TwoFactorCard />
+    </div>
   )
 }

@@ -16,7 +16,7 @@ class User extends Authenticatable
 
     protected $fillable = ['name', 'email', 'password', 'role_id', 'is_active'];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'];
 
     protected function casts(): array
     {
@@ -24,6 +24,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
             'is_active' => 'boolean',
         ];
     }
@@ -31,6 +34,11 @@ class User extends Authenticatable
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function hasTwoFactor(): bool
+    {
+        return $this->two_factor_secret !== null && $this->two_factor_confirmed_at !== null;
     }
 
     public function isSuperAdmin(): bool

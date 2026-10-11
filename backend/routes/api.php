@@ -61,11 +61,21 @@ Route::prefix('v1')->name('v1.')->group(function () {
     // ----------------------------------------------------------------- Admin
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('login', [Admin\AuthController::class, 'login'])->middleware('throttle:login')->name('login');
+        Route::post('two-factor-challenge', [Admin\AuthController::class, 'twoFactorChallenge'])->middleware('throttle:login')->name('two-factor.challenge');
+        Route::post('forgot-password', [Admin\AuthController::class, 'forgotPassword'])->middleware('throttle:password-reset')->name('password.email');
+        // Separate, looser limit than the email step so a mistyped new password does not lock the user out.
+        Route::post('reset-password', [Admin\AuthController::class, 'resetPassword'])->middleware('throttle:login')->name('password.update');
 
         Route::middleware(['auth:sanctum', 'active', 'throttle:api'])->group(function () {
             Route::post('logout', [Admin\AuthController::class, 'logout'])->name('logout');
             Route::get('me', [Admin\AuthController::class, 'me'])->name('me');
             Route::put('profile', [Admin\AuthController::class, 'updateProfile'])->name('profile');
+            Route::post('two-factor', [Admin\TwoFactorController::class, 'enable'])->name('two-factor.enable');
+            Route::post('two-factor/confirm', [Admin\TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
+            Route::post('two-factor/recovery-codes', [Admin\TwoFactorController::class, 'recoveryCodes'])->name('two-factor.recovery');
+            Route::delete('two-factor', [Admin\TwoFactorController::class, 'disable'])->name('two-factor.disable');
+            Route::delete('users/{id}/two-factor', [Admin\TwoFactorController::class, 'reset'])->whereNumber('id')->name('two-factor.reset');
+            Route::get('activity-log', Admin\ActivityLogController::class)->name('activity-log');
 
             Route::get('dashboard', Admin\DashboardController::class)->name('dashboard');
             Route::get('meta', Admin\MetaController::class)->name('meta');

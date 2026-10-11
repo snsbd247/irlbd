@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { CircleAlert, CircleCheck, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Spinner } from '../../components/ui/States'
@@ -39,11 +40,17 @@ export const useToast = () => useContext(ToastContext)
 
 export function Modal({ open, onClose, title, children, footer, size = 'lg' }) {
   const panel = useRef(null)
+  // Latest onClose without re-running the focus effect: parents often pass a new arrow
+  // function on every render, which would otherwise steal focus after each keystroke.
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+
   useEffect(() => {
     if (!open) return
     const previous = document.activeElement
-    panel.current?.focus()
-    const onKey = (e) => e.key === 'Escape' && onClose()
+    // Focus the dialog unless a field inside it (autoFocus) already has focus.
+    if (!panel.current?.contains(document.activeElement)) panel.current?.focus()
+    const onKey = (e) => e.key === 'Escape' && onCloseRef.current()
     window.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
     return () => {
@@ -51,11 +58,13 @@ export function Modal({ open, onClose, title, children, footer, size = 'lg' }) {
       document.body.style.overflow = ''
       previous?.focus?.()
     }
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
   const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl', xl: 'max-w-5xl' }
-  return (
+  // Rendered into <body> so a dialog opened from inside a <form> never nests forms
+  // (Enter in a dialog field must not submit the page form behind it).
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy-950/60 p-4 sm:p-8" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <button type="button" className="fixed inset-0 cursor-default" onClick={onClose} aria-label="Close dialog" tabIndex={-1} />
       <div ref={panel} tabIndex={-1} className={cn('relative w-full rounded-xl bg-white shadow-2xl outline-none', widths[size])}>
@@ -68,7 +77,8 @@ export function Modal({ open, onClose, title, children, footer, size = 'lg' }) {
         <div className="px-5 py-5">{children}</div>
         {footer && <div className="flex justify-end gap-2 border-t border-slate-100 px-5 py-4">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Award, Boxes, Factory, BriefcaseBusiness, Camera, UserSearch, MessageSquareQuote, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
+  Award, Boxes, ScrollText, Factory, BriefcaseBusiness, Camera, UserSearch, MessageSquareQuote, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
   FileSignature, LogOut, Mail, Menu, Navigation, Newspaper, Package, PanelsTopLeft, Settings, Shield, Tags, User, UserCog, Users, X,
 } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
@@ -67,6 +67,7 @@ const NAV = [
       { to: '/admin/settings', label: 'General settings & SEO', icon: Settings, perm: 'settings' },
       { to: '/admin/r/users', label: 'Admin users', icon: UserCog, perm: 'users' },
       { to: '/admin/r/roles', label: 'Roles & permissions', icon: Shield, perm: 'users' },
+      { to: '/admin/activity-log', label: 'Activity log', icon: ScrollText, perm: 'users' },
     ],
   },
 ]

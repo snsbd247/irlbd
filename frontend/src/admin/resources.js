@@ -410,7 +410,16 @@ export const RESOURCES = {
       { key: 'name', label: 'Name', sub: (r) => r.email },
       { key: 'role', label: 'Role', render: (r) => r.role?.name || '—' },
       { key: 'last_login_at', label: 'Last login', type: 'date' },
+      { key: 'two_factor_enabled', label: '2FA', type: 'bool' },
       { key: 'is_active', label: 'Active', type: 'bool' },
+    ],
+    rowActions: [
+      {
+        label: 'Reset 2FA',
+        show: (row) => row.two_factor_enabled,
+        confirm: (row) => `Turn off two-factor authentication for ${row.name}? Use this when they lost their phone; they can set it up again from their profile.`,
+        request: (row) => ['delete', `/admin/users/${row.id}/two-factor`],
+      },
     ],
     fields: [
       { name: 'name', label: 'Name', type: 'text', required: true },

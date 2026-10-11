@@ -46,6 +46,8 @@ class EnquiryController extends CrudController
     {
         $this->authorize('viewAny', ContactSubmission::class);
 
+        app(\App\Services\ActivityLogger::class)->log('exported', null, null, null, 'enquiries');
+
         return response()->streamDownload(function () {
             $out = fopen('php://output', 'w');
             fputcsv($out, ['ID', 'Date', 'Name', 'Email', 'Phone', 'Subject', 'Message', 'Status']);

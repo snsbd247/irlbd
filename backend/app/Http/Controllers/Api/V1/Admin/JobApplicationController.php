@@ -46,6 +46,7 @@ class JobApplicationController extends CrudController
         $this->authorize('view', $application);
         abort_unless(Storage::disk('local')->exists($application->cv_path), 404, 'CV file not found.');
 
+        app(\App\Services\ActivityLogger::class)->log('cv_downloaded', $application);
         $ext = pathinfo($application->cv_path, PATHINFO_EXTENSION);
         $name = preg_replace('/[^A-Za-z0-9_-]+/', '-', $application->name).'-CV.'.$ext;
 
