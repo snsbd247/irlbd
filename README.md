@@ -27,6 +27,10 @@ Added after the first release:
 - **Careers**: job posts and an application form with CV upload (CVs are stored privately, never in the web root).
 - **WhatsApp** chat button, **Google Analytics 4 / Meta Pixel** (IDs only), Organization/Product **JSON-LD**.
 - **Link previews** for WhatsApp/Facebook/LinkedIn: crawlers get per-page Open Graph tags from `share.php`.
+- **Quote tracking:** every quote gets a reference (IRQ-2026-00012), the customer gets a confirmation email, and `/track-quote` shows the status (reference + email required).
+- **Printable product catalog** at `/catalog` (browser "Save as PDF", works in Bengali too).
+- **Dealer & distributor finder** with a district filter (64 districts), **Facebook Messenger** chat button, FAQPage structured data.
+- **Bengali URLs** (`?lang=bn`) with hreflang alternates, per-language canonical, bilingual sitemap and previews; starter Bengali text for all seeded content.
 
 **Admin panel** (`/admin`):
 
@@ -41,7 +45,9 @@ Added after the first release:
 - Gallery albums, testimonials, industries, job posts
 - **Newsletter campaigns:** write, preview, send a test, then send to all subscribers in small batches (no cron needed)
 - **Bengali translations:** a "বাংলা" card on every content form, in the page/section editors, menus, gallery captions and a Settings tab
-- **Security:** two-factor authentication (authenticator app + recovery codes), password reset by email, and an activity log of every change
+- **Security:** two-factor authentication (authenticator app + recovery codes), password reset by email, an activity log of every change, and an optional admin IP allow-list
+- **Dashboard report:** leads per month for the last 12 months and the most requested products
+- **Data retention:** old job applications and CVs are deleted automatically (configurable)
 - Media library (secure uploads)
 - General settings: site name, header/footer/light/dark logos, favicon, contact details, social links, utility bar, header button, footer text, copyright, CTA defaults, SEO defaults, map, WhatsApp/analytics, brochure, notification addresses
 - Admin users, roles and permissions; personal profile/password
@@ -141,7 +147,7 @@ The seeded content reproduces the approved design so the site is complete on day
 
 **Verified in this workspace:**
 
-- 107 backend tests (571 assertions) pass: authentication, 2FA, password reset, activity log, authorization/escalation, CRUD, page builder, public vs private content, validation, uploads (images, PDFs, CVs), sanitization, settings, contact/quote/careers forms and their emails, newsletter campaigns and batching, translations, link-preview meta, CORS and headers.
+- 121 backend tests (653 assertions) pass: authentication, 2FA, password reset, activity log, authorization/escalation, CRUD, page builder, public vs private content, validation, uploads (images, PDFs, CVs), sanitization, settings, contact/quote/careers forms and their emails, newsletter campaigns and batching, translations, link-preview meta, CORS and headers.
 - Migrations and seeders run on MariaDB 10.4.
 - The production frontend build succeeds; the admin panel and editor are code-split from the public bundle.
 - The admin login → authenticated request → CSRF-protected write → upload flow was exercised over HTTP. A write without the CSRF header is rejected (419).

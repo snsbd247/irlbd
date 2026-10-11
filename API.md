@@ -36,6 +36,8 @@ There is **no registration endpoint**.
 
 Only published/active content is returned. Rate limit: 180 requests/min per IP.
 
+**Admin IP allow-list:** when `ADMIN_ALLOWED_IPS` is set, every `/admin/*` endpoint answers 403 for other addresses.
+
 **Language:** add `?lang=bn` to any public GET to receive Bengali text where a translation exists (English otherwise). The response carries `Content-Language`. Unknown languages are ignored.
 
 | Method | Endpoint | Query / body | Returns |
@@ -46,6 +48,7 @@ Only published/active content is returned. Rate limit: 180 requests/min per IP.
 | GET | `/pages/{slug}` | – | Any published page (same shape as `/home`) |
 | GET | `/product-categories` | – | Active categories with `products_count` |
 | GET | `/products` | `q`, `category` (slug), `industry` (slug), `featured`, `per_page` (≤48), `page` | Paginated products |
+| GET | `/products/catalog` | – | Every published product (with specifications and variants) in category order, for the printable catalog |
 | GET | `/products/compare` | `slugs` (comma separated, ≤4) | Products with specifications, variants and industries |
 | GET | `/products/{slug}` | – | `{ data: product (with images, specifications, variants, industries, category, datasheet_url), related: [...] }` |
 | GET | `/industries` | – | Active industries that have published products |
@@ -55,6 +58,7 @@ Only published/active content is returned. Rate limit: 180 requests/min per IP.
 | GET | `/news/{slug}` | – | `{ data: post (with content), recent: [...] }` |
 | GET | `/news-categories` | – | Categories with published `posts_count` |
 | GET | `/contact-info` | – | `{ offices, faqs, subjects }` |
+| GET | `/dealers` | `district`, `type` | `{ data: [dealers], districts: [districts that have active dealers] }` |
 | GET | `/gallery` · `/gallery/{slug}` | – | Active albums (cover, photo count) · one album with `images[{url, caption}]` |
 | GET | `/jobs` · `/jobs/{slug}` | – | Published job posts (`is_open` is false after the deadline) |
 | GET | `/meta` | `path` (site path) | `{ title, description, image, type, … }` for link previews; used by `share.php` |
@@ -62,6 +66,7 @@ Only published/active content is returned. Rate limit: 180 requests/min per IP.
 | GET | `/sitemap.xml` | – | XML sitemap of published pages, products, categories, services, news |
 | POST | `/contact` | `name`, `email`, `phone?`, `subject` (one of `subjects`), `message` (10–5000) | `201 { message }`. Rate limited 5/min, 50/day per IP. Honeypot field `website` must be empty. |
 | POST | `/quote` | `name`, `company?`, `email`, `phone`, `product_id?`, `quantity`, `specification?`, `needed_by?` (date), `message?` | `201 { message }`. Same limits and honeypot as `/contact`; emails the enquiry address. |
+| POST | `/quote/track` | `reference` (IRQ-YYYY-NNNNN), `email` | `{ reference, status, status_label, customer_note, product, quantity, submitted_at, updated_at }`; the same 404 for a wrong email or unknown reference. Rate limited like the forms. |
 | POST | `/jobs/{slug}/apply` | multipart: `name`, `email`, `phone`, `cover_letter?`, `cv` (PDF/DOC/DOCX ≤ `UPLOAD_CV_MAX_KB`), `consent` (accepted) | `201 { message }`. Rejected with 422 when the job is closed. CV stored privately. |
 | POST | `/newsletter/subscribe` | `email` | `201 { message }`, the same response whether or not the address already exists |
 | POST | `/newsletter/unsubscribe` | `token` | `{ message }` |
@@ -127,7 +132,8 @@ For each resource below:
 | `gallery-albums` | gallery | `is_active` | `title`, `slug`, `description`, `cover_image`, `event_date`, `images[{path, alt, alt_bn?}]` (≤200), `is_active` |
 | `job-posts` | careers | `status` | `title`, `slug`, `department`, `location`, `employment_type`, `vacancies`, `salary`, `deadline`, `summary`, `description`, `status`, `published_at`, `meta_*` |
 | `job-applications` | careers | `status`, `job` (job post id) | read-only except `status` and `admin_note`; `POST` returns 405 |
-| `quote-requests` | enquiries | `status` | read-only except `status` and `admin_note`; `POST` returns 405 |
+| `quote-requests` | enquiries | `status` | read-only except `status`, `admin_note` (internal) and `customer_note` (shown on the tracking page); `POST` returns 405. Responses include `reference`. |
+| `dealers` | contact | `is_active`, `district`, `type` | `name`, `type` (dealer/distributor/agent), `district` (one of 64), `address`, `contact_person`, `phone`, `email`, `map_url`, `is_active` |
 | `newsletter-campaigns` | subscribers | `status` | `subject`, `preheader`, `content` (rich text). Editable only as a draft. |
 | `services` | services | `is_active` | `title`, `slug`, `icon`, `short_description`, `description`, `image`, `is_active` |
 | `clients` | clients | `is_active` | `name`, `logo`, `website_url`, `is_active` |

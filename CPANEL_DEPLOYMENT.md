@@ -300,12 +300,29 @@ Seeding happens only when the database has no pages, so it never overwrites edit
 - **Newsletters:** sending runs in batches of `NEWSLETTER_BATCH_SIZE` (default 20) while the admin keeps the *Send* page open, so no cron is needed. Many shared hosts cap outgoing email (often 100–500 per hour). Ask your host and keep the list size in mind. If a send is interrupted, open the campaign again and press *Resume sending*.
 - **Two-factor authentication:** each admin can turn it on in *My profile*. Store the recovery codes safely. If someone loses their phone, a super admin can reset their 2FA from *Users*.
 - **Link previews:** paste a page URL into the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) to check the title/image. Set a JPG/PNG *Social share image* first, because SVG images aren't shown by Facebook/WhatsApp.
+- **CV retention:** job applications and CVs older than *Settings → Contact → Delete job applications and CVs older than* (default 365 days) are deleted by `php artisan cms:prune-applications` (cron above).
+- **Admin IP allow-list (optional):** set `ADMIN_ALLOWED_IPS=203.0.113.10,203.0.113.0/24` in `.env` (then `php artisan config:cache`) to allow the admin panel only from your office network. Check the IP first at https://ifconfig.me, or you will lock yourself out (remove the line to undo).
+- **Dealers page:** add dealers in *Admin → Dealers*, then publish the *Dealers & Distributors* page (it starts as a draft so the site never shows an empty list).
 - **Bengali:** the website has an EN | বাংলা switch. Add Bengali versions of the content in each form's *বাংলা* card and in *Settings → বাংলা*. Empty fields show English.
 - **Cron is not required.** Queues run synchronously and expired sessions are cleaned up automatically during normal traffic.
 
 ---
 
 ## 11. Backups
+
+### Automatic daily backup (cron)
+
+`irlbd-api/scripts/backup.sh` dumps the website database (credentials read from `.env`, never placed on the command line) and archives the uploads and applicant CVs into `~/irlbd-backups/daily/`, keeping 14 days. It only touches this website. Add it in cPanel → **Cron Jobs** (or `crontab -e`):
+
+```
+# IR Limited website: backup at 02:30, delete old job applications/CVs at 03:00
+30 2 * * * /bin/bash $HOME/irlbd-api/scripts/backup.sh >> $HOME/irlbd-backups/backup.log 2>&1
+0 3 * * * cd $HOME/irlbd-api && php artisan cms:prune-applications >> $HOME/irlbd-backups/backup.log 2>&1
+```
+
+Backups on the same server don't protect against losing the server: download a copy from `~/irlbd-backups/daily/` now and then (or use the host's off-site backup). To restore a dump: `gunzip -c db-YYYY-MM-DD.sql.gz | mysql -u USER -p DATABASE`.
+
+### Manual backups
 
 | What | How | How often |
 |---|---|---|
