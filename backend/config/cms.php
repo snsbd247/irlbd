@@ -118,6 +118,7 @@ return [
         'office_hours' => ['contact', 'text', 'Office hours', 'nullable|string|max:120', true],
         'enquiry_notify_email' => ['contact', 'email', 'Send enquiry notifications to (private)', 'nullable|email|max:150', false],
         'careers_notify_email' => ['contact', 'email', 'Send job applications to (private, defaults to the enquiry address)', 'nullable|email|max:150', false],
+        'cv_retention_days' => ['contact', 'text', 'Delete job applications and CVs older than (days, 0 = keep forever; default 365)', 'nullable|integer|min:0|max:3650', false],
 
         // Social
         'social_facebook' => ['social', 'url', 'Facebook URL', 'nullable|url:https|max:255', true],

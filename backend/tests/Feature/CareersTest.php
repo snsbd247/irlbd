@@ -124,4 +124,27 @@ class CareersTest extends TestCase
         $this->actingAs($hr)->spa()->deleteJson("/api/v1/admin/job-applications/{$id}")->assertNoContent();
         Storage::disk('local')->assertMissing($path);
     }
+
+    public function test_old_applications_and_cvs_are_pruned(): void
+    {
+        $job = $this->job();
+        $this->apply($job->slug)->assertCreated();
+        $this->apply($job->slug, ['email' => 'new@example.com'])->assertCreated();
+        [$old, $new] = \App\Models\JobApplication::orderBy('id')->get()->all();
+        $old->forceFill(['created_at' => now()->subDays(400)])->saveQuietly();
+
+        $this->artisan('cms:prune-applications', ['--dry-run' => true])->expectsOutputToContain('1 application(s)')->assertSuccessful();
+        $this->assertSame(2, \App\Models\JobApplication::count());
+
+        $this->artisan('cms:prune-applications')->assertSuccessful();
+        $this->assertSame([$new->id], \App\Models\JobApplication::pluck('id')->all());
+        Storage::disk('local')->assertMissing($old->cv_path);
+        Storage::disk('local')->assertExists($new->cv_path);
+
+        app(\App\Services\SettingsService::class)->save(['cv_retention_days' => '0']);
+        $new->forceFill(['created_at' => now()->subDays(5000)])->saveQuietly();
+        $this->artisan('cms:prune-applications')->expectsOutputToContain('keep forever')->assertSuccessful();
+        $this->assertSame(1, \App\Models\JobApplication::count());
+    }
 }
+
