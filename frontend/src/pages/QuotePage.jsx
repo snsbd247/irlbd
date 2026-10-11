@@ -63,7 +63,7 @@ export default function QuotePage() {
     try {
       const payload = { ...form, product_id: productId ? Number(productId) : null, needed_by: form.needed_by || null }
       const { data } = await api.post('/quote', payload)
-      setStatus({ state: 'success', message: data.message })
+      setStatus({ state: 'success', message: data.message, reference: data.reference })
       setForm(EMPTY)
     } catch (error) {
       setErrors(fieldErrors(error))
@@ -83,9 +83,19 @@ export default function QuotePage() {
                 <CircleCheck className="h-12 w-12 text-emerald-600" aria-hidden="true" />
                 <h2 className="text-xl font-semibold text-navy-900">{t('Request received')}</h2>
                 <p className="max-w-md text-sm text-muted">{status.message}</p>
+                {status.reference && (
+                  <p className="rounded-lg border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-navy-900">
+                    {t('Your reference number')}: <strong className="font-semibold tracking-wide">{status.reference}</strong>
+                    <span className="mt-1 block text-xs text-muted">{t('We have also emailed it to you. Use it to track your request.')}</span>
+                  </p>
+                )}
                 <div className="mt-2 flex gap-3">
                   <button type="button" className="btn-outline" onClick={() => setStatus({ state: 'idle', message: '' })}>{t('Request another quote')}</button>
-                  <Link to="/products" className="btn-primary">{t('Browse products')}</Link>
+                  {status.reference ? (
+                    <Link to={`/track-quote?ref=${encodeURIComponent(status.reference)}`} className="btn-primary">{t('Track my request')}</Link>
+                  ) : (
+                    <Link to="/products" className="btn-primary">{t('Browse products')}</Link>
+                  )}
                 </div>
               </div>
             ) : (

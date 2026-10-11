@@ -15,7 +15,7 @@ class QuoteRequestController extends CrudController
 
     protected string $request = QuoteStatusRequest::class;
 
-    protected array $searchable = ['name', 'company', 'email', 'phone', 'product_name'];
+    protected array $searchable = ['reference', 'name', 'company', 'email', 'phone', 'product_name'];
 
     protected array $filters = ['status' => 'status'];
 
@@ -49,11 +49,11 @@ class QuoteRequestController extends CrudController
 
         return response()->streamDownload(function () {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['ID', 'Date', 'Product', 'Quantity', 'Specification', 'Needed by', 'Name', 'Company', 'Email', 'Phone', 'Message', 'Status']);
+            fputcsv($out, ['ID', 'Reference', 'Date', 'Product', 'Quantity', 'Specification', 'Needed by', 'Name', 'Company', 'Email', 'Phone', 'Message', 'Status']);
             QuoteRequest::orderByDesc('id')->chunk(500, function ($rows) use ($out) {
                 foreach ($rows as $r) {
                     fputcsv($out, array_map([EnquiryController::class, 'csvSafe'], [
-                        $r->id, $r->created_at, $r->product_name, $r->quantity, $r->specification, $r->needed_by?->toDateString(),
+                        $r->id, $r->reference, $r->created_at, $r->product_name, $r->quantity, $r->specification, $r->needed_by?->toDateString(),
                         $r->name, $r->company, $r->email, $r->phone, $r->message, $r->status,
                     ]));
                 }

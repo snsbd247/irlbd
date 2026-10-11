@@ -10,6 +10,7 @@ class QuoteRequestResource extends BaseResource
     {
         return [
             'id' => $this->id,
+            'reference' => $this->reference,
             'product_id' => $this->product_id,
             'product_name' => $this->product_name,
             'product_slug' => $this->product?->slug,
@@ -23,6 +24,8 @@ class QuoteRequestResource extends BaseResource
             'message' => $this->message,
             'status' => $this->status,
             'admin_note' => $this->admin_note,
+            'customer_note' => $this->customer_note,
+            'status_changed_at' => $this->date($this->status_changed_at),
             'ip_address' => $this->ip_address,
             'read_at' => $this->date($this->read_at),
             'created_at' => $this->date($this->created_at),

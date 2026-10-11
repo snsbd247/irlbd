@@ -198,7 +198,7 @@ function QuoteModal({ id, onClose }) {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    if (data) setForm({ status: data.status, admin_note: data.admin_note || '' })
+    if (data) setForm({ status: data.status, admin_note: data.admin_note || '', customer_note: data.customer_note || '' })
   }, [data])
 
   async function save() {
@@ -221,7 +221,7 @@ function QuoteModal({ id, onClose }) {
     <Modal
       open
       onClose={() => { queryClient.invalidateQueries({ queryKey: ['admin', 'quote-requests'] }); onClose() }}
-      title={data ? `Quote request #${data.id}` : 'Quote request'}
+      title={data ? `Quote request ${data.reference || `#${data.id}`}` : 'Quote request'}
       footer={form && (
         <>
           <button type="button" className="btn-outline" onClick={onClose}>Close</button>
@@ -264,6 +264,11 @@ function QuoteModal({ id, onClose }) {
               <textarea id="quote-note" rows={3} className="input" value={form.admin_note} onChange={(e) => setForm({ ...form, admin_note: e.target.value })} />
             </div>
           </div>
+          <div>
+            <label htmlFor="quote-customer-note" className="label">Message to the customer (shown on the public tracking page)</label>
+            <textarea id="quote-customer-note" rows={2} maxLength={1000} className="input" placeholder="e.g. Quotation emailed on 12 Oct. Please check your inbox." value={form.customer_note} onChange={(e) => setForm({ ...form, customer_note: e.target.value })} />
+            <p className="mt-1 text-xs text-muted">The customer sees the status and this message when they enter reference {data.reference} and their email at /track-quote.</p>
+          </div>
         </div>
       )}
     </Modal>
@@ -304,7 +309,7 @@ export function QuoteRequests() {
         actions={<button type="button" className="btn-outline" onClick={() => downloadFile('/admin/quote-requests/export', 'quote-requests.csv', toast)}><Download className="h-4 w-4" aria-hidden="true" /> Export CSV</button>}
       />
       <Card>
-        <SearchBar value={term} onChange={(v) => { setTerm(v); setPage(1) }} statuses={['new', 'quoted', 'ordered', 'closed']} status={status} onStatus={(v) => { setStatus(v); setPage(1) }} placeholder="Search name, company, product..." />
+        <SearchBar value={term} onChange={(v) => { setTerm(v); setPage(1) }} statuses={['new', 'quoted', 'ordered', 'closed']} status={status} onStatus={(v) => { setStatus(v); setPage(1) }} placeholder="Search reference, name, company, product..." />
         {isLoading ? <div className="flex justify-center py-12"><Spinner /></div> : isError ? <ErrorState onRetry={refetch} /> : !data?.data?.length ? (
           <EmptyState title="No quote requests" message="Requests from the Request a Quote form will appear here." />
         ) : (
@@ -318,7 +323,7 @@ export function QuoteRequests() {
               <tbody>
                 {data.data.map((row) => (
                   <tr key={row.id} className={cn('border-b border-slate-100', !row.read_at && 'font-semibold')}>
-                    <td className="px-5 py-2.5"><button type="button" className="text-left" onClick={() => setOpen(row.id)}><span className="block text-navy-900">{row.name}</span><span className="block text-xs font-normal text-muted">{row.company || row.email}</span></button></td>
+                    <td className="px-5 py-2.5"><button type="button" className="text-left" onClick={() => setOpen(row.id)}><span className="block text-navy-900">{row.name}</span><span className="block text-xs font-normal text-muted">{row.reference} · {row.company || row.email}</span></button></td>
                     <td className="px-3 py-2.5 text-slate-700">{row.product_name || 'Custom'}</td>
                     <td className="px-3 py-2.5 text-slate-700">{row.quantity}</td>
                     <td className="px-3 py-2.5 font-normal whitespace-nowrap text-muted">{formatDate(row.created_at)}</td>

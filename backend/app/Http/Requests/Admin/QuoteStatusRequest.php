@@ -11,6 +11,7 @@ class QuoteStatusRequest extends AdminRequest
         return [
             'status' => 'required|in:'.implode(',', QuoteRequest::STATUSES),
             'admin_note' => 'nullable|string|max:5000',
+            'customer_note' => 'nullable|string|max:1000',
         ];
     }
 }

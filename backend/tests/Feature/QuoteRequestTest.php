@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\QuoteConfirmation;
 use App\Mail\QuoteRequested;
 use App\Models\Product;
 use App\Models\QuoteRequest;
@@ -109,4 +110,41 @@ class QuoteRequestTest extends TestCase
 
         $this->actingAs($support)->spa()->getJson('/api/v1/admin/dashboard')->assertJsonPath('stats.quotes.total', 1);
     }
+
+    public function test_quote_gets_reference_and_customer_confirmation(): void
+    {
+        Mail::fake();
+
+        $ref = $this->postJson('/api/v1/quote', $this->valid())->assertCreated()->json('reference');
+
+        $this->assertMatchesRegularExpression('/^IRQ-\d{4}-\d{5}$/', $ref);
+        $this->assertSame($ref, QuoteRequest::sole()->reference);
+        Mail::assertSent(QuoteConfirmation::class, fn ($mail) => $mail->hasTo('karim@example.com'));
+
+        $html = (new QuoteConfirmation(QuoteRequest::sole()))->render();
+        $this->assertStringContainsString($ref, $html);
+        $this->assertStringContainsString('track-quote?ref='.$ref, $html);
+    }
+
+    public function test_tracking_needs_matching_reference_and_email(): void
+    {
+        $ref = $this->postJson('/api/v1/quote', $this->valid())->json('reference');
+        $quote = QuoteRequest::sole();
+        $quote->update(['status' => 'quoted', 'customer_note' => 'Quotation emailed today.', 'admin_note' => 'internal only']);
+
+        $this->postJson('/api/v1/quote/track', ['reference' => strtolower($ref), 'email' => 'KARIM@example.com '])
+            ->assertOk()
+            ->assertJsonPath('status', 'quoted')
+            ->assertJsonPath('customer_note', 'Quotation emailed today.')
+            ->assertJsonMissingPath('admin_note')
+            ->assertJsonMissingPath('phone');
+        $this->assertNotNull($quote->fresh()->status_changed_at);
+
+        $wrongEmail = $this->postJson('/api/v1/quote/track', ['reference' => $ref, 'email' => 'other@example.com'])->assertNotFound()->json('message');
+        $noSuchRef = $this->postJson('/api/v1/quote/track', ['reference' => 'IRQ-2026-99999', 'email' => 'karim@example.com'])->assertNotFound()->json('message');
+        $this->assertSame($wrongEmail, $noSuchRef);
+
+        $this->postJson('/api/v1/quote/track', ['reference' => '1 OR 1=1', 'email' => 'karim@example.com'])->assertUnprocessable();
+    }
 }
+

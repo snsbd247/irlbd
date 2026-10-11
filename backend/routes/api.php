@@ -54,6 +54,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
     Route::middleware('throttle:forms')->group(function () {
         Route::post('contact', [PublicApi\ContactController::class, 'store'])->name('contact.store');
         Route::post('quote', [PublicApi\QuoteController::class, 'store'])->name('quote.store');
+        Route::post('quote/track', [PublicApi\QuoteController::class, 'track'])->name('quote.track');
         Route::post('jobs/{slug}/apply', [PublicApi\CareerController::class, 'apply'])->name('jobs.apply');
         Route::post('newsletter/subscribe', [PublicApi\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
         Route::post('newsletter/unsubscribe', [PublicApi\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
