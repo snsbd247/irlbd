@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin
+Disallow: /search
+
+# Replace example.com with your domain. Either regenerate a static sitemap.xml from
+# Admin > Settings > SEO, or point this at the API's live sitemap.
+Sitemap: https://example.com/sitemap.xml

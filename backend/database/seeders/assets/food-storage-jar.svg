@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450"><defs>
+  <linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset=".35" stop-color="#cfe6ff" stop-opacity=".55"/><stop offset=".7" stop-color="#9cc9ff" stop-opacity=".45"/><stop offset="1" stop-color="#ffffff" stop-opacity=".8"/></linearGradient>
+  <linearGradient id="white" x1="0" x2="1"><stop offset="0" stop-color="#e9eef5"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#d7dee8"/></linearGradient>
+  <linearGradient id="amber" x1="0" x2="1"><stop offset="0" stop-color="#7a3b0c"/><stop offset=".4" stop-color="#b8661c"/><stop offset="1" stop-color="#6b3109"/></linearGradient>
+  <linearGradient id="navybg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#071a33"/><stop offset=".6" stop-color="#0d3b73"/><stop offset="1" stop-color="#1767c4"/></linearGradient>
+  <linearGradient id="lightbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3f8ff"/><stop offset="1" stop-color="#dcebfb"/></linearGradient>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ec5ff"/><stop offset="1" stop-color="#e8f3ff"/></linearGradient>
+  <radialGradient id="glow" cx=".7" cy=".4" r=".6"><stop offset="0" stop-color="#3d8bff" stop-opacity=".55"/><stop offset="1" stop-color="#3d8bff" stop-opacity="0"/></radialGradient>
+</defs><rect width="600" height="450" fill="#f5f9ff"/><g>
+<rect x="80.0" y="190" width="140" height="210" rx="16.8" fill="url(#glass)" stroke="#ffffff" stroke-opacity=".7" stroke-width="1.5"/>
+<rect x="76.0" y="148.0" width="148" height="46.2" rx="6" fill="#e53935"/>
+<rect x="76.0" y="148.0" width="148" height="12.6" rx="3" fill="#ffffff" opacity=".3"/>
+<rect x="96.8" y="221.5" width="14.0" height="136.5" rx="3" fill="#ffffff" opacity=".55"/>
+</g><g>
+<rect x="240.0" y="160" width="140" height="240" rx="16.8" fill="url(#glass)" stroke="#ffffff" stroke-opacity=".7" stroke-width="1.5"/>
+<rect x="236.0" y="112.0" width="148" height="52.8" rx="6" fill="#1677e5"/>
+<rect x="236.0" y="112.0" width="148" height="14.399999999999999" rx="3" fill="#ffffff" opacity=".3"/>
+<rect x="256.8" y="196.0" width="14.0" height="156.0" rx="3" fill="#ffffff" opacity=".55"/>
+</g><g>
+<rect x="400.0" y="200" width="140" height="200" rx="16.8" fill="url(#glass)" stroke="#ffffff" stroke-opacity=".7" stroke-width="1.5"/>
+<rect x="396.0" y="160.0" width="148" height="44.0" rx="6" fill="#e53935"/>
+<rect x="396.0" y="160.0" width="148" height="12.0" rx="3" fill="#ffffff" opacity=".3"/>
+<rect x="416.8" y="230.0" width="14.0" height="130.0" rx="3" fill="#ffffff" opacity=".55"/>
+</g></svg>

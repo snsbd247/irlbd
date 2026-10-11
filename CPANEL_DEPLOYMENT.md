@@ -1,0 +1,315 @@
+# Deploying IR Limited on shared cPanel hosting
+
+This guide assumes **nothing** beyond a standard cPanel account: no SSH, no Composer, no Node.js, no cron, no symlinks. Steps that need SSH have a no-SSH alternative. Everything is built on your own computer and uploaded.
+
+```
+Your PC (build)                         cPanel account (/home/USER)
+────────────────                        ──────────────────────────────────────────────
+release/frontend/      ── upload ──▶    public_html/                 → https://example.com
+release/api-public/    ── upload ──▶    api.example.com/  (doc root) → https://api.example.com
+release/irlbd-api/     ── upload ──▶    irlbd-api/   (NOT web-accessible: code, .env, storage, vendor)
+```
+
+Replace `example.com` with the real domain and `USER` with the cPanel username throughout.
+
+---
+
+## 0. Check the hosting first
+
+In cPanel:
+
+1. **MultiPHP Manager / Select PHP Version** → set the domain(s) to **PHP 8.2 or newer**.
+2. **Select PHP Version → Extensions**: make sure `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd`, `tokenizer`, `xml`, `ctype`, `bcmath`, `curl` and `zip` are enabled. `gd` and `fileinfo` are required for secure image uploads.
+3. **Domains**: confirm you can create a subdomain and choose its document root. Nearly every cPanel host allows this. If yours doesn't, use **Option B** in step 2.
+4. `mod_rewrite` must be available. It almost always is on cPanel; the site will not route without it.
+
+If you can't see these screens, ask the host to confirm PHP ≥ 8.2 with the extensions above.
+
+---
+
+## 1. Build the release on your computer
+
+Requirements on your PC: PHP 8.2+, Composer, Node 20+, Git Bash (Windows) or any bash shell.
+
+```bash
+bash scripts/build-release.sh https://api.example.com
+```
+
+This creates `release/` and `release/irlbd-release.zip`:
+
+| Folder | What it is | Goes to |
+|---|---|---|
+| `frontend/` | Static React build (`index.html`, `assets/`, `.htaccess`, `robots.txt`) | `public_html/` |
+| `api-public/` | Laravel's public folder; its `index.php` boots the app from `../irlbd-api` | API subdomain document root |
+| `irlbd-api/` | Laravel app with production `vendor/` already installed | `/home/USER/irlbd-api` (outside `public_html`) |
+
+> The API URL is baked into the frontend at build time. If it changes, rebuild and re-upload `frontend/`.
+
+---
+
+## 2. Create the API subdomain
+
+**Option A (recommended): subdomain `api.example.com`**
+
+cPanel → **Domains → Create a New Domain** (or *Subdomains* in older cPanel):
+
+- Domain: `api.example.com`
+- Document root: `/home/USER/api.example.com`. Untick "Share document root with example.com".
+
+Folder layout after upload:
+
+```
+/home/USER/
+├── public_html/            ← frontend files
+├── api.example.com/        ← contents of release/api-public (index.php, .htaccess, uploads/)
+└── irlbd-api/              ← contents of release/irlbd-api (app, vendor, storage, .env)
+```
+
+`api-public/index.php` looks for the app in `dirname(__DIR__)/irlbd-api`, which is `/home/USER/irlbd-api` with this layout. If you put the folders elsewhere, edit `$app_path` at the top of `index.php`.
+
+**Option B: no subdomain (API in a subfolder of the main site)**
+
+- Upload `release/api-public/*` to `public_html/backend/`.
+- Upload `release/irlbd-api/` to `/home/USER/irlbd-api` (still outside `public_html`).
+- Edit `public_html/backend/index.php` and set `$app_path = '/home/USER/irlbd-api';` because `dirname(__DIR__)` would point at `public_html`.
+- Build the frontend with `bash scripts/build-release.sh https://example.com/backend`. API URLs become `https://example.com/backend/api/v1/...`.
+- In `.env` use `APP_URL=https://example.com/backend` and `SESSION_DOMAIN=` (empty: same host).
+
+The rest of this guide uses Option A.
+
+---
+
+## 3. Create the MySQL database
+
+cPanel → **MySQL® Database Wizard**:
+
+1. Database: e.g. `USER_irlbd`
+2. User: e.g. `USER_irlbd` with a long random password
+3. Privileges: **ALL PRIVILEGES** on that database
+
+Write down the full database name, user and password (cPanel prefixes them with `USER_`).
+
+---
+
+## 4. Upload the files
+
+Using **File Manager** (enable *Settings → Show Hidden Files* so `.htaccess` and `.env` are visible), or FTP/SFTP:
+
+1. Upload `irlbd-release.zip` to `/home/USER/` and **Extract**.
+2. Move the contents of `frontend/` into `public_html/`, including `.htaccess`.
+3. Move the contents of `api-public/` into `api.example.com/`, including `.htaccess` and `uploads/.htaccess`.
+4. Rename/keep `irlbd-api/` at `/home/USER/irlbd-api`.
+5. Delete the leftover empty folders and the zip.
+
+---
+
+## 5. Configure `.env`
+
+Copy `/home/USER/irlbd-api/.env.example` to `/home/USER/irlbd-api/.env` and edit it:
+
+```dotenv
+APP_NAME="IR Limited"
+APP_ENV=production
+APP_KEY=base64:REPLACE_ME          # see below
+APP_DEBUG=false                     # never true in production
+APP_URL=https://api.example.com
+
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=USER_irlbd
+DB_USERNAME=USER_irlbd
+DB_PASSWORD=the-database-password
+
+FRONTEND_URL=https://example.com
+CORS_ALLOWED_ORIGINS=https://example.com,https://www.example.com
+SANCTUM_STATEFUL_DOMAINS=example.com,www.example.com
+SESSION_DOMAIN=.example.com
+SESSION_SECURE_COOKIE=true
+SESSION_ENCRYPT=true
+SESSION_DRIVER=database
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
+
+# Uploads live in the API web root. Always set these in production.
+UPLOADS_ROOT=/home/USER/api.example.com/uploads
+UPLOADS_URL=https://api.example.com/uploads
+
+# Lets "Regenerate sitemap" write public_html/sitemap.xml
+SITEMAP_OUTPUT_PATH=/home/USER/public_html
+
+# First super admin (delete ADMIN_PASSWORD after installing!)
+ADMIN_NAME="Site Administrator"
+ADMIN_EMAIL=you@example.com
+ADMIN_PASSWORD=a-long-unique-password-123
+
+# Only for the no-SSH installer in step 7 (delete afterwards)
+INSTALL_TOKEN=
+```
+
+### Generating `APP_KEY` without SSH
+
+Run one of these **on your PC** and paste the output (including `base64:`) into `APP_KEY`:
+
+```bash
+php -r "echo 'base64:'.base64_encode(random_bytes(32)).PHP_EOL;"
+```
+```powershell
+"base64:" + [Convert]::ToBase64String((1..32 | % { [byte](Get-Random -Max 256) }))
+```
+
+Keep `APP_KEY` safe and never change it after launch: it encrypts sessions.
+
+### Cookie & CORS settings explained
+
+| Setting | Why |
+|---|---|
+| `SANCTUM_STATEFUL_DOMAINS` | Requests from these hosts get session cookies (admin login + public forms' CSRF). List every host visitors use (`example.com` and `www.example.com`). |
+| `SESSION_DOMAIN=.example.com` | Lets the cookie set by `api.example.com` be read on `example.com`. Must be the shared parent domain with a leading dot. |
+| `CORS_ALLOWED_ORIGINS` | Exact origins (scheme + host) allowed to call the API with credentials. Use `https://`. |
+| `SESSION_SECURE_COOKIE=true` | Cookies only over HTTPS. Requires SSL on both domains (step 8). |
+
+---
+
+## 6. File permissions
+
+In File Manager → select → **Change Permissions**:
+
+| Path | Permission |
+|---|---|
+| `irlbd-api/storage` and everything inside | folders `755`, files `644` (use `775`/`664` only if your host runs PHP as a different user and writes fail) |
+| `irlbd-api/bootstrap/cache` | `755` |
+| `api.example.com/uploads` | `755` |
+| `irlbd-api/.env` | `640` (or `600`) |
+| Everything else | folders `755`, files `644` |
+
+Never use `777`.
+
+---
+
+## 7. Install: migrations, seed data and the first admin
+
+### Option A: with SSH or cPanel "Terminal"
+
+```bash
+cd ~/irlbd-api
+php artisan migrate --force
+php artisan db:seed --force          # roles, settings, pages, menus, demo content, first admin
+php artisan cms:create-admin         # optional: create/reset another super admin interactively
+php artisan config:cache
+php artisan route:cache
+```
+
+`UPLOADS_ROOT` must be set (step 5) so the seeder copies images into the API web root.
+
+If your host's default `php` is older than 8.2, use the versioned binary, e.g. `/opt/cpanel/ea-php82/root/usr/bin/php artisan …`.
+
+### Option B: without SSH (one-time web installer)
+
+1. Put a random value of **at least 32 characters** in `.env`: `INSTALL_TOKEN=...`
+   (generate one with `php -r "echo bin2hex(random_bytes(24));"` or a password manager).
+2. From your PC run (Windows 10/11 and macOS include `curl`):
+
+   ```bash
+   curl -X POST https://api.example.com/api/install -d "token=YOUR_INSTALL_TOKEN"
+   ```
+   PowerShell:
+   ```powershell
+   Invoke-RestMethod -Method Post -Uri https://api.example.com/api/install -Body @{ token = "YOUR_INSTALL_TOKEN" }
+   ```
+3. The response lists the migration and seeding output. On the first run it migrates and seeds (creating the admin from `ADMIN_EMAIL`/`ADMIN_PASSWORD`), then writes `storage/app/private/installed.lock` so seeding never runs again. Later runs only apply new migrations.
+4. **Immediately remove `INSTALL_TOKEN` and `ADMIN_PASSWORD` from `.env`.** Without the token the endpoint returns 404.
+
+Seeding happens only when the database has no pages, so it never overwrites edited content. To start without demo products/news/clients, set `SEED_DEMO_CONTENT=false` before installing.
+
+---
+
+## 8. SSL (HTTPS)
+
+1. cPanel → **SSL/TLS Status** → run **AutoSSL** for `example.com`, `www.example.com` and `api.example.com`.
+2. Once both certificates are active, uncomment the HTTPS redirect in `public_html/.htaccess`:
+   ```apache
+   RewriteCond %{HTTPS} !=on
+   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+   ```
+3. Use `https://` everywhere in `.env` and rebuild the frontend if `VITE_API_URL` was `http://`.
+
+---
+
+## 9. Verify the deployment
+
+| Check | Expected |
+|---|---|
+| `https://api.example.com/` | `{"name":"IR Limited API","version":"v1",...}` |
+| `https://api.example.com/api/v1/settings` | JSON with `site_name` |
+| `https://api.example.com/api/v1/pages/does-not-exist` | `{"message":"Resource not found."}` (no stack trace) |
+| `https://example.com/` | Homepage with hero slider |
+| `https://example.com/our-mission`, then refresh | Page reloads (not a 404): the SPA `.htaccess` works |
+| `https://example.com/admin` | Login screen; sign in with the admin you created |
+| Admin → Settings → change the site name → save | New name on the public site after a reload |
+| Contact form | "Message sent", and the enquiry appears under Admin → Enquiries |
+| Admin → Media → upload a JPG | Thumbnail appears; file is under `api.example.com/uploads/general/…` |
+
+---
+
+## 10. After launch
+
+- **Change the admin password** (Admin → My profile) if `ADMIN_PASSWORD` was ever shared.
+- Replace the placeholder images and verify the seeded facts (see README → *Before going live*).
+- **Sitemap:** Admin → General settings → SEO → *Regenerate sitemap.xml* (needs `SITEMAP_OUTPUT_PATH`). Then edit `public_html/robots.txt` so `Sitemap:` uses your domain. Regenerate after publishing major content. A live sitemap is always available at `https://api.example.com/api/v1/sitemap.xml`.
+- **Email notifications (optional):** create a mailbox in cPanel → *Email Accounts*, fill the `MAIL_*` values in `.env`, then set *Admin → Settings → Contact → Send enquiry notifications to*. Enquiries are always stored even if email fails.
+- **Cron is not required.** Queues run synchronously and expired sessions are cleaned up automatically during normal traffic.
+
+---
+
+## 11. Backups
+
+| What | How | How often |
+|---|---|---|
+| Database | cPanel → **Backup** → *Download a MySQL Database Backup*, or phpMyAdmin → Export (SQL) | Daily/weekly, and before every update |
+| Uploaded media | Download `api.example.com/uploads/` (File Manager → Compress) | Weekly |
+| Configuration | Download `irlbd-api/.env` and keep it somewhere private (it contains secrets) | After every change |
+| Full account | cPanel → **Backup** → *Full Backup*, or JetBackup if the host provides it | Monthly |
+
+To restore: import the SQL in phpMyAdmin, re-upload `uploads/`, restore `.env`.
+
+---
+
+## 12. Updating and rolling back
+
+**Update:**
+
+1. Back up the database, `uploads/` and `.env` (section 11).
+2. Build a new release on your PC.
+3. Upload the new `irlbd-api/` as `/home/USER/irlbd-api-new`, copy your `.env` into it, and copy `storage/app/private/installed.lock` if it exists.
+4. Rename `irlbd-api` → `irlbd-api-previous`, then `irlbd-api-new` → `irlbd-api`.
+5. Replace `api.example.com/index.php` and `.htaccess` if they changed. **Keep `uploads/`.**
+6. Replace the files in `public_html/` with the new `frontend/` (keep `sitemap.xml`).
+7. Apply migrations: SSH `php artisan migrate --force && php artisan optimize:clear && php artisan config:cache && php artisan route:cache`, **or** temporarily set `INSTALL_TOKEN` and call `/api/install` (migrate-only after the first install), then remove the token.
+
+**Roll back:** rename `irlbd-api-previous` back to `irlbd-api`, restore the previous frontend files and, if the update ran migrations, import the database backup taken in step 1.
+
+---
+
+## 13. Troubleshooting
+
+| Symptom | Likely cause / fix |
+|---|---|
+| **500 error** on the API | Read `irlbd-api/storage/logs/laravel-*.log`. Usual causes: wrong PHP version, missing extension, wrong DB credentials, `storage/` not writable, empty `APP_KEY`, wrong `$app_path` in `index.php`. |
+| Blank page or "No application encryption key" | `APP_KEY` missing or malformed; it must start with `base64:`. |
+| **404 when refreshing** `/our-mission` | `public_html/.htaccess` is missing (hidden files weren't uploaded) or `mod_rewrite` is off. |
+| **CORS error** in the browser console | `CORS_ALLOWED_ORIGINS` must exactly match the site origin, including `https://` and `www.` if used. Run `php artisan config:clear` if config was cached. |
+| **419 "Page expired"** / CSRF mismatch | `SESSION_DOMAIN` must be `.example.com`; `SANCTUM_STATEFUL_DOMAINS` must list the site host(s); both sites must use HTTPS when `SESSION_SECURE_COOKIE=true`. Clear browser cookies and retry. |
+| Login succeeds then immediately logs out / 401 | Same cookie settings as above; check the browser isn't blocking third-party cookies for a *different* domain (API and site must share a parent domain). |
+| Changes to `.env` have no effect | Config is cached: `php artisan config:clear` (SSH), or call the installer with a token (it clears caches). |
+| Uploaded images return 404 | `UPLOADS_ROOT` must be the real path of `api.example.com/uploads`, and `UPLOADS_URL` its public URL. |
+| "The image could not be processed" | PHP `gd` extension is disabled; enable it in *Select PHP Version*. |
+| Mixed-content warnings | `APP_URL`, `UPLOADS_URL` and `VITE_API_URL` must all be `https://`. |
+| Too many attempts (429) | Rate limit hit (login 5/min, forms 5/min). Wait a minute. |
+| Installer returns 404 | `INSTALL_TOKEN` is empty or shorter than 32 characters (this is the safe default). |
+
+---
+
+## SEO notes
+
+The site is a client-rendered single-page app. Google renders JavaScript and picks up the per-page titles, descriptions and Open Graph tags that the app sets. Crawlers and social previews that don't execute JavaScript only see the defaults in `index.html`. For full social-preview support on every page, you could later add a prerendering step to the build or a small PHP endpoint that injects meta tags. Neither is required to deploy.

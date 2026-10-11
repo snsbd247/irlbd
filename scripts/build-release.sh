@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# Builds an upload-ready release for shared cPanel hosting (no Node/Composer needed on the server).
+#
+#   Usage: scripts/build-release.sh https://api.example.com
+#
+# Produces:
+#   release/frontend/          -> upload contents to public_html/
+#   release/api-public/        -> upload contents to the API subdomain's document root
+#   release/irlbd-api/         -> upload to /home/USER/irlbd-api (OUTSIDE public_html)
+#   release/irlbd-release.zip  -> all of the above in one archive
+set -euo pipefail
+
+API_URL="${1:-}"
+if [[ -z "$API_URL" ]]; then
+  echo "Usage: $0 https://api.example.com" >&2
+  exit 1
+fi
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+OUT="$ROOT/release"
+rm -rf "$OUT"
+mkdir -p "$OUT"
+
+echo "==> Building React frontend (VITE_API_URL=$API_URL)"
+( cd "$ROOT/frontend" && { [ -d node_modules ] || npm ci; } && VITE_API_URL="$API_URL" npm run build )
+cp -r "$ROOT/frontend/dist" "$OUT/frontend"
+
+echo "==> Preparing Laravel API (production dependencies only)"
+mkdir -p "$OUT/irlbd-api"
+( cd "$ROOT/backend" && tar --exclude=./vendor --exclude=./node_modules --exclude=./.env --exclude='./storage/logs/*' \
+    --exclude='./storage/framework/sessions/*' --exclude='./storage/framework/cache/data/*' --exclude='./storage/framework/views/*' \
+    --exclude='./public/uploads' --exclude='./database/database.sqlite' \
+    --exclude='./tests' --exclude='./.phpunit.result.cache' -cf - . ) | ( cd "$OUT/irlbd-api" && tar -xf - )
+( cd "$OUT/irlbd-api" && composer install --no-dev --optimize-autoloader --no-interaction --no-progress )
+
+echo "==> Splitting public directory for the API document root"
+mv "$OUT/irlbd-api/public" "$OUT/api-public"
+mkdir -p "$OUT/api-public/uploads"
+cp "$ROOT/backend/public/uploads/.htaccess" "$OUT/api-public/uploads/.htaccess"
+# index.php that boots the app from the folder OUTSIDE the web root.
+cat > "$OUT/api-public/index.php" <<'PHP'
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+
+define('LARAVEL_START', microtime(true));
+
+// Path to the Laravel application, which lives OUTSIDE the public web root.
+// Adjust if you uploaded irlbd-api somewhere else.
+$app_path = dirname(__DIR__).'/irlbd-api';
+if (! is_dir($app_path)) {
+    $app_path = getenv('HOME').'/irlbd-api';
+}
+
+if (file_exists($maintenance = $app_path.'/storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+require $app_path.'/vendor/autoload.php';
+
+/** @var Application $app */
+$app = require_once $app_path.'/bootstrap/app.php';
+
+// This folder is the public directory (uploads live here; no symlinks needed).
+$app->usePublicPath(__DIR__);
+
+$app->handleRequest(Request::capture());
+PHP
+
+cp "$ROOT/backend/.env.example" "$OUT/irlbd-api/.env.example"
+
+echo "==> Zipping"
+( cd "$OUT" && (command -v zip >/dev/null && zip -qr irlbd-release.zip frontend api-public irlbd-api || powershell -NoProfile -Command "Compress-Archive -Path frontend,api-public,irlbd-api -DestinationPath irlbd-release.zip -Force") )
+
+echo
+echo "Release ready in $OUT"
+echo "Next: follow CPANEL_DEPLOYMENT.md"

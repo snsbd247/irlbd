@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450"><defs>
+  <linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset=".35" stop-color="#cfe6ff" stop-opacity=".55"/><stop offset=".7" stop-color="#9cc9ff" stop-opacity=".45"/><stop offset="1" stop-color="#ffffff" stop-opacity=".8"/></linearGradient>
+  <linearGradient id="white" x1="0" x2="1"><stop offset="0" stop-color="#e9eef5"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#d7dee8"/></linearGradient>
+  <linearGradient id="amber" x1="0" x2="1"><stop offset="0" stop-color="#7a3b0c"/><stop offset=".4" stop-color="#b8661c"/><stop offset="1" stop-color="#6b3109"/></linearGradient>
+  <linearGradient id="navybg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#071a33"/><stop offset=".6" stop-color="#0d3b73"/><stop offset="1" stop-color="#1767c4"/></linearGradient>
+  <linearGradient id="lightbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3f8ff"/><stop offset="1" stop-color="#dcebfb"/></linearGradient>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ec5ff"/><stop offset="1" stop-color="#e8f3ff"/></linearGradient>
+  <radialGradient id="glow" cx=".7" cy=".4" r=".6"><stop offset="0" stop-color="#3d8bff" stop-opacity=".55"/><stop offset="1" stop-color="#3d8bff" stop-opacity="0"/></radialGradient>
+</defs><rect width="600" height="450" fill="#f5f9ff"/><g>
+<rect x="168.2" y="94" width="63.6" height="18" rx="4" fill="#1677e5"/>
+<rect x="168.2" y="94" width="63.6" height="5" rx="2" fill="#ffffff" opacity=".35"/>
+<path d="M171.2,112 L171.2,139.4 C110.0,168.8 110.0,194.0 110.0,200.0
+ L110.0,400 Q110.0,410 120.0,410 L280.0,410 Q290.0,410 290.0,400
+ L290.0,200.0 C290.0,194.0 290.0,168.8 228.8,139.4 L228.8,112 Z"
+ fill="url(#white)" stroke="#ffffff" stroke-opacity=".6" stroke-width="1.5"/><rect x="135.2" y="206.0" width="18.0" height="150.0" rx="3" fill="#ffffff" opacity=".55"/></g><g>
+<rect x="393.0" y="144" width="54.0" height="18" rx="4" fill="#2e7d32"/>
+<rect x="393.0" y="144" width="54.0" height="5" rx="2" fill="#ffffff" opacity=".35"/>
+<path d="M396.0,162 L396.0,184.5 C345.0,209.0 345.0,230.0 345.0,236.0
+ L345.0,400 Q345.0,410 355.0,410 L485.0,410 Q495.0,410 495.0,400
+ L495.0,236.0 C495.0,230.0 495.0,209.0 444.0,184.5 L444.0,162 Z"
+ fill="url(#white)" stroke="#ffffff" stroke-opacity=".6" stroke-width="1.5"/><rect x="366.0" y="242.0" width="15.0" height="125.0" rx="3" fill="#ffffff" opacity=".55"/></g></svg>

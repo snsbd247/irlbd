@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800"><defs>
+  <linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset=".35" stop-color="#cfe6ff" stop-opacity=".55"/><stop offset=".7" stop-color="#9cc9ff" stop-opacity=".45"/><stop offset="1" stop-color="#ffffff" stop-opacity=".8"/></linearGradient>
+  <linearGradient id="white" x1="0" x2="1"><stop offset="0" stop-color="#e9eef5"/><stop offset=".45" stop-color="#ffffff"/><stop offset="1" stop-color="#d7dee8"/></linearGradient>
+  <linearGradient id="amber" x1="0" x2="1"><stop offset="0" stop-color="#7a3b0c"/><stop offset=".4" stop-color="#b8661c"/><stop offset="1" stop-color="#6b3109"/></linearGradient>
+  <linearGradient id="navybg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#071a33"/><stop offset=".6" stop-color="#0d3b73"/><stop offset="1" stop-color="#1767c4"/></linearGradient>
+  <linearGradient id="lightbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3f8ff"/><stop offset="1" stop-color="#dcebfb"/></linearGradient>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ec5ff"/><stop offset="1" stop-color="#e8f3ff"/></linearGradient>
+  <radialGradient id="glow" cx=".7" cy=".4" r=".6"><stop offset="0" stop-color="#3d8bff" stop-opacity=".55"/><stop offset="1" stop-color="#3d8bff" stop-opacity="0"/></radialGradient>
+</defs><rect width="1200" height="800" fill="url(#navybg)"/><ellipse cx="600" cy="680" rx="380" ry="90" fill="#5d4037"/><path d="M600 660 C600 520 600 430 600 360" stroke="#2e7d32" stroke-width="16" fill="none"/><path d="M600 470 C470 470 420 380 430 300 C540 300 600 360 600 470 Z" fill="#43a047"/><path d="M600 420 C730 420 790 330 780 240 C660 250 600 320 600 420 Z" fill="#66bb6a"/></svg>

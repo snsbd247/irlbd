@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Http\Resources\MediaResource;
+use App\Models\Media;
+use App\Services\MediaService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+
+class MediaController extends Controller
+{
+    use AuthorizesRequests;
+
+    public function __construct(protected MediaService $media) {}
+
+    public function index(Request $request): AnonymousResourceCollection
+    {
+        $this->authorizeMediaAccess($request);
+
+        $items = Media::query()
+            ->when($request->filled('folder'), fn ($q) => $q->where('folder', $request->input('folder')))
+            ->when($request->filled('search'), fn ($q) => $q->where('original_name', 'like', '%'.addcslashes($request->input('search'), '%_\\').'%'))
+            ->latest('id')
+            ->paginate(min((int) $request->input('per_page', 30), 100));
+
+        return MediaResource::collection($items);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $this->authorizeMediaAccess($request);
+
+        $mimes = implode(',', array_unique(array_values(config('cms.uploads.mimes'))));
+        $data = $request->validate([
+            'file' => ['required', 'file', 'max:'.config('cms.uploads.max_kb'), 'mimes:'.$mimes.',jpeg'],
+            'folder' => 'nullable|string|in:'.implode(',', config('cms.uploads.folders')),
+            'alt' => 'nullable|string|max:255',
+        ]);
+
+        $media = $this->media->store($request->file('file'), $data['folder'] ?? 'general', $request->user()->id, $data['alt'] ?? null);
+
+        return (new MediaResource($media))->response()->setStatusCode(201);
+    }
+
+    public function update(Request $request, Media $media): MediaResource
+    {
+        $this->authorize('update', $media);
+        $media->update($request->validate(['alt' => 'nullable|string|max:255']));
+
+        return new MediaResource($media);
+    }
+
+    public function destroy(Media $media): JsonResponse
+    {
+        $this->authorize('delete', $media);
+        $this->media->delete($media);
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * Editors of any content module need to upload/pick images, so access is granted to
+     * anyone holding "media.manage" or any content-management permission.
+     */
+    protected function authorizeMediaAccess(Request $request): void
+    {
+        $user = $request->user();
+        $modules = ['media', 'pages', 'products', 'services', 'clients', 'team', 'news', 'history', 'quality', 'contact', 'settings'];
+
+        foreach ($modules as $module) {
+            if ($user->hasPermission($module.'.manage')) {
+                return;
+            }
+        }
+
+        abort(403, 'You do not have permission to manage media.');
+    }
+}
