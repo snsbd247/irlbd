@@ -39,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         Models\ContactSubmission::class => Policies\EnquiryPolicy::class,
         Models\QuoteRequest::class => Policies\EnquiryPolicy::class,
         Models\NewsletterSubscriber::class => Policies\SubscriberPolicy::class,
+        Models\NewsletterCampaign::class => Policies\SubscriberPolicy::class,
         Models\Media::class => Policies\MediaPolicy::class,
         Models\User::class => Policies\UserPolicy::class,
         Models\Role::class => Policies\RolePolicy::class,

@@ -385,6 +385,23 @@ export const RESOURCES = {
     ],
   },
 
+  'newsletter-campaigns': {
+    title: 'Newsletters',
+    singular: 'newsletter',
+    permission: 'subscribers',
+    description: 'Write an email, preview it, send a test to yourself, then send it to all subscribers.',
+    filters: [{ name: 'status', label: 'Status', options: [['draft', 'Draft'], ['sending', 'Sending'], ['sent', 'Sent']] }],
+    columns: [
+      { key: 'subject', label: 'Subject', sub: (r) => r.author && `by ${r.author}` },
+      { key: 'status', label: 'Status', type: 'status' },
+      { key: 'sent_count', label: 'Sent', render: (r) => (r.status === 'draft' ? '-' : `${r.sent_count} / ${r.recipients_total}`) },
+      { key: 'created_at', label: 'Created', type: 'date' },
+    ],
+    editPath: (r) => `/admin/newsletters/${r.id}`,
+    newPath: '/admin/newsletters/new',
+    canDelete: (r) => r.status !== 'sending',
+  },
+
   pages: {
     title: 'Pages',
     singular: 'page',

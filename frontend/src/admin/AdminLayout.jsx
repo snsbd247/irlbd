@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Award, Boxes, ScrollText, Factory, BriefcaseBusiness, Camera, UserSearch, MessageSquareQuote, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
+  Award, Boxes, MailPlus, ScrollText, Factory, BriefcaseBusiness, Camera, UserSearch, MessageSquareQuote, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
   FileSignature, LogOut, Mail, Menu, Navigation, Newspaper, Package, PanelsTopLeft, Settings, Shield, Tags, User, UserCog, Users, X,
 } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
@@ -58,6 +58,7 @@ const NAV = [
     items: [
       { to: '/admin/quote-requests', label: 'Quote requests', icon: FileSignature, perm: 'enquiries', badge: 'quotes' },
       { to: '/admin/enquiries', label: 'Enquiries', icon: Inbox, perm: 'enquiries', badge: 'enquiries' },
+      { to: '/admin/r/newsletter-campaigns', label: 'Send newsletter', icon: MailPlus, perm: 'subscribers' },
       { to: '/admin/subscribers', label: 'Subscribers', icon: Mail, perm: 'subscribers' },
     ],
   },

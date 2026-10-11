@@ -101,6 +101,10 @@ Route::prefix('v1')->name('v1.')->group(function () {
             Route::get('quote-requests/export', [Admin\QuoteRequestController::class, 'export'])->name('quote-requests.export');
             Route::get('job-applications/{id}/cv', [Admin\JobApplicationController::class, 'cv'])->whereNumber('id')->name('job-applications.cv');
             Route::get('subscribers/export', [Admin\SubscriberController::class, 'export'])->name('subscribers.export');
+            Route::get('newsletter-campaigns/recipients', [Admin\NewsletterCampaignController::class, 'recipients'])->name('newsletter.recipients');
+            Route::get('newsletter-campaigns/{id}/preview', [Admin\NewsletterCampaignController::class, 'preview'])->whereNumber('id')->name('newsletter.preview');
+            Route::post('newsletter-campaigns/{id}/test', [Admin\NewsletterCampaignController::class, 'test'])->whereNumber('id')->middleware('throttle:forms')->name('newsletter.test');
+            Route::post('newsletter-campaigns/{id}/send-batch', [Admin\NewsletterCampaignController::class, 'sendBatch'])->whereNumber('id')->name('newsletter.send-batch');
 
             $crud = [
                 'pages' => Admin\PageController::class,
@@ -125,6 +129,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
                 'job-posts' => Admin\JobPostController::class,
                 'job-applications' => Admin\JobApplicationController::class,
                 'subscribers' => Admin\SubscriberController::class,
+                'newsletter-campaigns' => Admin\NewsletterCampaignController::class,
                 'users' => Admin\UserController::class,
                 'roles' => Admin\RoleController::class,
             ];

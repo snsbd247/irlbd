@@ -8,6 +8,7 @@ import AdminLayout from './AdminLayout'
 import { RESOURCES } from './resources'
 import { ResourceForm, ResourceList } from './pages/ResourcePages'
 import PageEditor from './pages/PageEditor'
+import NewsletterEditor from './pages/Newsletter'
 import Menus from './pages/Menus'
 import Settings from './pages/Settings'
 import { Enquiries, JobApplications, MediaLibrary, QuoteRequests, Subscribers } from './pages/Inbox'
@@ -18,6 +19,7 @@ function ResourceRoute({ form = false }) {
   const { resource, id } = useParams()
   if (!RESOURCES[resource]) return <Navigate to="/admin" replace />
   if (resource === 'pages' && form) return <Navigate to={`/admin/pages/${id}`} replace />
+  if (resource === 'newsletter-campaigns' && form) return <Navigate to={`/admin/newsletters/${id}`} replace />
   return form ? <ResourceForm key={resource} resourceKey={resource} /> : <ResourceList key={resource} resourceKey={resource} />
 }
 
@@ -50,6 +52,7 @@ export default function AdminApp() {
               <Route index element={<Dashboard />} />
               <Route path="homepage" element={<HomepageBuilder />} />
               <Route path="pages/:id" element={<PageEditor />} />
+              <Route path="newsletters/:id" element={<NewsletterEditor />} />
               <Route path="menus" element={<Menus />} />
               <Route path="settings" element={<Settings />} />
               <Route path="media" element={<MediaLibrary />} />

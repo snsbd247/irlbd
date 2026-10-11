@@ -184,5 +184,5 @@ export function Card({ title, actions, children, className }) {
 }
 
 export function statusTone(status) {
-  return { published: 'green', subscribed: 'green', new: 'blue', read: 'slate', replied: 'green', archived: 'slate', draft: 'amber', unsubscribed: 'slate' }[status] || 'slate'
+  return { published: 'green', subscribed: 'green', sent: 'green', sending: 'blue', new: 'blue', read: 'slate', replied: 'green', archived: 'slate', draft: 'amber', unsubscribed: 'slate' }[status] || 'slate'
 }

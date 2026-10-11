@@ -23,6 +23,9 @@ return [
 
     'seed_demo_content' => (bool) env('SEED_DEMO_CONTENT', true),
 
+    // Emails per newsletter batch request. Keep within your host's hourly email limit.
+    'newsletter_batch_size' => (int) env('NEWSLETTER_BATCH_SIZE', 20),
+
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
 
     // Absolute path where the generated sitemap.xml should be written
