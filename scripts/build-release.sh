@@ -50,7 +50,7 @@ fi
 echo "==> Preparing Laravel API (production dependencies only)"
 mkdir -p "$OUT/irlbd-api"
 ( cd "$ROOT/backend" && tar --exclude=./vendor --exclude=./node_modules --exclude=./.env --exclude='./storage/logs/*' \
-    --exclude='./storage/framework/sessions/*' --exclude='./storage/framework/cache/data/*' --exclude='./storage/framework/views/*' \
+    --exclude='./storage/framework/sessions/*' --exclude='./storage/framework/cache/data/*' --exclude='./storage/framework/views/*' --exclude='./storage/framework/testing' \
     --exclude='./public/uploads' --exclude='./database/database.sqlite' \
     --exclude='./tests' --exclude='./.phpunit.result.cache' -cf - . ) | ( cd "$OUT/irlbd-api" && tar -xf - )
 ( cd "$OUT/irlbd-api" && composer install --no-dev --optimize-autoloader --no-interaction --no-progress )
