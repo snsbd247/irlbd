@@ -13,7 +13,7 @@ import { NotAllowed } from './Misc'
 const PAGE_FIELDS = [
   { name: 'title', label: 'Page title', type: 'text', required: true },
   { name: 'slug', label: 'URL slug', type: 'text', help: 'The page address, e.g. "our-mission" → /our-mission. Leave empty to generate.' },
-  { name: 'template', label: 'Page type', type: 'select', required: true, options: [['sections', 'Content page (sections)'], ['products', 'Product catalog'], ['news', 'News listing'], ['contact', 'Contact page'], ['gallery', 'Photo gallery'], ['careers', 'Careers (job list)'], ['dealers', 'Dealer finder']] },
+  { name: 'template', label: 'Page type', type: 'select', required: true, options: [['sections', 'Content page (sections)'], ['products', 'Product catalog'], ['news', 'News listing'], ['contact', 'Contact page'], ['gallery', 'Photo gallery'], ['careers', 'Careers (job list)'], ['dealers', 'Branches / dealer list']] },
   { name: 'status', label: 'Status', type: 'select', required: true, options: [['draft', 'Draft (hidden)'], ['published', 'Published']] },
   { name: 'hero_title', label: 'Banner title', type: 'text', help: 'Defaults to the page title.' },
   { name: 'hero_subtitle', label: 'Banner subtitle', type: 'text' },

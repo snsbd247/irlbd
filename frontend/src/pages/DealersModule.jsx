@@ -7,9 +7,9 @@ import { districtName } from '../lib/districts'
 import { useLang } from '../lib/i18n'
 import { safeHref, telHref } from '../lib/utils'
 
-const TYPE_LABELS = { dealer: 'Dealer', distributor: 'Distributor', agent: 'Agent' }
+const TYPE_LABELS = { head_office: 'Head Office', factory: 'Factory', sales_office: 'Sales Office', dealer: 'Dealer', distributor: 'Distributor', agent: 'Agent' }
 
-/** Dealer finder rendered inside the "Dealers" CMS page (template: dealers). */
+/** Branch / dealer list rendered inside the CMS page with template "dealers" (Our Branches). */
 export default function DealersModule({ section }) {
   const { lang, t } = useLang()
   const [params, setParams] = useSearchParams()
@@ -33,8 +33,10 @@ export default function DealersModule({ section }) {
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             {section?.eyebrow && <p className="eyebrow">{section.eyebrow}</p>}
-            <h2 className="heading-lg mt-2">{section?.title || t('Find a Dealer Near You')}</h2>
+            <h2 className="heading-lg mt-2">{section?.title || t('Our Branches')}</h2>
           </div>
+          {/* The district filter only helps once there are locations in several districts. */}
+          {(data?.districts?.length > 2 || district) && (
           <div className="w-full sm:w-72">
             <label htmlFor="dealer-district" className="label">{t('District')}</label>
             <select id="dealer-district" className="input" value={district} onChange={(e) => choose(e.target.value)}>
@@ -42,6 +44,7 @@ export default function DealersModule({ section }) {
               {(data?.districts || []).map((d) => <option key={d} value={d}>{districtName(d, lang)}</option>)}
             </select>
           </div>
+          )}
         </div>
 
         {isLoading ? (
@@ -49,7 +52,7 @@ export default function DealersModule({ section }) {
         ) : isError ? (
           <ErrorState onRetry={refetch} />
         ) : !data.data.length ? (
-          <EmptyState icon={Store} title={t('No dealers listed yet')} message={t('Please contact us and we will connect you with the nearest dealer.')} />
+          <EmptyState icon={Store} title={t('No locations listed yet')} message={t('Please contact our head office for directions.')} />
         ) : (
           <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {data.data.map((d) => (

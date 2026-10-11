@@ -54,6 +54,7 @@ class BanglaContentSeeder extends Seeder
         'Management Team' => 'ব্যবস্থাপনা পর্ষদ',
         'Careers' => 'ক্যারিয়ার',
         'Dealers & Distributors' => 'ডিলার ও ডিস্ট্রিবিউটর',
+        'Our Branches' => 'আমাদের শাখা',
         'Plastic Bottles' => 'প্লাস্টিক বোতল',
         'Plastic Caps & Closures' => 'প্লাস্টিক ক্যাপ ও ক্লোজার',
         'Jars & Containers' => 'জার ও কন্টেইনার',

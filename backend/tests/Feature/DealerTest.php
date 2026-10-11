@@ -51,9 +51,9 @@ class DealerTest extends TestCase
     {
         $this->seed(\Database\Seeders\DealersContentSeeder::class);
 
-        $this->getJson('/api/v1/pages/dealers')->assertNotFound();
+        $this->getJson('/api/v1/pages/branches')->assertNotFound();
         $footer = collect($this->getJson('/api/v1/navigation')->json('footer_quick'))->pluck('label');
-        $this->assertNotContains('Dealers & Distributors', $footer);
+        $this->assertNotContains('Our Branches', $footer);
     }
 
     public function test_demo_dealers_use_company_contacts_and_never_replace_real_ones(): void
@@ -64,7 +64,7 @@ class DealerTest extends TestCase
 
         $this->assertSame(['Dhaka', 'Gazipur'], Dealer::orderBy('district')->pluck('district')->all());
         $this->assertSame(['+880 9633917362'], Dealer::distinct()->pluck('phone')->all());
-        $this->getJson('/api/v1/pages/dealers')->assertOk();
+        $this->getJson('/api/v1/pages/branches')->assertOk();
 
         Dealer::query()->delete();
         Dealer::create(['name' => 'Real Dealer', 'type' => 'dealer', 'district' => 'Bogura', 'is_active' => true]);

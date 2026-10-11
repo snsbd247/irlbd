@@ -387,13 +387,13 @@ export const RESOURCES = {
 
   dealers: {
     translatable: ['name', 'address', 'contact_person'],
-    title: 'Dealers & distributors',
-    singular: 'dealer',
+    title: 'Branches & dealers',
+    singular: 'location',
     permission: 'contact',
     sortable: true,
-    description: 'Shown on the "Dealers & Distributors" page (publish that page under Pages once dealers are added).',
+    description: 'Branches (head office, factory, sales offices) and any dealers, shown on the "Our Branches" page.',
     filters: [
-      { name: 'type', label: 'Type', options: [['dealer', 'Dealer'], ['distributor', 'Distributor'], ['agent', 'Agent']] },
+      { name: 'type', label: 'Type', options: [['head_office', 'Head office'], ['factory', 'Factory'], ['sales_office', 'Sales office'], ['dealer', 'Dealer'], ['distributor', 'Distributor'], ['agent', 'Agent']] },
       { name: 'district', label: 'District', options: DISTRICTS.map(([d]) => [d, d]) },
     ],
     columns: [
@@ -403,8 +403,8 @@ export const RESOURCES = {
       { key: 'is_active', label: 'Visible', type: 'bool' },
     ],
     fields: [
-      { name: 'name', label: 'Business name', type: 'text', required: true },
-      { name: 'type', label: 'Type', type: 'select', required: true, default: 'dealer', options: [['dealer', 'Dealer'], ['distributor', 'Distributor'], ['agent', 'Agent']] },
+      { name: 'name', label: 'Name', type: 'text', required: true },
+      { name: 'type', label: 'Type', type: 'select', required: true, default: 'sales_office', options: [['head_office', 'Head office'], ['factory', 'Factory'], ['sales_office', 'Sales office'], ['dealer', 'Dealer'], ['distributor', 'Distributor'], ['agent', 'Agent']] },
       { name: 'district', label: 'District', type: 'select', required: true, options: DISTRICTS.map(([d]) => [d, d]) },
       { name: 'contact_person', label: 'Contact person', type: 'text' },
       { name: 'phone', label: 'Phone', type: 'text' },
@@ -457,7 +457,7 @@ export const RESOURCES = {
     filters: [{ name: 'status', label: 'Status', options: [['published', 'Published'], ['draft', 'Draft']] }],
     columns: [
       { key: 'title', label: 'Title', sub: (r) => r.path },
-      { key: 'template', label: 'Type', render: (r) => (r.is_home ? 'Homepage' : { sections: 'Content page', products: 'Product catalog', news: 'News listing', contact: 'Contact page', gallery: 'Photo gallery', careers: 'Careers', dealers: 'Dealer finder' }[r.template]) },
+      { key: 'template', label: 'Type', render: (r) => (r.is_home ? 'Homepage' : { sections: 'Content page', products: 'Product catalog', news: 'News listing', contact: 'Contact page', gallery: 'Photo gallery', careers: 'Careers', dealers: 'Branches' }[r.template]) },
       { key: 'sections_count', label: 'Sections' },
       { key: 'status', label: 'Status', type: 'status' },
     ],

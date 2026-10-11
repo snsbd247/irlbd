@@ -153,6 +153,12 @@ const BN = {
   'Product catalog (PDF)': 'পণ্য ক্যাটালগ (PDF)',
   // Dealers
   'Find a Dealer Near You': 'আপনার কাছের ডিলার খুঁজুন',
+  'Our Branches': 'আমাদের শাখা',
+  'Head Office': 'প্রধান কার্যালয়',
+  'Factory': 'কারখানা',
+  'Sales Office': 'বিক্রয় কার্যালয়',
+  'No locations listed yet': 'এখনো কোনো ঠিকানা যুক্ত করা হয়নি',
+  'Please contact our head office for directions.': 'ঠিকানার জন্য আমাদের প্রধান কার্যালয়ে যোগাযোগ করুন।',
   'District': 'জেলা',
   'All districts': 'সব জেলা',
   'No dealers listed yet': 'এখনো কোনো ডিলার যুক্ত করা হয়নি',

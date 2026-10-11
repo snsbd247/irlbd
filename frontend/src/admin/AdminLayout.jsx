@@ -42,7 +42,7 @@ const NAV = [
       { to: '/admin/r/clients', label: 'Clients', icon: Building2, perm: 'clients' },
       { to: '/admin/r/testimonials', label: 'Testimonials', icon: MessageSquareQuote, perm: 'clients' },
       { to: '/admin/r/offices', label: 'Offices', icon: Building2, perm: 'contact' },
-      { to: '/admin/r/dealers', label: 'Dealers', icon: Store, perm: 'contact' },
+      { to: '/admin/r/dealers', label: 'Branches', icon: Store, perm: 'contact' },
       { to: '/admin/r/faqs', label: 'FAQs', icon: CircleHelp, perm: 'contact' },
       { to: '/admin/media', label: 'Media library', icon: Images, perm: 'media' },
     ],

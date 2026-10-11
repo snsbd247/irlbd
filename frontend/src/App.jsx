@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import PublicLayout from './components/layout/PublicLayout'
 import { PageLoader } from './components/ui/States'
 import ErrorBoundary from './components/ui/ErrorBoundary'
@@ -42,6 +42,8 @@ export default function App() {
         <Route path="request-quote" element={<QuotePage />} />
         <Route path="track-quote" element={<TrackQuotePage />} />
         <Route path="catalog" element={<CatalogPage />} />
+        {/* The branches page was briefly published as /dealers. */}
+        <Route path="dealers" element={<Navigate to="/branches" replace />} />
         <Route path="compare" element={<ComparePage />} />
         <Route path="gallery/:slug" element={<AlbumPage />} />
         <Route path="careers/:slug" element={<JobDetailPage />} />
