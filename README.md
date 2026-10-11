@@ -20,7 +20,7 @@ The React app is built to static files. In production only Apache + PHP run; no 
 Added after the first release:
 
 - **English / বাংলা** language switch (top bar and mobile menu). Content comes translated from the API with English fallback; interface text uses a built-in dictionary.
-- **Request a Quote** form (`/quote`, pre-filled from a product) with email notification.
+- **Request a Quote** form (`/request-quote`, pre-filled from a product) with email notification.
 - **Product variants** (sizes, capacity, weight, neck size, colour, MOQ), **industries** filter, **compare** up to 4 products side by side, and a downloadable **PDF datasheet** per product.
 - **Company brochure** download (footer and products page).
 - **Photo gallery** albums with a lightbox, **testimonials**, **management team** and **video** sections.

@@ -35,6 +35,13 @@ cat > "$OUT/frontend/share-config.php" <<CONF
 return ['api_url' => '$API_URL'];
 CONF
 # (Overwrites the local-development share-config.php copied from public/.)
+# When the API is a folder of the website (https://example.com/api), the website
+# address is known: point robots.txt's Sitemap line at it.
+if [[ "$API_URL" =~ ^(https?://[^/]+)/.+ ]]; then
+  SITE_ORIGIN="${BASH_REMATCH[1]}"
+  sed -i "s#^Sitemap: .*#Sitemap: $SITE_ORIGIN/sitemap.xml#" "$OUT/frontend/robots.txt"
+  sed -i '/^# Replace example.com/,/^# Admin > Settings > SEO/d' "$OUT/frontend/robots.txt"
+fi
 
 echo "==> Preparing Laravel API (production dependencies only)"
 mkdir -p "$OUT/irlbd-api"
@@ -58,10 +65,18 @@ use Illuminate\Http\Request;
 define('LARAVEL_START', microtime(true));
 
 // Path to the Laravel application, which lives OUTSIDE the public web root.
-// Adjust if you uploaded irlbd-api somewhere else.
-$app_path = dirname(__DIR__).'/irlbd-api';
-if (! is_dir($app_path)) {
-    $app_path = getenv('HOME').'/irlbd-api';
+// Found automatically for /home/USER/api.example.com (subdomain) and
+// /home/USER/public_html/api (subfolder). Otherwise set the path here.
+$app_path = null;
+foreach ([dirname(__DIR__).'/irlbd-api', dirname(__DIR__, 2).'/irlbd-api', getenv('HOME').'/irlbd-api'] as $candidate) {
+    if (is_file($candidate.'/bootstrap/app.php')) {
+        $app_path = $candidate;
+        break;
+    }
+}
+if ($app_path === null) {
+    http_response_code(500);
+    exit('Application folder "irlbd-api" not found. Set $app_path in index.php.');
 }
 
 if (file_exists($maintenance = $app_path.'/storage/framework/maintenance.php')) {

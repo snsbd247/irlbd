@@ -14,6 +14,46 @@ Replace `example.com` with the real domain and `USER` with the cPanel username t
 
 ---
 
+## Quick reference: irlbd.com (API in the `/api` folder)
+
+IR Limited uses **one domain, no subdomain**: the website is `https://irlbd.com` and the API lives in the folder `https://irlbd.com/api`. This is *Option B* of step 2. Follow the guide with these exact values:
+
+```
+/home/USER/
+├── public_html/              ← contents of release/frontend  (website)
+│   └── api/                  ← contents of release/api-public (index.php, .htaccess, uploads/)
+└── irlbd-api/                ← release/irlbd-api (code, .env, storage, vendor — NOT web-accessible)
+```
+
+| What | Value |
+|---|---|
+| Build command (step 1) | `bash scripts/build-release.sh https://irlbd.com/api` |
+| API endpoints | `https://irlbd.com/api/api/v1/...`. The folder is `/api` and Laravel adds its own `/api` prefix. Visitors never see these URLs. |
+| Web installer (step 7, no SSH) | `curl -X POST https://irlbd.com/api/api/install -d "token=YOUR_INSTALL_TOKEN"` |
+| `index.php` | No edit needed: it finds `/home/USER/irlbd-api` automatically. |
+
+`.env` values (step 5) that differ from the generic example:
+
+```dotenv
+APP_URL=https://irlbd.com/api
+FRONTEND_URL=https://irlbd.com
+CORS_ALLOWED_ORIGINS=https://irlbd.com,https://www.irlbd.com
+SANCTUM_STATEFUL_DOMAINS=irlbd.com,www.irlbd.com
+SESSION_DOMAIN=.irlbd.com
+SESSION_SECURE_COOKIE=true
+UPLOADS_ROOT=/home/USER/public_html/api/uploads
+UPLOADS_URL=https://irlbd.com/api/uploads
+SITEMAP_OUTPUT_PATH=/home/USER/public_html
+```
+
+Recommended: send `www.irlbd.com` to `irlbd.com` (cPanel → **Domains → Redirects**, or *Force HTTPS Redirect* plus a www redirect) so every visitor uses the same address. `www` also works without this, thanks to the CORS and cookie settings above.
+
+When you **update** the site later (step 12), replace the files in `public_html/` **but keep the `public_html/api/` folder** (especially `api/uploads/`), and only replace `api/index.php` and `api/.htaccess` inside it.
+
+This exact layout was tested locally under Apache with the release package: web installer, pages, Bengali switch, contact/quote/job-application forms (CV upload and admin download), admin login, media upload, uploaded images and sitemap writing.
+
+---
+
 ## 0. Check the hosting first
 
 In cPanel:
@@ -65,15 +105,14 @@ Folder layout after upload:
 └── irlbd-api/              ← contents of release/irlbd-api (app, vendor, storage, .env)
 ```
 
-`api-public/index.php` looks for the app in `dirname(__DIR__)/irlbd-api`, which is `/home/USER/irlbd-api` with this layout. If you put the folders elsewhere, edit `$app_path` at the top of `index.php`.
+`api-public/index.php` looks for the app in `../irlbd-api` and `../../irlbd-api`, which is `/home/USER/irlbd-api` with this layout. If you put the folders elsewhere, edit `$app_path` at the top of `index.php`.
 
-**Option B: no subdomain (API in a subfolder of the main site)**
+**Option B: no subdomain (API in a subfolder of the main site; used for irlbd.com)**
 
-- Upload `release/api-public/*` to `public_html/backend/`.
-- Upload `release/irlbd-api/` to `/home/USER/irlbd-api` (still outside `public_html`).
-- Edit `public_html/backend/index.php` and set `$app_path = '/home/USER/irlbd-api';` because `dirname(__DIR__)` would point at `public_html`.
-- Build the frontend with `bash scripts/build-release.sh https://example.com/backend`. API URLs become `https://example.com/backend/api/v1/...`.
-- In `.env` use `APP_URL=https://example.com/backend` and `SESSION_DOMAIN=` (empty: same host).
+- Upload `release/api-public/*` (including `.htaccess`) to `public_html/api/`.
+- Upload `release/irlbd-api/` to `/home/USER/irlbd-api` (still outside `public_html`). `index.php` finds it automatically.
+- Build the frontend with `bash scripts/build-release.sh https://example.com/api`. API URLs become `https://example.com/api/api/v1/...`.
+- In `.env` use `APP_URL=https://example.com/api`, `UPLOADS_ROOT=/home/USER/public_html/api/uploads`, `UPLOADS_URL=https://example.com/api/uploads`. See the *Quick reference* at the top for the full list.
 
 The rest of this guide uses Option A.
 
@@ -256,7 +295,7 @@ Seeding happens only when the database has no pages, so it never overwrites edit
 
 - **Change the admin password** (Admin → My profile) if `ADMIN_PASSWORD` was ever shared.
 - Replace the placeholder images and verify the seeded facts (see README → *Before going live*).
-- **Sitemap:** Admin → General settings → SEO → *Regenerate sitemap.xml* (needs `SITEMAP_OUTPUT_PATH`). Then edit `public_html/robots.txt` so `Sitemap:` uses your domain. Regenerate after publishing major content. A live sitemap is always available at `https://api.example.com/api/v1/sitemap.xml`.
+- **Sitemap:** Admin → General settings → SEO → *Regenerate sitemap.xml* (needs `SITEMAP_OUTPUT_PATH`). Then check that `Sitemap:` in `public_html/robots.txt` uses your domain (the build fills it in automatically when the API is a folder of the site, as for irlbd.com). Regenerate after publishing major content. A live sitemap is always available at `https://api.example.com/api/v1/sitemap.xml`.
 - **Email (strongly recommended):** create a mailbox in cPanel → *Email Accounts* and fill the `MAIL_*` values in `.env`. Email is needed for the *Forgot password* link, enquiry/quote/job-application notifications (set the addresses in *Admin → Settings → Contact*) and newsletters. Submissions are always stored even if email fails. Send yourself a test from *Admin → Newsletter → Send test* to confirm.
 - **Newsletters:** sending runs in batches of `NEWSLETTER_BATCH_SIZE` (default 20) while the admin keeps the *Send* page open, so no cron is needed. Many shared hosts cap outgoing email (often 100–500 per hour). Ask your host and keep the list size in mind. If a send is interrupted, open the campaign again and press *Resume sending*.
 - **Two-factor authentication:** each admin can turn it on in *My profile*. Store the recovery codes safely. If someone loses their phone, a super admin can reset their 2FA from *Users*.
