@@ -138,6 +138,52 @@ export const RESOURCES = {
     ],
   },
 
+  'gallery-albums': {
+    title: 'Gallery Albums',
+    singular: 'album',
+    permission: 'gallery',
+    description: 'Photo albums shown on the Gallery page. Albums without photos are hidden.',
+    sortable: true,
+    columns: [
+      { key: 'cover_image_url', type: 'image' },
+      { key: 'title', label: 'Album', sub: (r) => r.description },
+      { key: 'images_count', label: 'Photos' },
+      { key: 'is_active', label: 'Visible', type: 'bool' },
+    ],
+    fields: [
+      { name: 'title', label: 'Album title', type: 'text', required: true },
+      { name: 'slug', label: 'URL slug', type: 'text', help: 'Leave empty to generate from the title.' },
+      { name: 'event_date', label: 'Date (optional)', type: 'date' },
+      { name: 'cover_image', label: 'Cover image (defaults to the first photo)', type: 'image', folder: 'gallery' },
+      { name: 'description', label: 'Description', type: 'textarea', span: 'full', max: 500 },
+      { name: 'images', label: 'Photos (the text box under each photo is its caption)', type: 'gallery', folder: 'gallery', span: 'full', default: [] },
+      { name: 'is_active', label: 'Visible on website', type: 'toggle', default: true },
+    ],
+  },
+
+  testimonials: {
+    title: 'Testimonials',
+    singular: 'testimonial',
+    permission: 'clients',
+    description: 'Only publish real feedback from clients who agreed to be featured.',
+    sortable: true,
+    columns: [
+      { key: 'photo_url', type: 'image' },
+      { key: 'name', label: 'Name', sub: (r) => [r.designation, r.company].filter(Boolean).join(', ') },
+      { key: 'rating', label: 'Rating', render: (r) => (r.rating ? '★'.repeat(r.rating) : '-') },
+      { key: 'is_active', label: 'Visible', type: 'bool' },
+    ],
+    fields: [
+      { name: 'name', label: 'Name', type: 'text', required: true },
+      { name: 'designation', label: 'Designation', type: 'text' },
+      { name: 'company', label: 'Company', type: 'text' },
+      { name: 'rating', label: 'Rating', type: 'select', options: [[5, '★★★★★'], [4, '★★★★'], [3, '★★★'], [2, '★★'], [1, '★']] },
+      { name: 'quote', label: 'Testimonial', type: 'textarea', required: true, span: 'full', rows: 4, max: 1500 },
+      { name: 'photo', label: 'Photo (optional)', type: 'image', folder: 'clients' },
+      { name: 'is_active', label: 'Visible on website', type: 'toggle', default: true },
+    ],
+  },
+
   'team-members': {
     title: 'Team & Founder',
     singular: 'member',
@@ -288,7 +334,7 @@ export const RESOURCES = {
     filters: [{ name: 'status', label: 'Status', options: [['published', 'Published'], ['draft', 'Draft']] }],
     columns: [
       { key: 'title', label: 'Title', sub: (r) => r.path },
-      { key: 'template', label: 'Type', render: (r) => (r.is_home ? 'Homepage' : { sections: 'Content page', products: 'Product catalog', news: 'News listing', contact: 'Contact page' }[r.template]) },
+      { key: 'template', label: 'Type', render: (r) => (r.is_home ? 'Homepage' : { sections: 'Content page', products: 'Product catalog', news: 'News listing', contact: 'Contact page', gallery: 'Photo gallery' }[r.template]) },
       { key: 'sections_count', label: 'Sections' },
       { key: 'status', label: 'Status', type: 'status' },
     ],

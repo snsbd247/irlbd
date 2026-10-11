@@ -77,7 +77,7 @@ class MediaController extends Controller
     protected function authorizeMediaAccess(Request $request): void
     {
         $user = $request->user();
-        $modules = ['media', 'pages', 'products', 'services', 'clients', 'team', 'news', 'history', 'quality', 'contact', 'settings'];
+        $modules = ['media', 'pages', 'products', 'services', 'clients', 'gallery', 'team', 'news', 'history', 'quality', 'contact', 'settings'];
 
         foreach ($modules as $module) {
             if ($user->hasPermission($module.'.manage')) {

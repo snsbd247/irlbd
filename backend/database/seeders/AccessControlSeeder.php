@@ -26,7 +26,7 @@ class AccessControlSeeder extends Seeder
             'is_super' => false,
         ]);
         $editor->permissions()->sync(Permission::whereIn('group', [
-            'pages', 'menus', 'products', 'services', 'clients', 'team', 'news', 'history', 'quality', 'contact', 'media',
+            'pages', 'menus', 'products', 'services', 'clients', 'gallery', 'team', 'news', 'history', 'quality', 'contact', 'media',
         ])->pluck('id'));
 
         $support = Role::updateOrCreate(['slug' => 'support'], [

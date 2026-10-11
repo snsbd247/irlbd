@@ -13,7 +13,7 @@ class Page extends Model
 {
     use HasFactory, HasSlug, Publishable;
 
-    public const TEMPLATES = ['sections', 'products', 'news', 'contact'];
+    public const TEMPLATES = ['sections', 'products', 'news', 'contact', 'gallery'];
 
     protected $fillable = [
         'title', 'slug', 'template', 'hero_title', 'hero_subtitle', 'hero_image', 'content',

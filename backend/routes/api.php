@@ -41,6 +41,9 @@ Route::prefix('v1')->name('v1.')->group(function () {
         Route::get('news/{slug}', [PublicApi\NewsController::class, 'show'])->name('news.show');
 
         Route::get('contact-info', [PublicApi\ContactController::class, 'info'])->name('contact.info');
+
+        Route::get('gallery', [PublicApi\GalleryController::class, 'index'])->name('gallery.index');
+        Route::get('gallery/{slug}', [PublicApi\GalleryController::class, 'show'])->name('gallery.show');
     });
 
     Route::middleware('throttle:forms')->group(function () {
@@ -91,6 +94,8 @@ Route::prefix('v1')->name('v1.')->group(function () {
                 'products' => Admin\ProductController::class,
                 'services' => Admin\ServiceController::class,
                 'clients' => Admin\ClientController::class,
+                'testimonials' => Admin\TestimonialController::class,
+                'gallery-albums' => Admin\GalleryAlbumController::class,
                 'team-members' => Admin\TeamMemberController::class,
                 'news-categories' => Admin\NewsCategoryController::class,
                 'news-posts' => Admin\NewsPostController::class,

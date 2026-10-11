@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import HeroSlider from './HeroSlider'
+import { GallerySection, TeamGrid, Testimonials, VideoSection } from './ShowcaseSections'
 import { AboutIntro, CtaBanner, FeatureStrip, IconCards, ImageText, NewsletterSection, ProcessSteps, RichTextSection, Stats } from './ContentSections'
 import { Certifications, Clients, Faq, FeaturedProducts, FounderMessage, LatestNews, ProductCategories, ServicesGrid, Timeline } from './DataSections'
 
@@ -24,6 +25,10 @@ const REGISTRY = {
   rich_text: RichTextSection,
   cta_banner: CtaBanner,
   newsletter: NewsletterSection,
+  gallery: GallerySection,
+  testimonials: Testimonials,
+  team_grid: TeamGrid,
+  video: VideoSection,
 }
 
 /**

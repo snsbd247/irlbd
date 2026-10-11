@@ -33,7 +33,7 @@ class PublicContentTest extends TestCase
         $this->getJson('/api/v1/products?category=plastic-caps-closures')->assertJsonPath('meta.total', 2);
         $this->getJson('/api/v1/products/pet-water-bottle')->assertOk()->assertJsonCount(5, 'data.specifications');
         $this->getJson('/api/v1/news?per_page=3')->assertOk()->assertJsonPath('meta.last_page', 2);
-        $this->getJson('/api/v1/navigation')->assertOk()->assertJsonCount(5, 'header')->assertJsonCount(5, 'header.1.children');
+        $this->getJson('/api/v1/navigation')->assertOk()->assertJsonCount(5, 'header')->assertJsonCount(6, 'header.1.children'); // + Gallery; draft Management Team stays hidden
     }
 
     public function test_drafts_and_inactive_content_are_hidden(): void

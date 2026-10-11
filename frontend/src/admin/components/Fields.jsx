@@ -156,6 +156,9 @@ export function FieldControl({ field, value, onChange, record = {}, error, idPre
     case 'number':
       control = <input {...common} type="number" className="input" value={value ?? ''} min={field.min} max={field.max} onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))} />
       break
+    case 'date':
+      control = <input {...common} type="date" className="input" value={(value || '').slice(0, 10)} onChange={(e) => onChange(e.target.value || null)} />
+      break
     case 'datetime':
       control = (
         <input

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Award, Boxes, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
+  Award, Boxes, Camera, MessageSquareQuote, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
   FileSignature, LogOut, Mail, Menu, Navigation, Newspaper, Package, PanelsTopLeft, Settings, Shield, Tags, User, UserCog, Users, X,
 } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
@@ -37,7 +37,9 @@ const NAV = [
       { to: '/admin/r/team-members', label: 'Team & founder', icon: Users, perm: 'team' },
       { to: '/admin/r/milestones', label: 'History milestones', icon: History, perm: 'history' },
       { to: '/admin/r/certifications', label: 'Certifications', icon: Award, perm: 'quality' },
+      { to: '/admin/r/gallery-albums', label: 'Gallery', icon: Camera, perm: 'gallery' },
       { to: '/admin/r/clients', label: 'Clients', icon: Building2, perm: 'clients' },
+      { to: '/admin/r/testimonials', label: 'Testimonials', icon: MessageSquareQuote, perm: 'clients' },
       { to: '/admin/r/offices', label: 'Offices', icon: Building2, perm: 'contact' },
       { to: '/admin/r/faqs', label: 'FAQs', icon: CircleHelp, perm: 'contact' },
       { to: '/admin/media', label: 'Media library', icon: Images, perm: 'media' },

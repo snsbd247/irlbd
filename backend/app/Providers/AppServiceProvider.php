@@ -24,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
         Models\ProductCategory::class => Policies\ProductPolicy::class,
         Models\Service::class => Policies\ServicePolicy::class,
         Models\Client::class => Policies\ClientPolicy::class,
+        Models\Testimonial::class => Policies\ClientPolicy::class,
+        Models\GalleryAlbum::class => Policies\GalleryPolicy::class,
         Models\TeamMember::class => Policies\TeamPolicy::class,
         Models\NewsPost::class => Policies\NewsPolicy::class,
         Models\NewsCategory::class => Policies\NewsPolicy::class,

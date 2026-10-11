@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Http\Resources\CertificationResource;
 use App\Http\Resources\ClientResource;
 use App\Http\Resources\FaqResource;
+use App\Http\Resources\GalleryAlbumResource;
+use App\Http\Resources\TestimonialResource;
 use App\Http\Resources\HeroSlideResource;
 use App\Http\Resources\MilestoneResource;
 use App\Http\Resources\NewsPostResource;
@@ -15,6 +17,8 @@ use App\Http\Resources\TeamMemberResource;
 use App\Models\Certification;
 use App\Models\Client;
 use App\Models\Faq;
+use App\Models\GalleryAlbum;
+use App\Models\Testimonial;
 use App\Models\HeroSlide;
 use App\Models\Milestone;
 use App\Models\NewsPost;
@@ -70,6 +74,16 @@ class SectionHydrator
                 Certification::active()->where('is_verified', true)->ordered()->get()
             ),
             'faqs' => FaqResource::collection(Faq::active()->ordered()->get()),
+            'gallery' => GalleryAlbumResource::collection(
+                GalleryAlbum::active()->ordered()->withCount('images')->with(['images' => fn ($q) => $q->limit(1)])
+                    ->get()->filter(fn ($a) => $a->images_count > 0)->take($limit)->values()
+            ),
+            'testimonials' => TestimonialResource::collection(Testimonial::active()->ordered()->get()),
+            'team' => TeamMemberResource::collection(
+                TeamMember::active()->ordered()
+                    ->when(! ($settings['include_founder'] ?? false), fn ($q) => $q->where('is_founder', false))
+                    ->get()
+            ),
             default => null,
         };
     }

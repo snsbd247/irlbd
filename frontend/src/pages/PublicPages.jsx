@@ -15,6 +15,7 @@ import { cn, formatDate, stripHtml } from '../lib/utils'
 import ProductsModule from './ProductsModule'
 import NewsModule, { NewsSidebar } from './NewsModule'
 import ContactModule from './ContactModule'
+import { GalleryModule } from './GalleryPages'
 
 const isNotFound = (error) => error?.response?.status === 404
 
@@ -45,6 +46,7 @@ const MODULES = {
   products: (section) => <ProductsModule key="products-module" section={section} />,
   news: () => <NewsModule key="news-module" />,
   contact: () => <ContactModule key="contact-module" />,
+  gallery: () => <GalleryModule key="gallery-module" />,
 }
 
 export function DynamicPage() {
