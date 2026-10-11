@@ -35,5 +35,12 @@ class AccessControlSeeder extends Seeder
             'is_super' => false,
         ]);
         $support->permissions()->sync(Permission::whereIn('group', ['enquiries', 'subscribers'])->pluck('id'));
+
+        $hr = Role::updateOrCreate(['slug' => 'hr'], [
+            'name' => 'HR',
+            'description' => 'Publishes job posts and reviews applications and CVs.',
+            'is_super' => false,
+        ]);
+        $hr->permissions()->sync(Permission::whereIn('group', ['careers'])->pluck('id'));
     }
 }

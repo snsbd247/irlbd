@@ -5,6 +5,7 @@ import { PageLoader } from './components/ui/States'
 import ErrorBoundary from './components/ui/ErrorBoundary'
 import QuotePage from './pages/QuotePage'
 import { AlbumPage } from './pages/GalleryPages'
+import { JobDetailPage } from './pages/CareerPages'
 import { DynamicPage, HomePage, NewsDetail, NotFound, ProductDetail, SearchPage, ServiceDetail, UnsubscribePage } from './pages/PublicPages'
 
 // The admin CMS is code-split so public visitors never download it.
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="search" element={<SearchPage />} />
         <Route path="request-quote" element={<QuotePage />} />
         <Route path="gallery/:slug" element={<AlbumPage />} />
+        <Route path="careers/:slug" element={<JobDetailPage />} />
         <Route path="newsletter/unsubscribe" element={<UnsubscribePage />} />
         <Route path=":slug" element={<DynamicPage />} />
         <Route path="*" element={<NotFound />} />

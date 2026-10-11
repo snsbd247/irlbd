@@ -10,7 +10,7 @@ import { useAuth } from '../auth'
 import { MediaDetails, MediaGrid, UploadButton } from '../components/Media'
 import { NotAllowed } from './Misc'
 
-async function downloadCsv(endpoint, filename, toast) {
+async function downloadFile(endpoint, filename, toast) {
   try {
     const res = await api.get(endpoint, { responseType: 'blob' })
     const url = URL.createObjectURL(res.data)
@@ -161,7 +161,7 @@ export function Enquiries() {
       <PageHeader
         title="Contact enquiries"
         description="Messages submitted through the website contact form."
-        actions={<button type="button" className="btn-outline" onClick={() => downloadCsv('/admin/enquiries/export', 'enquiries.csv', toast)}><Download className="h-4 w-4" aria-hidden="true" /> Export CSV</button>}
+        actions={<button type="button" className="btn-outline" onClick={() => downloadFile('/admin/enquiries/export', 'enquiries.csv', toast)}><Download className="h-4 w-4" aria-hidden="true" /> Export CSV</button>}
       />
       <Card>
         <SearchBar value={term} onChange={(v) => { setTerm(v); setPage(1) }} statuses={['new', 'read', 'replied', 'archived']} status={status} onStatus={(v) => { setStatus(v); setPage(1) }} placeholder="Search name, email, subject…" />
@@ -301,7 +301,7 @@ export function QuoteRequests() {
       <PageHeader
         title="Quote requests"
         description="Quotation requests submitted from the website."
-        actions={<button type="button" className="btn-outline" onClick={() => downloadCsv('/admin/quote-requests/export', 'quote-requests.csv', toast)}><Download className="h-4 w-4" aria-hidden="true" /> Export CSV</button>}
+        actions={<button type="button" className="btn-outline" onClick={() => downloadFile('/admin/quote-requests/export', 'quote-requests.csv', toast)}><Download className="h-4 w-4" aria-hidden="true" /> Export CSV</button>}
       />
       <Card>
         <SearchBar value={term} onChange={(v) => { setTerm(v); setPage(1) }} statuses={['new', 'quoted', 'ordered', 'closed']} status={status} onStatus={(v) => { setStatus(v); setPage(1) }} placeholder="Search name, company, product..." />
@@ -336,6 +336,148 @@ export function QuoteRequests() {
         <Pagination meta={data?.meta} onChange={setPage} className="mt-4" />
       </Card>
       {open && <QuoteModal id={open} onClose={() => setOpen(null)} />}
+    </div>
+  )
+}
+
+const APP_STATUSES = ['new', 'shortlisted', 'interview', 'rejected', 'hired']
+const APP_TONES = { new: 'blue', shortlisted: 'amber', interview: 'amber', rejected: 'slate', hired: 'green' }
+
+function ApplicationModal({ id, onClose }) {
+  const toast = useToast()
+  const queryClient = useQueryClient()
+  const { data, isLoading } = useQuery({ queryKey: ['admin', 'job-applications', 'one', id], queryFn: () => api.get(`/admin/job-applications/${id}`).then((r) => r.data) })
+  const [form, setForm] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (data) setForm({ status: data.status, admin_note: data.admin_note || '' })
+  }, [data])
+
+  async function save() {
+    setSaving(true)
+    try {
+      await api.put(`/admin/job-applications/${id}`, form)
+      toast('Application updated.')
+      queryClient.invalidateQueries({ queryKey: ['admin', 'job-applications'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] })
+      onClose()
+    } catch (e) {
+      toast(errorMessage(e), 'error')
+    }
+    setSaving(false)
+  }
+
+  async function downloadCv() {
+    const ext = (data.cv_original_name.match(/\.(pdf|docx?)$/i) || [])[0] || ''
+    await downloadFile(`/admin/job-applications/${id}/cv`, `${data.name.replace(/[^A-Za-z0-9]+/g, '-')}-CV${ext}`, toast)
+  }
+
+  return (
+    <Modal
+      open
+      onClose={() => { queryClient.invalidateQueries({ queryKey: ['admin', 'job-applications'] }); onClose() }}
+      title={data ? `${data.name} · ${data.job_title || 'Application'}` : 'Application'}
+      footer={form && (
+        <>
+          <button type="button" className="btn-outline" onClick={onClose}>Close</button>
+          <button type="button" className="btn-primary" onClick={save} disabled={saving}>{saving && <Spinner className="h-4 w-4 text-white" />} Save</button>
+        </>
+      )}
+    >
+      {isLoading || !form ? (
+        <div className="flex justify-center py-8"><Spinner /></div>
+      ) : (
+        <div className="space-y-5 text-sm">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div><p className="text-xs text-muted">Position</p><p className="font-medium text-navy-900">{data.job_title || 'General'}</p></div>
+            <div><p className="text-xs text-muted">Received</p><p>{new Date(data.created_at).toLocaleString()}</p></div>
+            <div><p className="text-xs text-muted">Email</p><a className="flex items-center gap-1 text-brand-600" href={`mailto:${data.email}`}><Mail className="h-3.5 w-3.5" />{data.email}</a></div>
+            <div><p className="text-xs text-muted">Phone</p><a className="flex items-center gap-1 text-brand-600" href={telHref(data.phone)}><Phone className="h-3.5 w-3.5" />{data.phone}</a></div>
+          </div>
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 p-3">
+            <div className="min-w-0">
+              <p className="truncate font-medium text-navy-900">{data.cv_original_name}</p>
+              <p className="text-xs text-muted">{(data.cv_size / 1024).toFixed(0)} KB · stored privately</p>
+            </div>
+            <button type="button" className="btn-outline shrink-0 py-2" onClick={downloadCv}><Download className="h-4 w-4" aria-hidden="true" /> Download CV</button>
+          </div>
+          {data.cover_letter && (
+            <div>
+              <p className="text-xs text-muted">Cover letter</p>
+              <p className="mt-1 rounded-lg bg-slate-50 p-4 whitespace-pre-line text-ink">{data.cover_letter}</p>
+            </div>
+          )}
+          <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
+            <div>
+              <label htmlFor="app-status" className="label">Status</label>
+              <select id="app-status" className="input" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+                {APP_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="app-note" className="label">Internal note</label>
+              <textarea id="app-note" rows={3} className="input" value={form.admin_note} onChange={(e) => setForm({ ...form, admin_note: e.target.value })} />
+            </div>
+          </div>
+        </div>
+      )}
+    </Modal>
+  )
+}
+
+export function JobApplications() {
+  const { can } = useAuth()
+  const toast = useToast()
+  const confirm = useConfirm()
+  const queryClient = useQueryClient()
+  const [term, setTerm] = useState('')
+  const search = useDebounced(term)
+  const [status, setStatus] = useState('')
+  const [page, setPage] = useState(1)
+  const [open, setOpen] = useState(null)
+  const params = { page, search: search || undefined, status: status || undefined }
+  const { data, isLoading, isError, refetch } = useList('job-applications', '/admin/job-applications', params, can('careers'))
+
+  if (!can('careers')) return <NotAllowed />
+
+  async function remove(row) {
+    if (!(await confirm(`Delete the application from ${row.name}? The CV file is deleted too.`))) return
+    try {
+      await api.delete(`/admin/job-applications/${row.id}`)
+      toast('Application deleted.')
+      queryClient.invalidateQueries({ queryKey: ['admin', 'job-applications'] })
+    } catch (e) {
+      toast(errorMessage(e), 'error')
+    }
+  }
+
+  return (
+    <div>
+      <PageHeader title="Job applications" description="Applications and CVs submitted from the Careers page. CVs are stored privately and only downloadable here." />
+      <Card>
+        <SearchBar value={term} onChange={(v) => { setTerm(v); setPage(1) }} statuses={APP_STATUSES} status={status} onStatus={(v) => { setStatus(v); setPage(1) }} placeholder="Search name, email, position..." />
+        {isLoading ? <div className="flex justify-center py-12"><Spinner /></div> : isError ? <ErrorState onRetry={refetch} /> : !data?.data?.length ? (
+          <EmptyState title="No applications yet" />
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {data.data.map((row) => (
+              <li key={row.id} className={cn('flex items-center gap-3 py-3', !row.read_at && 'font-semibold')}>
+                <button type="button" onClick={() => setOpen(row.id)} className="min-w-0 flex-1 text-left">
+                  <p className="truncate text-sm text-navy-900">{row.name} <span className="font-normal text-muted">· {row.email}</span></p>
+                  <p className="truncate text-sm font-normal text-slate-600">{row.job_title || 'General application'}</p>
+                </button>
+                <span className="hidden text-xs font-normal whitespace-nowrap text-muted sm:block">{formatDate(row.created_at)}</span>
+                <Badge tone={APP_TONES[row.status]}>{row.status}</Badge>
+                <button type="button" className="rounded-md p-2 text-slate-600 hover:bg-brand-50" onClick={() => setOpen(row.id)} aria-label="Open"><Eye className="h-4 w-4" /></button>
+                <button type="button" className="rounded-md p-2 text-slate-600 hover:bg-red-50 hover:text-red-600" onClick={() => remove(row)} aria-label="Delete"><Trash2 className="h-4 w-4" /></button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Pagination meta={data?.meta} onChange={setPage} className="mt-4" />
+      </Card>
+      {open && <ApplicationModal id={open} onClose={() => setOpen(null)} />}
     </div>
   )
 }
@@ -380,7 +522,7 @@ export function Subscribers() {
     <div>
       <PageHeader
         title="Newsletter subscribers"
-        actions={<button type="button" className="btn-outline" onClick={() => downloadCsv('/admin/subscribers/export', 'subscribers.csv', toast)}><Download className="h-4 w-4" aria-hidden="true" /> Export CSV</button>}
+        actions={<button type="button" className="btn-outline" onClick={() => downloadFile('/admin/subscribers/export', 'subscribers.csv', toast)}><Download className="h-4 w-4" aria-hidden="true" /> Export CSV</button>}
       />
       <Card>
         <SearchBar value={term} onChange={(v) => { setTerm(v); setPage(1) }} statuses={['subscribed', 'unsubscribed']} status={status} onStatus={(v) => { setStatus(v); setPage(1) }} placeholder="Search email…" />

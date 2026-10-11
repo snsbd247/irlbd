@@ -184,6 +184,36 @@ export const RESOURCES = {
     ],
   },
 
+  'job-posts': {
+    title: 'Job Posts',
+    singular: 'job post',
+    permission: 'careers',
+    description: 'Published jobs appear on the Careers page until their deadline.',
+    sortable: true,
+    filters: [{ name: 'status', label: 'Status', options: [['published', 'Published'], ['draft', 'Draft']] }],
+    columns: [
+      { key: 'title', label: 'Position', sub: (r) => [r.department, r.location].filter(Boolean).join(' · ') },
+      { key: 'deadline', label: 'Deadline', type: 'date' },
+      { key: 'applications_count', label: 'Applications' },
+      { key: 'status', label: 'Status', type: 'status' },
+    ],
+    fields: [
+      { name: 'title', label: 'Position title', type: 'text', required: true, span: 'full' },
+      { name: 'slug', label: 'URL slug', type: 'text', help: 'Leave empty to generate from the title.' },
+      { name: 'department', label: 'Department', type: 'text' },
+      { name: 'location', label: 'Location', type: 'text' },
+      { name: 'employment_type', label: 'Employment type', type: 'select', required: true, default: 'full_time', options: [['full_time', 'Full-time'], ['part_time', 'Part-time'], ['contract', 'Contract'], ['internship', 'Internship']] },
+      { name: 'vacancies', label: 'Vacancies', type: 'number', min: 1 },
+      { name: 'salary', label: 'Salary (optional, e.g. "Negotiable")', type: 'text' },
+      { name: 'deadline', label: 'Application deadline', type: 'date', help: 'Leave empty to keep it open until you unpublish it.' },
+      { name: 'summary', label: 'Short summary', type: 'textarea', span: 'full', max: 500 },
+      { name: 'description', label: 'Job description (responsibilities, requirements, benefits)', type: 'richtext', span: 'full', minHeight: 320 },
+      { name: 'status', label: 'Status', type: 'select', required: true, default: 'draft', options: [['draft', 'Draft'], ['published', 'Published']] },
+      { name: 'meta_title', label: 'SEO title', type: 'text', span: 'full', group: 'SEO' },
+      { name: 'meta_description', label: 'SEO description', type: 'textarea', span: 'full', group: 'SEO' },
+    ],
+  },
+
   'team-members': {
     title: 'Team & Founder',
     singular: 'member',
@@ -334,7 +364,7 @@ export const RESOURCES = {
     filters: [{ name: 'status', label: 'Status', options: [['published', 'Published'], ['draft', 'Draft']] }],
     columns: [
       { key: 'title', label: 'Title', sub: (r) => r.path },
-      { key: 'template', label: 'Type', render: (r) => (r.is_home ? 'Homepage' : { sections: 'Content page', products: 'Product catalog', news: 'News listing', contact: 'Contact page', gallery: 'Photo gallery' }[r.template]) },
+      { key: 'template', label: 'Type', render: (r) => (r.is_home ? 'Homepage' : { sections: 'Content page', products: 'Product catalog', news: 'News listing', contact: 'Contact page', gallery: 'Photo gallery', careers: 'Careers' }[r.template]) },
       { key: 'sections_count', label: 'Sections' },
       { key: 'status', label: 'Status', type: 'status' },
     ],

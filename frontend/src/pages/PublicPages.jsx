@@ -16,6 +16,7 @@ import ProductsModule from './ProductsModule'
 import NewsModule, { NewsSidebar } from './NewsModule'
 import ContactModule from './ContactModule'
 import { GalleryModule } from './GalleryPages'
+import { CareersModule } from './CareerPages'
 
 const isNotFound = (error) => error?.response?.status === 404
 
@@ -47,6 +48,7 @@ const MODULES = {
   news: () => <NewsModule key="news-module" />,
   contact: () => <ContactModule key="contact-module" />,
   gallery: () => <GalleryModule key="gallery-module" />,
+  careers: (section) => <CareersModule key="careers-module" section={section} />,
 }
 
 export function DynamicPage() {

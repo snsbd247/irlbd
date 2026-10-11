@@ -32,6 +32,7 @@ return [
     'uploads' => [
         'max_kb' => (int) env('UPLOAD_MAX_KB', 5120),
         'document_max_kb' => (int) env('UPLOAD_DOCUMENT_MAX_KB', 15360),
+        'cv_max_kb' => (int) env('UPLOAD_CV_MAX_KB', 5120),
         'max_dimension' => (int) env('UPLOAD_MAX_DIMENSION', 2000),
         // Raster images only. SVG is intentionally excluded (it can carry script).
         'mimes' => [
@@ -55,6 +56,7 @@ return [
         'services' => 'Services',
         'clients' => 'Clients & testimonials',
         'gallery' => 'Photo gallery',
+        'careers' => 'Careers: job posts & applications (CVs)',
         'team' => 'Team & founder',
         'news' => 'News & categories',
         'history' => 'History milestones',
@@ -97,6 +99,7 @@ return [
         'contact_address' => ['contact', 'textarea', 'Address', 'nullable|string|max:500', true],
         'office_hours' => ['contact', 'text', 'Office hours', 'nullable|string|max:120', true],
         'enquiry_notify_email' => ['contact', 'email', 'Send enquiry notifications to (private)', 'nullable|email|max:150', false],
+        'careers_notify_email' => ['contact', 'email', 'Send job applications to (private, defaults to the enquiry address)', 'nullable|email|max:150', false],
 
         // Social
         'social_facebook' => ['social', 'url', 'Facebook URL', 'nullable|url:https|max:255', true],

@@ -8,6 +8,7 @@ use App\Models\Media;
 use App\Models\NewsletterSubscriber;
 use App\Models\NewsPost;
 use App\Models\Page;
+use App\Models\JobApplication;
 use App\Models\Product;
 use App\Models\QuoteRequest;
 use Illuminate\Http\JsonResponse;
@@ -39,6 +40,10 @@ class DashboardController extends Controller
             'quotes' => $user->hasPermission('enquiries.manage') ? [
                 'total' => QuoteRequest::count(),
                 'new' => QuoteRequest::where('status', 'new')->count(),
+            ] : null,
+            'applications' => $user->hasPermission('careers.manage') ? [
+                'total' => JobApplication::count(),
+                'new' => JobApplication::where('status', 'new')->count(),
             ] : null,
             'subscribers' => $user->hasPermission('subscribers.manage') ? [
                 'total' => NewsletterSubscriber::where('status', 'subscribed')->count(),

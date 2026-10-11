@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\JobPost;
 use App\Models\NewsPost;
 use App\Models\Page;
 use App\Models\Product;
@@ -26,6 +27,9 @@ class SitemapService
         }
         foreach (Service::active()->get() as $service) {
             $urls[] = [$base.'/services/'.$service->slug, $service->updated_at, '0.6'];
+        }
+        foreach (JobPost::open()->get() as $job) {
+            $urls[] = [$base.'/careers/'.$job->slug, $job->updated_at, '0.5'];
         }
         foreach (NewsPost::published()->latest('published_at')->get() as $post) {
             $urls[] = [$base.'/news/'.$post->slug, $post->updated_at, '0.6'];

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Award, Boxes, Camera, MessageSquareQuote, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
+  Award, Boxes, BriefcaseBusiness, Camera, UserSearch, MessageSquareQuote, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
   FileSignature, LogOut, Mail, Menu, Navigation, Newspaper, Package, PanelsTopLeft, Settings, Shield, Tags, User, UserCog, Users, X,
 } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
@@ -46,6 +46,13 @@ const NAV = [
     ],
   },
   {
+    group: 'Careers',
+    items: [
+      { to: '/admin/r/job-posts', label: 'Job posts', icon: BriefcaseBusiness, perm: 'careers' },
+      { to: '/admin/job-applications', label: 'Applications', icon: UserSearch, perm: 'careers', badge: 'applications' },
+    ],
+  },
+  {
     group: 'Inbox',
     items: [
       { to: '/admin/quote-requests', label: 'Quote requests', icon: FileSignature, perm: 'enquiries', badge: 'quotes' },
@@ -70,7 +77,7 @@ function Sidebar({ onNavigate }) {
     queryFn: () => api.get('/admin/dashboard').then((r) => r.data),
     staleTime: 60 * 1000,
   })
-  const badges = { enquiries: dashboard?.stats?.enquiries?.new, quotes: dashboard?.stats?.quotes?.new }
+  const badges = { enquiries: dashboard?.stats?.enquiries?.new, quotes: dashboard?.stats?.quotes?.new, applications: dashboard?.stats?.applications?.new }
 
   return (
     <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 py-4">

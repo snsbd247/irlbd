@@ -42,6 +42,8 @@ Route::prefix('v1')->name('v1.')->group(function () {
 
         Route::get('contact-info', [PublicApi\ContactController::class, 'info'])->name('contact.info');
 
+        Route::get('jobs', [PublicApi\CareerController::class, 'index'])->name('jobs.index');
+        Route::get('jobs/{slug}', [PublicApi\CareerController::class, 'show'])->name('jobs.show');
         Route::get('gallery', [PublicApi\GalleryController::class, 'index'])->name('gallery.index');
         Route::get('gallery/{slug}', [PublicApi\GalleryController::class, 'show'])->name('gallery.show');
     });
@@ -49,6 +51,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
     Route::middleware('throttle:forms')->group(function () {
         Route::post('contact', [PublicApi\ContactController::class, 'store'])->name('contact.store');
         Route::post('quote', [PublicApi\QuoteController::class, 'store'])->name('quote.store');
+        Route::post('jobs/{slug}/apply', [PublicApi\CareerController::class, 'apply'])->name('jobs.apply');
         Route::post('newsletter/subscribe', [PublicApi\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
         Route::post('newsletter/unsubscribe', [PublicApi\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
     });
@@ -84,6 +87,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
 
             Route::get('enquiries/export', [Admin\EnquiryController::class, 'export'])->name('enquiries.export');
             Route::get('quote-requests/export', [Admin\QuoteRequestController::class, 'export'])->name('quote-requests.export');
+            Route::get('job-applications/{id}/cv', [Admin\JobApplicationController::class, 'cv'])->whereNumber('id')->name('job-applications.cv');
             Route::get('subscribers/export', [Admin\SubscriberController::class, 'export'])->name('subscribers.export');
 
             $crud = [
@@ -105,6 +109,8 @@ Route::prefix('v1')->name('v1.')->group(function () {
                 'faqs' => Admin\FaqController::class,
                 'enquiries' => Admin\EnquiryController::class,
                 'quote-requests' => Admin\QuoteRequestController::class,
+                'job-posts' => Admin\JobPostController::class,
+                'job-applications' => Admin\JobApplicationController::class,
                 'subscribers' => Admin\SubscriberController::class,
                 'users' => Admin\UserController::class,
                 'roles' => Admin\RoleController::class,
