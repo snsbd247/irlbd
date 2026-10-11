@@ -8,6 +8,7 @@ import { Icon } from '../../lib/icons'
 import { cn, safeHref } from '../../lib/utils'
 import { RichText } from './ContentSections'
 import { useT } from '../../lib/i18n'
+import { JsonLd } from '../layout/Integrations'
 
 function HeaderRow({ section, align = 'left' }) {
   return (
@@ -303,6 +304,14 @@ export function Faq({ section }) {
   if (!faqs.length) return null
   return (
     <section className="py-14">
+      {/* FAQPage structured data: lets Google show these questions in search results. */}
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })),
+        }}
+      />
       <div className="container-x max-w-4xl">
         <SectionHeading eyebrow={section.eyebrow} title={section.title} />
         <div className="mt-6 space-y-3">
