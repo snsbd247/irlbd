@@ -26,7 +26,10 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('@tiptap') || id.includes('prosemirror')) return 'editor'
+              // TipTap is reached only through the lazily loaded admin editor, so it is
+              // split automatically; forcing a manual chunk pulled shared helpers into it
+              // and made every public page preload the editor.
+              if (id.includes('@tiptap') || id.includes('prosemirror')) return undefined
               if (id.includes('react-router') || id.includes('react-dom') || id.includes('/react/') || id.includes('scheduler')) return 'react'
               if (id.includes('@tanstack') || id.includes('axios')) return 'data'
             }
