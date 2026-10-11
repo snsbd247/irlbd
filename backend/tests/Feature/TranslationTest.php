@@ -152,4 +152,38 @@ class TranslationTest extends TestCase
         $this->assertSame('খবর', $news->translationsArray()['bn']['label']);
         $this->assertSame(2, Translation::count());
     }
+
+    public function test_section_text_settings_can_be_translated(): void
+    {
+        $page = Page::create(['title' => 'Mission', 'slug' => 'mission', 'status' => 'published']);
+        $section = $page->sections()->create(['type' => 'image_text', 'title' => 'Goal', 'settings' => ['card_title' => 'Our Goal', 'card_icon' => 'target'], 'is_active' => true]);
+
+        $this->actingAs($this->admin())->spa()->putJson("/api/v1/admin/sections/{$section->id}", [
+            'title' => 'Goal', 'settings' => ['card_title' => 'Our Goal', 'card_icon' => 'target'],
+            'translations' => ['bn' => ['settings:card_title' => 'আমাদের লক্ষ্য', 'settings:card_icon' => 'x', 'settings:evil' => 'y']],
+        ])->assertOk();
+
+        $this->assertSame(['settings:card_title'], Translation::where('translatable_type', 'PageSection')->pluck('field')->all());
+
+        $bn = collect($this->getJson('/api/v1/pages/mission?lang=bn')->assertOk()->json('sections'))->firstWhere('id', $section->id);
+        $en = collect($this->getJson('/api/v1/pages/mission')->assertOk()->json('sections'))->firstWhere('id', $section->id);
+        $this->assertSame('আমাদের লক্ষ্য', $bn['settings']['card_title']);
+        $this->assertSame('target', $bn['settings']['card_icon']);
+        $this->assertSame('Our Goal', $en['settings']['card_title']);
+    }
+
+    public function test_content_seeder_translates_seeded_text_once(): void
+    {
+        $slide = \App\Models\HeroSlide::create(['title' => 'Innovative', 'highlight' => 'Packaging', 'is_active' => true]);
+        $edited = \App\Models\HeroSlide::create(['title' => 'Something an editor wrote', 'is_active' => true]);
+
+        $this->seed(\Database\Seeders\BanglaContentSeeder::class);
+        $count = Translation::count();
+        $this->seed(\Database\Seeders\BanglaContentSeeder::class);
+
+        $this->assertSame($count, Translation::count());
+        $this->assertSame('উদ্ভাবনী', $slide->translationsArray()['bn']['title']);
+        $this->assertSame([], $edited->translationsArray());
+    }
 }
+

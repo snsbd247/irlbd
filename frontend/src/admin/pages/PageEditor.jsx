@@ -44,6 +44,8 @@ const FIELD_LABELS = {
 
 const PAGE_TRANSLATABLE = ['title', 'hero_title', 'hero_subtitle', 'content', 'meta_title', 'meta_description']
 const SECTION_TRANSLATABLE = ['eyebrow', 'title', 'subtitle', 'content', 'button_label', 'image_alt']
+// Text-like layout settings are translated as "settings:<key>" (see PageSection::TRANSLATABLE_SETTINGS).
+const SETTING_TRANSLATABLE = ['card_title', 'card_text', 'badge_label']
 const ITEM_TRANSLATABLE = ['title', 'subtitle', 'description', 'value']
 
 const ITEM_FIELD_LABELS = {
@@ -134,11 +136,18 @@ function SectionEditor({ section, type, onClose, onSaved }) {
       <p className="mb-5 rounded-md bg-brand-50 px-3 py-2 text-sm text-brand-800">{type.description}</p>
       <div className="space-y-6">
         <FieldGrid fields={fields} record={record} setRecord={setRecord} errors={errors} idPrefix={`section-${section.id}`} />
-        {type.fields.some((f) => SECTION_TRANSLATABLE.includes(f)) && (
+        {(type.fields.some((f) => SECTION_TRANSLATABLE.includes(f)) || settingFields.some((f) => SETTING_TRANSLATABLE.includes(f.name))) && (
           <details className="rounded-lg border border-slate-200 p-4" open={!!record.translations?.bn}>
             <summary className="cursor-pointer text-sm font-semibold text-navy-900">বাংলা (Bengali translation) <span className="font-normal text-muted">— optional, empty fields show English</span></summary>
             <div className="mt-4">
-              <TranslationCard fields={fields} names={SECTION_TRANSLATABLE} translations={record.translations} english={record} onChange={(translations) => setRecord((r) => ({ ...r, translations }))} idPrefix={`section-${section.id}`} />
+              <TranslationCard
+                fields={[...fields, ...settingFields.filter((f) => SETTING_TRANSLATABLE.includes(f.name)).map((f) => ({ ...f, name: `settings:${f.name}`, label: `${f.label} (layout)` }))]}
+                names={[...SECTION_TRANSLATABLE, ...SETTING_TRANSLATABLE.map((k) => `settings:${k}`)]}
+                translations={record.translations}
+                english={{ ...record, ...Object.fromEntries(Object.entries(settings).map(([k, v]) => [`settings:${k}`, v])) }}
+                onChange={(translations) => setRecord((r) => ({ ...r, translations }))}
+                idPrefix={`section-${section.id}`}
+              />
             </div>
           </details>
         )}
