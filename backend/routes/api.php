@@ -24,6 +24,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
         Route::get('navigation', [PublicApi\SiteController::class, 'navigation'])->name('navigation');
         Route::get('search', [PublicApi\SiteController::class, 'search'])->name('search');
         Route::get('sitemap.xml', [PublicApi\SiteController::class, 'sitemap'])->name('sitemap');
+        Route::get('meta', PublicApi\MetaController::class)->name('meta');
 
         Route::get('home', [PublicApi\PageController::class, 'home'])->name('home');
         Route::get('pages/{slug}', [PublicApi\PageController::class, 'show'])->name('pages.show');

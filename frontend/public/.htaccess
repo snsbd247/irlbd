@@ -8,6 +8,13 @@ Options -Indexes
     # RewriteCond %{HTTPS} !=on
     # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+    # Social-media link-preview crawlers do not run JavaScript: give them per-page
+    # Open Graph tags from share.php. Regular visitors and search engines are unaffected.
+    RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|Slackbot|TelegramBot|Discordbot|Pinterestbot|SkypeUriPreview|redditbot|Embedly|vkShare) [NC]
+    RewriteCond %{REQUEST_URI} !^/(assets|uploads)/
+    RewriteCond %{REQUEST_URI} !\.(js|css|png|jpe?g|webp|gif|svg|ico|xml|txt|pdf|php)$ [NC]
+    RewriteRule ^(.*)$ share.php?path=/$1 [L,QSA]
+
     # Serve existing files and folders directly (assets, sitemap.xml, robots.txt…).
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
@@ -32,6 +39,10 @@ Options -Indexes
     </FilesMatch>
 </IfModule>
 
+# Compression. AddOutputFilterByType needs mod_filter; without the guard a host lacking
+# it would answer every request with "500 Internal Server Error".
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml text/xml application/xml
+    <IfModule mod_filter.c>
+        AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml text/xml application/xml
+    </IfModule>
 </IfModule>

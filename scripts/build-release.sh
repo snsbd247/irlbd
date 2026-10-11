@@ -15,6 +15,11 @@ if [[ -z "$API_URL" ]]; then
   echo "Usage: $0 https://api.example.com" >&2
   exit 1
 fi
+if [[ ! "$API_URL" =~ ^https?://[A-Za-z0-9.:/_-]+$ ]]; then
+  echo "Invalid API URL: $API_URL (expected e.g. https://api.example.com)" >&2
+  exit 1
+fi
+API_URL="${API_URL%/}"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT="$ROOT/release"
@@ -24,6 +29,12 @@ mkdir -p "$OUT"
 echo "==> Building React frontend (VITE_API_URL=$API_URL)"
 ( cd "$ROOT/frontend" && { [ -d node_modules ] || npm ci; } && VITE_API_URL="$API_URL" npm run build )
 cp -r "$ROOT/frontend/dist" "$OUT/frontend"
+# API address for share.php (social-media link previews).
+cat > "$OUT/frontend/share-config.php" <<CONF
+<?php
+return ['api_url' => '$API_URL'];
+CONF
+# (Overwrites the local-development share-config.php copied from public/.)
 
 echo "==> Preparing Laravel API (production dependencies only)"
 mkdir -p "$OUT/irlbd-api"
