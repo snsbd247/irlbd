@@ -61,8 +61,44 @@ class DashboardController extends Controller
 
         return response()->json([
             'stats' => array_filter($stats),
+            'report' => $this->report($user),
             'recent_enquiries' => $recentEnquiries,
             'recent_news' => $recentNews,
         ]);
+    }
+
+    /**
+     * Last 12 months of incoming leads (only the kinds this user may see) and the
+     * products most often asked for in quotations. Grouped in PHP so it works the
+     * same on MySQL and SQLite; volumes for a company site are small.
+     */
+    protected function report($user): array
+    {
+        $start = now()->startOfMonth()->subMonths(11);
+        $months = collect(range(0, 11))->map(fn ($i) => $start->copy()->addMonths($i)->format('Y-m'));
+        $series = [];
+        $byMonth = function (string $model) use ($start, $months) {
+            $counts = $model::where('created_at', '>=', $start)->pluck('created_at')
+                ->countBy(fn ($d) => $d->format('Y-m'));
+
+            return $months->map(fn ($m) => (int) ($counts[$m] ?? 0))->values()->all();
+        };
+
+        if ($user->hasPermission('enquiries.manage')) {
+            $series['enquiries'] = $byMonth(ContactSubmission::class);
+            $series['quotes'] = $byMonth(QuoteRequest::class);
+        }
+        if ($user->hasPermission('careers.manage')) {
+            $series['applications'] = $byMonth(JobApplication::class);
+        }
+
+        $topProducts = $user->hasPermission('enquiries.manage')
+            ? QuoteRequest::where('created_at', '>=', $start)->get(['product_name'])
+                ->countBy(fn ($q) => $q->product_name ?: 'Custom / not listed')
+                ->sortDesc()->take(5)
+                ->map(fn ($n, $name) => ['name' => $name, 'count' => $n])->values()->all()
+            : [];
+
+        return ['months' => $months->all(), 'series' => $series, 'top_products' => $topProducts];
     }
 }

@@ -9,6 +9,7 @@ import { useAuth } from '../auth'
 import { Badge, Card, PageHeader, SaveButton, statusTone, useToast } from '../components/ui'
 import { useSettings } from '../../lib/queries'
 import { TwoFactorCard, TwoFactorStep } from './Security'
+import MonthlyReport from '../components/MonthlyReport'
 
 export function NotAllowed() {
   return (
@@ -128,6 +129,7 @@ export function Dashboard() {
         {st.subscribers && <Stat icon={Mail} label="Newsletter subscribers" value={st.subscribers.total} to="/admin/subscribers" />}
         {st.media && <Stat icon={Images} label="Media files" value={st.media.total} to="/admin/media" />}
       </div>
+      <MonthlyReport report={data.report} />
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {data.recent_enquiries?.length > 0 && (
           <Card title="Latest enquiries" actions={<Link to="/admin/enquiries" className="text-sm font-medium text-brand-600">View all</Link>}>
