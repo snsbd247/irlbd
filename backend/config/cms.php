@@ -19,6 +19,9 @@ return [
     ],
 
     // Enables the one-time web installer (POST /install) for hosts without SSH. Leave empty otherwise.
+    // Optional: only these IPs / CIDR ranges may use the admin API (empty = anyone).
+    'admin_allowed_ips' => array_values(array_filter(array_map('trim', explode(',', (string) env('ADMIN_ALLOWED_IPS', ''))))),
+
     'install_token' => env('INSTALL_TOKEN'),
 
     'seed_demo_content' => (bool) env('SEED_DEMO_CONTENT', true),

@@ -63,7 +63,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
     });
 
     // ----------------------------------------------------------------- Admin
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware(\App\Http\Middleware\RestrictAdminIp::class)->group(function () {
         Route::post('login', [Admin\AuthController::class, 'login'])->middleware('throttle:login')->name('login');
         Route::post('two-factor-challenge', [Admin\AuthController::class, 'twoFactorChallenge'])->middleware('throttle:login')->name('two-factor.challenge');
         Route::post('forgot-password', [Admin\AuthController::class, 'forgotPassword'])->middleware('throttle:password-reset')->name('password.email');
