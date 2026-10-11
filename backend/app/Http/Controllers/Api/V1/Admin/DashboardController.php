@@ -9,6 +9,7 @@ use App\Models\NewsletterSubscriber;
 use App\Models\NewsPost;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\QuoteRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -34,6 +35,10 @@ class DashboardController extends Controller
             'enquiries' => $user->hasPermission('enquiries.manage') ? [
                 'total' => ContactSubmission::count(),
                 'new' => ContactSubmission::where('status', 'new')->count(),
+            ] : null,
+            'quotes' => $user->hasPermission('enquiries.manage') ? [
+                'total' => QuoteRequest::count(),
+                'new' => QuoteRequest::where('status', 'new')->count(),
             ] : null,
             'subscribers' => $user->hasPermission('subscribers.manage') ? [
                 'total' => NewsletterSubscriber::where('status', 'subscribed')->count(),

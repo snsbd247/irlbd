@@ -139,7 +139,7 @@ class ContentSeeder extends Seeder
             'topbar_enabled' => true,
             'topbar_text' => 'Quality Packaging for a Sustainable Tomorrow',
             'header_cta_label' => 'Get a Quote',
-            'header_cta_url' => '/contact',
+            'header_cta_url' => '/request-quote',
             'footer_about' => 'A trusted manufacturer of high-quality plastic packaging products, delivering innovative and sustainable solutions for a better tomorrow.',
             'copyright_text' => '© {year} IR Limited. All Rights Reserved.',
             'newsletter_title' => 'Newsletter',

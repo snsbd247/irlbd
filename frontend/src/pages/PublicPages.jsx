@@ -87,7 +87,7 @@ export function ProductDetail() {
 
   const product = data.data
   const gallery = product.images?.length ? product.images : product.image_url ? [{ id: 0, url: product.image_url, alt: product.name }] : []
-  const quoteUrl = `/contact?subject=${encodeURIComponent('Product Quotation')}&product=${encodeURIComponent(product.name)}`
+  const quoteUrl = `/request-quote?product=${encodeURIComponent(product.slug)}`
   const crumbs = [{ label: 'Our Products', href: '/products' }, ...(product.category ? [{ label: product.category.name, href: `/products?category=${product.category.slug}` }] : []), { label: product.name }]
 
   return (

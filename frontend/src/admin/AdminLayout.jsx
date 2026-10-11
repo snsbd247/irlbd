@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
   Award, Boxes, Briefcase, Building2, CircleHelp, ExternalLink, FileText, History, House, Images, Inbox, LayoutDashboard,
-  LogOut, Mail, Menu, Navigation, Newspaper, Package, PanelsTopLeft, Settings, Shield, Tags, User, UserCog, Users, X,
+  FileSignature, LogOut, Mail, Menu, Navigation, Newspaper, Package, PanelsTopLeft, Settings, Shield, Tags, User, UserCog, Users, X,
 } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { api } from '../lib/api'
@@ -46,6 +46,7 @@ const NAV = [
   {
     group: 'Inbox',
     items: [
+      { to: '/admin/quote-requests', label: 'Quote requests', icon: FileSignature, perm: 'enquiries', badge: 'quotes' },
       { to: '/admin/enquiries', label: 'Enquiries', icon: Inbox, perm: 'enquiries', badge: 'enquiries' },
       { to: '/admin/subscribers', label: 'Subscribers', icon: Mail, perm: 'subscribers' },
     ],
@@ -67,7 +68,7 @@ function Sidebar({ onNavigate }) {
     queryFn: () => api.get('/admin/dashboard').then((r) => r.data),
     staleTime: 60 * 1000,
   })
-  const newEnquiries = dashboard?.stats?.enquiries?.new
+  const badges = { enquiries: dashboard?.stats?.enquiries?.new, quotes: dashboard?.stats?.quotes?.new }
 
   return (
     <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 py-4">
@@ -88,8 +89,8 @@ function Sidebar({ onNavigate }) {
                   >
                     <item.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                     <span className="flex-1">{item.label}</span>
-                    {item.badge === 'enquiries' && newEnquiries > 0 && (
-                      <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white" aria-label={`${newEnquiries} new`}>{newEnquiries}</span>
+                    {item.badge && badges[item.badge] > 0 && (
+                      <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white" aria-label={`${badges[item.badge]} new`}>{badges[item.badge]}</span>
                     )}
                   </NavLink>
                 </li>

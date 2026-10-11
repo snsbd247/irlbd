@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Box, FileText, Inbox, Lock, Mail, Newspaper, Images, ShieldAlert } from 'lucide-react'
+import { Box, FileSignature, FileText, Inbox, Lock, Mail, Newspaper, Images, ShieldAlert } from 'lucide-react'
 import { api, errorMessage, fieldErrors } from '../../lib/api'
 import { formatDate } from '../../lib/utils'
 import { ErrorState, Spinner } from '../../components/ui/States'
@@ -101,6 +101,7 @@ export function Dashboard() {
     <div>
       <PageHeader title={`Welcome, ${user.name}`} description="Overview of your website content and enquiries." />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {st.quotes && <Stat icon={FileSignature} label="Quote requests" value={st.quotes.total} sub={`${st.quotes.new} new`} to="/admin/quote-requests" />}
         {st.enquiries && <Stat icon={Inbox} label="Enquiries" value={st.enquiries.total} sub={`${st.enquiries.new} new`} to="/admin/enquiries" />}
         {st.products && <Stat icon={Box} label="Products" value={st.products.total} sub={`${st.products.published} published`} to="/admin/r/products" />}
         {st.news && <Stat icon={Newspaper} label="News posts" value={st.news.total} sub={`${st.news.published} published`} to="/admin/r/news-posts" />}

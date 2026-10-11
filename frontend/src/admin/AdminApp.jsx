@@ -10,7 +10,7 @@ import { ResourceForm, ResourceList } from './pages/ResourcePages'
 import PageEditor from './pages/PageEditor'
 import Menus from './pages/Menus'
 import Settings from './pages/Settings'
-import { Enquiries, MediaLibrary, Subscribers } from './pages/Inbox'
+import { Enquiries, MediaLibrary, QuoteRequests, Subscribers } from './pages/Inbox'
 import { Dashboard, Login, Profile } from './pages/Misc'
 
 function ResourceRoute({ form = false }) {
@@ -52,6 +52,7 @@ export default function AdminApp() {
               <Route path="media" element={<MediaLibrary />} />
               <Route path="enquiries" element={<Enquiries />} />
               <Route path="subscribers" element={<Subscribers />} />
+              <Route path="quote-requests" element={<QuoteRequests />} />
               <Route path="profile" element={<Profile />} />
               <Route path="r/:resource" element={<ResourceRoute />} />
               <Route path="r/:resource/:id" element={<ResourceRoute form />} />

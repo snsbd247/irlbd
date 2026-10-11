@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ContactRequest;
 use App\Http\Resources\FaqResource;
 use App\Http\Resources\OfficeResource;
+use App\Mail\EnquiryReceived;
 use App\Models\ContactSubmission;
 use App\Models\Faq;
 use App\Models\Office;
@@ -54,11 +55,7 @@ class ContactController extends Controller
         }
 
         try {
-            Mail::raw(
-                "New website enquiry\n\nName: {$submission->name}\nEmail: {$submission->email}\nPhone: {$submission->phone}\n".
-                "Subject: {$submission->subject}\n\n{$submission->message}",
-                fn ($m) => $m->to($to)->replyTo($submission->email)->subject('Website enquiry: '.$submission->subject)
-            );
+            Mail::to($to)->send(new EnquiryReceived($submission));
         } catch (\Throwable $e) {
             Log::warning('Enquiry notification failed: '.$e->getMessage());
         }

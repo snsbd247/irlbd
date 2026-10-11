@@ -45,6 +45,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
 
     Route::middleware('throttle:forms')->group(function () {
         Route::post('contact', [PublicApi\ContactController::class, 'store'])->name('contact.store');
+        Route::post('quote', [PublicApi\QuoteController::class, 'store'])->name('quote.store');
         Route::post('newsletter/subscribe', [PublicApi\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
         Route::post('newsletter/unsubscribe', [PublicApi\NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
     });
@@ -79,6 +80,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
             Route::delete('sections/{section}', [Admin\SectionController::class, 'destroy'])->name('sections.destroy');
 
             Route::get('enquiries/export', [Admin\EnquiryController::class, 'export'])->name('enquiries.export');
+            Route::get('quote-requests/export', [Admin\QuoteRequestController::class, 'export'])->name('quote-requests.export');
             Route::get('subscribers/export', [Admin\SubscriberController::class, 'export'])->name('subscribers.export');
 
             $crud = [
@@ -97,6 +99,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
                 'offices' => Admin\OfficeController::class,
                 'faqs' => Admin\FaqController::class,
                 'enquiries' => Admin\EnquiryController::class,
+                'quote-requests' => Admin\QuoteRequestController::class,
                 'subscribers' => Admin\SubscriberController::class,
                 'users' => Admin\UserController::class,
                 'roles' => Admin\RoleController::class,
