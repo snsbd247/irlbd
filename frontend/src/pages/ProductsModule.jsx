@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { PackageSearch, Search, X } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { BookOpen, PackageSearch, Search, X } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import { useProductCategories, useProducts } from '../lib/queries'
@@ -55,7 +55,10 @@ export default function ProductsModule({ section }) {
       <div className="container-x">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <SectionHeading eyebrow={section?.eyebrow} title={activeCategory ? activeCategory.name : section?.title || t('All Products')} subtitle={activeCategory?.short_description || section?.subtitle} />
-          <BrochureButton className="btn-outline shrink-0" />
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Link to="/catalog" className="btn-outline"><BookOpen className="h-4 w-4" aria-hidden="true" /> {t('Product catalog (PDF)')}</Link>
+            <BrochureButton className="btn-outline" />
+          </div>
         </div>
 
         <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

@@ -5,6 +5,7 @@ import { PageLoader } from './components/ui/States'
 import ErrorBoundary from './components/ui/ErrorBoundary'
 import QuotePage from './pages/QuotePage'
 import TrackQuotePage from './pages/TrackQuotePage'
+import CatalogPage from './pages/CatalogPage'
 import ComparePage from './pages/ComparePage'
 import { AlbumPage } from './pages/GalleryPages'
 import { JobDetailPage } from './pages/CareerPages'
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="search" element={<SearchPage />} />
         <Route path="request-quote" element={<QuotePage />} />
         <Route path="track-quote" element={<TrackQuotePage />} />
+        <Route path="catalog" element={<CatalogPage />} />
         <Route path="compare" element={<ComparePage />} />
         <Route path="gallery/:slug" element={<AlbumPage />} />
         <Route path="careers/:slug" element={<JobDetailPage />} />

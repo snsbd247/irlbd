@@ -43,13 +43,17 @@ export default function PublicLayout() {
         {t('Skip to content')}
       </a>
       <ScrollToTop />
-      <Header />
+      <div className="print:hidden">
+        <Header />
+      </div>
       <main id="main" className="flex-1">
         <Outlet />
       </main>
-      <Footer />
-      <ChatButtons />
-      <CompareBar />
+      <div className="print:hidden">
+        <Footer />
+        <ChatButtons />
+        <CompareBar />
+      </div>
       <Analytics />
       <OrganizationJsonLd />
     </div>

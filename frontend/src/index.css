@@ -116,3 +116,15 @@
   @apply prose max-w-none prose-slate prose-headings:text-navy-900 prose-a:text-brand-600 prose-strong:text-navy-900 prose-p:leading-relaxed prose-img:rounded-lg;
 }
 
+
+/* Printing (e.g. the product catalog): plain white pages, keep table/badge colours. */
+@media print {
+  @page {
+    margin: 14mm 12mm;
+  }
+  body {
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

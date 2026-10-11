@@ -70,6 +70,23 @@ class ProductController extends Controller
         return ProductResource::collection($products);
     }
 
+    /**
+     * Everything needed for the printable catalog: every published product with its
+     * specifications and variants, in category order. Capped to keep the page light.
+     */
+    public function catalog(): AnonymousResourceCollection
+    {
+        $products = Product::visible()
+            ->with(['category', 'specifications', 'variants'])
+            ->leftJoin('product_categories', 'product_categories.id', '=', 'products.product_category_id')
+            ->orderByRaw('product_categories.sort_order IS NULL, product_categories.sort_order')
+            ->orderBy('products.sort_order')->orderBy('products.name')
+            ->select('products.*')
+            ->limit(300)->get();
+
+        return ProductResource::collection($products);
+    }
+
     public function industries(): AnonymousResourceCollection
     {
         return IndustryResource::collection(

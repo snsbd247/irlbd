@@ -31,6 +31,7 @@ Route::prefix('v1')->name('v1.')->group(function () {
 
         Route::get('product-categories', [PublicApi\ProductController::class, 'categories'])->name('product-categories.index');
         Route::get('products', [PublicApi\ProductController::class, 'index'])->name('products.index');
+        Route::get('products/catalog', [PublicApi\ProductController::class, 'catalog'])->name('products.catalog');
         Route::get('products/compare', [PublicApi\ProductController::class, 'compare'])->name('products.compare');
         Route::get('industries', [PublicApi\ProductController::class, 'industries'])->name('industries.index');
         Route::get('products/{slug}', [PublicApi\ProductController::class, 'show'])->name('products.show');

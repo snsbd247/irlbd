@@ -144,6 +144,13 @@ const BN = {
   'Any size, colour, neck finish or printing on request.': 'চাহিদা অনুযায়ী যেকোনো সাইজ, রং, নেক ফিনিশ বা প্রিন্টিং।',
   'Nationwide delivery': 'দেশব্যাপী ডেলিভারি',
   'On-time delivery across Bangladesh and export on request.': 'সারা বাংলাদেশে সময়মতো ডেলিভারি, চাহিদায় রপ্তানি।',
+  // Catalog
+  'Product Catalog': 'পণ্য ক্যাটালগ',
+  'Download PDF / Print': 'PDF ডাউনলোড / প্রিন্ট',
+  'Tip: choose "Save as PDF" as the printer to download the catalog.': 'টিপস: ক্যাটালগ ডাউনলোড করতে প্রিন্টার হিসেবে "Save as PDF" বেছে নিন।',
+  'Other products': 'অন্যান্য পণ্য',
+  'Catalog generated on': 'ক্যাটালগ তৈরির তারিখ',
+  'Product catalog (PDF)': 'পণ্য ক্যাটালগ (PDF)',
   // Dealers
   'Find a Dealer Near You': 'আপনার কাছের ডিলার খুঁজুন',
   'District': 'জেলা',
