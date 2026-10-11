@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Certification;
 use App\Models\Faq;
+use App\Models\GalleryAlbum;
+use App\Models\GalleryImage;
 use App\Models\HeroSlide;
 use App\Models\Industry;
 use App\Models\MenuItem;
@@ -17,6 +19,7 @@ use App\Models\Setting;
 use App\Models\TeamMember;
 use App\Models\Testimonial;
 use App\Models\NewsCategory;
+use App\Models\NewsPost;
 use App\Models\Page;
 use App\Models\ProductCategory;
 use App\Models\Translation;
@@ -69,9 +72,14 @@ class BanglaContentSeeder extends Seeder
             PageSection::class => ['eyebrow', 'title', 'subtitle', 'content', 'button_label', 'image_alt'],
             SectionItem::class => ['title', 'subtitle', 'description', 'value'],
             Page::class => ['hero_title', 'hero_subtitle', 'content', 'meta_title', 'meta_description'],
-            Product::class => ['name', 'short_description'],
+            Product::class => ['name', 'short_description', 'description', 'meta_description'],
             ProductCategory::class => ['short_description'],
-            Service::class => ['title', 'short_description'],
+            Service::class => ['title', 'short_description', 'description'],
+            NewsPost::class => ['title', 'excerpt', 'content', 'meta_title', 'meta_description'],
+            NewsCategory::class => ['name'],
+            GalleryAlbum::class => ['title', 'description'],
+            GalleryImage::class => ['caption'],
+            \App\Models\Dealer::class => ['name', 'address'],
             Milestone::class => ['title', 'description'],
             Faq::class => ['question', 'answer'],
             TeamMember::class => ['designation', 'quote', 'message'],

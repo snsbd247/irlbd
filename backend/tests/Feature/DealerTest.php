@@ -55,4 +55,21 @@ class DealerTest extends TestCase
         $footer = collect($this->getJson('/api/v1/navigation')->json('footer_quick'))->pluck('label');
         $this->assertNotContains('Dealers & Distributors', $footer);
     }
+
+    public function test_demo_dealers_use_company_contacts_and_never_replace_real_ones(): void
+    {
+        app(\App\Services\SettingsService::class)->save(['contact_phone' => '+880 9633917362', 'contact_email' => 'info@irlbd.com']);
+        $this->seed(\Database\Seeders\DealersContentSeeder::class);
+        $this->seed(\Database\Seeders\DemoDealersSeeder::class);
+
+        $this->assertSame(5, Dealer::count());
+        $this->assertSame(['+880 9633917362'], Dealer::distinct()->pluck('phone')->all());
+        $this->getJson('/api/v1/pages/dealers')->assertOk();
+
+        Dealer::query()->delete();
+        Dealer::create(['name' => 'Real Dealer', 'type' => 'dealer', 'district' => 'Bogura', 'is_active' => true]);
+        $this->seed(\Database\Seeders\DemoDealersSeeder::class);
+        $this->assertSame(['Real Dealer'], Dealer::pluck('name')->all());
+    }
 }
+
