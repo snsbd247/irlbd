@@ -32,7 +32,11 @@ export default function HeroSlider({ section }) {
       onBlur={() => setPaused(false)}
     >
       <div className="relative min-h-[520px] lg:min-h-[600px]">
-        {slides.map((slide, i) => (
+        {slides.map((slide, i) => {
+          // Photos (unlike the illustrations) carry their subject on the right: keep it visible
+          // on wide screens by darkening only the text side, and crop towards it on phones.
+          const isPhoto = /\.(jpe?g|png|webp)(\?|$)/i.test(slide.image_url || '')
+          return (
           <div
             key={slide.id}
             className={cn('absolute inset-0 transition-opacity duration-700', i === index ? 'opacity-100' : 'pointer-events-none opacity-0')}
@@ -41,8 +45,16 @@ export default function HeroSlider({ section }) {
             aria-roledescription="slide"
             aria-label={`${i + 1} of ${slides.length}`}
           >
-            {slide.image_url && <img src={slide.image_url} alt="" className="absolute inset-0 h-full w-full object-cover" fetchPriority={i === 0 ? 'high' : 'low'} />}
-            <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/85 to-navy-950/10" aria-hidden="true" />
+            {slide.image_url && <img src={slide.image_url} alt="" className={cn('absolute inset-0 h-full w-full object-cover', isPhoto && 'object-[75%_center] lg:object-center')} fetchPriority={i === 0 ? 'high' : 'low'} />}
+            <div
+              className={cn(
+                'absolute inset-0',
+                isPhoto
+                  ? 'bg-navy-950/70 lg:bg-transparent lg:bg-gradient-to-r lg:from-navy-950 lg:from-35% lg:via-navy-950/60 lg:via-50% lg:to-transparent lg:to-75%'
+                  : 'bg-gradient-to-r from-navy-950 via-navy-950/85 to-navy-950/10',
+              )}
+              aria-hidden="true"
+            />
             <div className="container-x relative flex min-h-[520px] items-center py-16 lg:min-h-[600px]">
               <div className="max-w-xl">
                 {slide.eyebrow && <p className="text-xs font-semibold tracking-[0.16em] text-white/90 uppercase">{slide.eyebrow}</p>}
@@ -73,7 +85,8 @@ export default function HeroSlider({ section }) {
               </div>
             </div>
           </div>
-        ))}
+          )
+        })}
       </div>
 
       {slides.length > 1 && (
