@@ -5,6 +5,16 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HelmetProvider } from 'react-helmet-async'
 import App from './App'
 import { LanguageProvider } from './lib/i18n'
+// Fonts are bundled with the site (no Google Fonts request): faster first paint, no third-party tracking.
+// Only the subsets the site uses; the browser downloads a file only when text needs it (unicode-range).
+import '@fontsource/poppins/latin-400.css'
+import '@fontsource/poppins/latin-500.css'
+import '@fontsource/poppins/latin-600.css'
+import '@fontsource/poppins/latin-700.css'
+import '@fontsource/hind-siliguri/bengali-400.css'
+import '@fontsource/hind-siliguri/bengali-500.css'
+import '@fontsource/hind-siliguri/bengali-600.css'
+import '@fontsource/hind-siliguri/bengali-700.css'
 import './index.css'
 
 const queryClient = new QueryClient({

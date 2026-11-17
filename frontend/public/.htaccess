@@ -4,9 +4,9 @@ Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Force HTTPS (uncomment once SSL is active).
-    # RewriteCond %{HTTPS} !=on
-    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # Force HTTPS. Comment these two lines out only if the site has no SSL certificate.
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # Social-media link-preview crawlers do not run JavaScript: give them per-page
     # Open Graph tags from share.php. Regular visitors and search engines are unaffected.
@@ -35,6 +35,12 @@ SetEnvIfNoCase Host ".*" IR_SITE
     Header always set X-Frame-Options "SAMEORIGIN" env=IR_SITE
     Header always set Referrer-Policy "strict-origin-when-cross-origin" env=IR_SITE
     Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()" env=IR_SITE
+    # Browsers remember to use HTTPS only for one year (ignored on plain-HTTP responses).
+    # Sub-domains are deliberately not included: other sites on them may lack SSL.
+    Header always set Strict-Transport-Security "max-age=31536000" env=IR_SITE
+    # Restrictive policy that does not limit where scripts, styles, images or fonts load
+    # from: no plugins, no <base> hijacking, no framing by other sites, no mixed content.
+    Header always set Content-Security-Policy "object-src 'none'; base-uri 'self'; frame-ancestors 'self'; upgrade-insecure-requests" env=IR_SITE
 
     # Hashed build assets never change → cache for a year. index.html must not be cached.
     <FilesMatch "\.(js|css|woff2?)$">

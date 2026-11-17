@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds an upload-ready release for shared cPanel hosting (no Node/Composer needed on the server).
 #
-#   Usage: scripts/build-release.sh https://api.example.com
+#   Usage: [PHP_HANDLER=ea-php82] scripts/build-release.sh https://api.example.com
 #
 # Produces:
 #   release/frontend/          -> upload contents to public_html/
@@ -45,6 +45,24 @@ if [[ "$API_URL" =~ ^(https?://[^/]+)/.+ ]]; then
   SITE_HOST="${SITE_ORIGIN#*://}"; SITE_HOST="${SITE_HOST#www.}"; SITE_HOST="${SITE_HOST%%:*}"
   HOST_RE="^(www[.])?$(printf '%s' "$SITE_HOST" | sed 's/[.]/[.]/g')(:[0-9]+)?\$"
   sed -i "s|^SetEnvIfNoCase Host \".\*\" IR_SITE|SetEnvIfNoCase Host \"$HOST_RE\" IR_SITE|" "$OUT/frontend/.htaccess"
+fi
+# cPanel writes its PHP-version handler into public_html/.htaccess; uploading a new
+# .htaccess removes it. PHP_HANDLER=ea-php82 (as shown in cPanel > MultiPHP Manager)
+# puts the same block back so share.php keeps running on the chosen PHP version.
+if [[ -n "${PHP_HANDLER:-}" ]]; then
+  if [[ ! "$PHP_HANDLER" =~ ^[a-z0-9-]+$ ]]; then
+    echo "Invalid PHP_HANDLER: $PHP_HANDLER (expected e.g. ea-php82)" >&2
+    exit 1
+  fi
+  cat >> "$OUT/frontend/.htaccess" <<HANDLER
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the "$PHP_HANDLER" package as the default "PHP" programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-$PHP_HANDLER .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
+HANDLER
 fi
 
 echo "==> Preparing Laravel API (production dependencies only)"
